@@ -103,7 +103,7 @@ Value *reverse(Value *list){
  *      be after we've got an easier way of managing memory.
 */
 void cleanup(Value *list){
-    assert(list->type != NULL_TYPE);
+    assert(list != NULL);
     Value *next;
     //always free() what we malloc()
     for (Value *cur = list->c.car; cur; cur = next){
