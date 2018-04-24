@@ -4,7 +4,7 @@
  * Yitong Chen, Yingying Wang, Megan Zhao
  * 
  * Yitong (1 2 8)
- * Yingying (4 5 9)
+ * Yingying (4 5 9) 
  * Megan (3 6 7)
  * in 1 or 2 sentences describe the
  * purpose of this file.
@@ -12,19 +12,28 @@
 
 
 #include "linkedlist.h"
+#include <assert.h>
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  */
 Value *makeNull(){
-    
+    Value *emptyList = malloc(sizeof(Value));
+    emptyList->type = NULL_TYPE;
+    return emptyList;
 }
 
 /*
  * Create a nonempty list (a new Value object of type CONS_TYPE).
  */
 Value *cons(Value *car, Value *cdr){
-    
+    struct ConsCell newCell;
+    newCell.car = car;
+    newCell.cdr = cdr;
+    Value *newList = malloc(sizeof(Value));
+    newList->type = CONS_TYPE;
+    newList->c = newCell;
+    return newList;    
 }
 
 /*
@@ -39,7 +48,8 @@ void display(Value *list){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *car(Value *list){
-    
+    assert(list->type = CONS_TYPE);
+    return list->c.car;
 }
 
 /*
@@ -47,7 +57,8 @@ Value *car(Value *list){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *cdr(Value *list){
-    
+    assert(list->type = CONS_TYPE);
+    return list->c.cdr;
 }
 
 /*
@@ -92,5 +103,13 @@ Value *reverse(Value *list){
  *      be after we've got an easier way of managing memory.
 */
 void cleanup(Value *list){
-    
+    assert(list->type = CONS_TYPE);
+    Value *next;
+    //always free() what we malloc()
+    for (Value *cur = list->c.car; cur; cur = next){
+        next = list->c.cdr;
+        free(cur);
+    }
 }
+
+
