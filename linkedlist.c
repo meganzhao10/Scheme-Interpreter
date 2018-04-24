@@ -1,6 +1,17 @@
+/*
+ * proj1: Linked list
+ * Due: Friday, 04/27 at 22:00
+ * Yitong Chen, Yingying Wang, Megan Zhao
+ * 
+ * Yitong (1 2 8)
+ * Yingying (4 5 9)
+ * Megan (3 6 7)
+ * in 1 or 2 sentences describe the
+ * purpose of this file.
+ */
+
+
 #include "linkedlist.h"
-
-
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
