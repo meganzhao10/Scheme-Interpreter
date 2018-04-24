@@ -110,6 +110,7 @@ void cleanup(Value *list){
         next = list->c.cdr;
         free(cur);
     }
+    free(list);
 }
 
 
