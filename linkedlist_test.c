@@ -18,7 +18,12 @@ int main(void) {
    head = cons(val1, head);
    head = cons(val2, head);
 
-   display(head);
+   display(cdr(head));
+//   display(car(head));
+
+   Value *reversed;
+   reversed = reverse(head);
+   display(reversed);
    printf("Length = %i\n", length(head));
    printf("Empty? %i\n", isNull(head));
    cleanup(head);

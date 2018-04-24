@@ -14,7 +14,7 @@
 #include "linkedlist.h"
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <assert.h>
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  */
@@ -41,8 +41,7 @@ Value *cons(Value *car, Value *cdr){
  * Print a representation of the contents of a linked list.
  */
 void display(Value *list){
-    Value *cur;
-    for (cur = list; cur; cur = cur->c.cdr) {
+    for (Value *cur = list; cur->type != NULL_TYPE; cur=cur->c.cdr) {
         switch (cur->c.car->type) {
             case INT_TYPE:
                 printf("%i => ", cur->c.car->i);
@@ -59,24 +58,8 @@ void display(Value *list){
             case NULL_TYPE:
                 return;
         }
-        printf("%i", cur->c.car->type);
     }
-//    Value *cur = list;
-//    printf("cur type: %i\n", cur->type);
-//    if (cur->type != NULL_TYPE){
-//    cur = cur->c.cdr;}
-////    printf("cur type: %d\n", cur->c.cdr)
-//    int j = 0;
-//  //  for (int i = 0; i < 2; i ++) {
-////        cur = cur->c.cdr;
-//        printf("%s\n", cur->c.car->s);
-//   // }
-//    printf("\n");
-//    Value *cur;
-//    cur = list;
-//    printf("cdr: %d\n", cur->c.cdr->type);
-//    cur = cur->c.cdr;
-//    printf("cdr: %d\n", cur->c.cdr->type);
+    printf("\n");
 }
 
 /*
@@ -84,7 +67,9 @@ void display(Value *list){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *car(Value *list){
-    
+    assert(list->type == CONS_TYPE);
+    //printf("num: %s", list->c.car->s);
+    return list->c.car;
 }
 
 /*
@@ -92,7 +77,8 @@ Value *car(Value *list){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 Value *cdr(Value *list){
-    
+    assert(list->type == CONS_TYPE);
+    return list->c.cdr;
 }
 
 /*
@@ -100,7 +86,8 @@ Value *cdr(Value *list){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 bool isNull(Value *value){
-    
+    assert(value != NULL);
+    return value->type == NULL_TYPE;
 }
 
 /*
@@ -108,7 +95,11 @@ bool isNull(Value *value){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 int length(Value *value){
-    
+    int length = 0;
+    for (Value *cur=value; cur; cur = cur->c.cdr) {
+        length ++;
+    }
+    return length - 1;
 }
 
 /*
@@ -124,7 +115,18 @@ int length(Value *value){
  *      be after we've got an easier way of managing memory.
  */
 Value *reverse(Value *list){
-    
+    assert(list != NULL);
+    // Return the list itself if it has type NULL_TYPE
+    if (list->type == NULL_TYPE) {
+        return list;
+    } else {
+        printf("type: %i", list->type);
+        return cons(cdr(list), list->c.car);
+        // recursively call cons
+//return cons(reverse(cdr(list)), car(list));
+//        Value *hello;
+//        return hello;
+    }
 }
 
 /*
