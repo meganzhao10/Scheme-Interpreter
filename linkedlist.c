@@ -106,9 +106,9 @@ void cleanup(Value *list){
     assert(list != NULL);
     
     Value *next;
-    printf("first free:\n");
+    //printf("first free:\n");
     
-    free(car(list));
+    free(list->c.car);
     
     //always free() what we malloc()
     for (Value *cur = list->c.cdr; cur; cur = next){
