@@ -102,18 +102,13 @@ Value *cdr(Value *list) {
 /*
  * Create a new linked list whose entries correspond to the given list's
  * entries, but in reverse order.  The resulting list is a deep copy of the
- * original: that is, there should be no shared memory between the original
- * list and the new one.
- *
- * (Uses assertions to ensure that this is a legitimate operation.)
- *
- * FAQ: What if there are nested lists inside that list?
- * ANS: There won't be for this assignment. There will be later, but that will
- *      be after we've got an easier way of managing memory.
+ * original.
+ * Reversing a non-list Value results in assertion failure.
  */
 Value *reverse(Value *list) {
-    
+    // Reverse can only be applied to an empty list or a non-empty list 
     assert(list->type == NULL_TYPE || list->type == CONS_TYPE);
+    // Create new linked list
     Value *reversed = makeNull();
     if (list->type == NULL_TYPE) {
         return reversed;
@@ -140,7 +135,7 @@ Value *reverse(Value *list) {
         } 
         reversed = cons(new_value, reversed);
     }
-        return reversed;
+    return reversed;
 }
 
 void cleanup(Value *list){
