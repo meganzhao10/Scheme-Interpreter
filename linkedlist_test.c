@@ -68,13 +68,14 @@ int main(void) {
     assert(car(cdr(cdr(head)))->i == INT);
     // reversed should be a deep copy, so changing head should
     // not affect reversed
-    head->c.car->d = 3.2;
+    car(head)->d = 3.2;
+    strcpy(car(cdr(head))->s, "soup");
     display(head);
     display(reversed);
     
     // cleanup the original list and the reversed list
-//    cleanup(head);
-//   cleanup(reversed);
+    cleanup(head);
+    cleanup(reversed);
     return 0;
 
 }

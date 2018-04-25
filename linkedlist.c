@@ -3,15 +3,13 @@
  * Due: Friday, 04/27 at 22:00
  * Yitong Chen, Yingying Wang, Megan Zhao
  * 
- * Yitong (1 2 8)
- * Yingying (4 5 9) 
- * Megan (3 6 7)
- * in 1 or 2 sentences describe the
- * purpose of this file.
+ * This project implements the Scheme list as an linkedlist
+ * using C.
  */
 
 #include "linkedlist.h"
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <assert.h>
 
@@ -63,7 +61,9 @@ void display(Value *list){
 
 /*
  * Get the car value of a given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ * 
+ * Asserts that this function can only be called on a non-empty list 
+ * (Value of type CONS_TYPE).
  */
 Value *car(Value *list){
     assert(list->type = CONS_TYPE);
@@ -72,7 +72,9 @@ Value *car(Value *list){
 
 /*
  * Get the cdr value of a given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ * 
+ * Asserts that this function can only be called on a non-empty list 
+ * (Value of type CONS_TYPE).
  */
 Value *cdr(Value *list){
     assert(list->type = CONS_TYPE);
@@ -81,7 +83,8 @@ Value *cdr(Value *list){
 
 /*
  * Test if the given value is a NULL_TYPE value.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ *
+ * Asserts that the list has been allocated.
  */
 bool isNull(Value *value){
     assert(value != NULL);
@@ -94,7 +97,8 @@ bool isNull(Value *value){
 
 /*
  * Compute the length of the given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ * 
+ * Asserts that the list has been allocated.
  */
 int length(Value *value){
     assert(value != NULL);
@@ -113,7 +117,8 @@ int length(Value *value){
  * Create a new linked list whose entries correspond to the given list's
  * entries, but in reverse order.  The resulting list is a deep copy of the
  * original.
- * Reversing a non-list Value results in assertion failure.
+ * 
+ * Asserts that the reverse function can only be called on a list.
  */
 Value *reverse(Value *list) {
     // Reverse can only be applied to an empty list or a non-empty list 
@@ -135,7 +140,8 @@ Value *reverse(Value *list) {
                 new_value->d = cur->c.car->d;
                 break;
             case STR_TYPE:
-                new_value->s = cur->c.car->s;
+                new_value->s = malloc(10 * sizeof(char));
+                strcpy(new_value->s, cur->c.car->s);
                 break;
             case CONS_TYPE:
                 new_value->c = cur->c.car->c;
@@ -152,11 +158,7 @@ Value *reverse(Value *list) {
 /*
  * Frees up all memory directly or indirectly referred to by list.
  *
- * (Uses assertions to ensure that this is a legitimate operation.)
- *
- * FAQ: What if there are nested lists inside that list?
- * ANS: There won't be for this assignment. There will be later, but that will
- *      be after we've got an easier way of managing memory.
+ * Asserts that the list to be cleaned up has been allocated.
 */
 void cleanup(Value *list){
 
