@@ -104,13 +104,21 @@ Value *reverse(Value *list){
 */
 void cleanup(Value *list){
     assert(list != NULL);
+    
     Value *next;
+    printf("first free:\n");
+    
+    free(car(list));
+    
     //always free() what we malloc()
-    for (Value *cur = list->c.car; cur; cur = next){
-        next = list->c.cdr;
-        free(cur);
+    for (Value *cur = list->c.cdr; cur; cur = next){
+        //printf("cur:\n");
+        //display(cur);
+        next = cur->c.cdr;
+        //printf("next:\n");
+        //display(next);
+        free(cur->c.car);
     }
-    free(list);
+    
 }
-
 
