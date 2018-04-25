@@ -159,24 +159,21 @@ Value *reverse(Value *list) {
  *      be after we've got an easier way of managing memory.
 */
 void cleanup(Value *list){
-   //probably wrong... need to check 
+
     assert(list != NULL);
-    
     Value *next;
-    printf("first free:\n");
-    
-    free(list->c.car);
-    
-    //always free() what we malloc()
-    for (Value *cur = list->c.cdr; cur; cur = next){
-        printf("cur:\n");
-        display(cur);
-        next = cur->c.cdr;
-        printf("next:\n");
-        display(next);
-        free(cur->c.car);
+                         
+    for (Value *cur = list; cur->type!=NULL_TYPE; cur = next){
+        if (cur->c.car->type == STR_TYPE){   
+            free(cur->c.car->s);
+         }
+         next = cur->c.cdr;
+         free(cur->c.car);
+         free(cur);
     }
+    free(next);
 }
+
 
 
 
