@@ -10,7 +10,7 @@
  * purpose of this file.
  */
 
-
+#include <stdlib.h>
 #include "linkedlist.h"
 #include <stdio.h>
 #include <assert.h>
@@ -132,10 +132,16 @@ Value *reverse(Value *list){
 */
 void cleanup(Value *list){
         assert(list != NULL);
-            Value *next;
-                //always free() what we malloc()
-                    for (Value *cur = list->c.car; cur; cur = next){
-                            next = list->c.cdr;
-                                    free(cur);
-                                        }
-                                        }
+        Value *next;
+        //always free() what we malloc()
+        
+        for (Value *cur = list; cur->type!=NULL_TYPE; cur = next){
+            if (cur->c.car->type == STR_TYPE){
+                free(cur->c.car->s);
+            }
+            next = cur->c.cdr;
+            free(cur->c.car);            
+            free(cur);
+        }  
+        free(next);
+}
