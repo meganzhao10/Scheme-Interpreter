@@ -10,9 +10,7 @@
  * purpose of this file.
  */
 
-
 #include "linkedlist.h"
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -43,7 +41,24 @@ Value *cons(Value *car, Value *cdr) {
  * Print a representation of the contents of a linked list.
  */
 void display(Value *list){
-    
+    Value *cur = list;
+    while(cur->type != NULL_TYPE){
+        switch(cur->c.car->type){
+            case INT_TYPE:
+                printf("type:INT_TYPE; value: %i\n",cur->c.car->i);
+                break;
+            case DOUBLE_TYPE:
+                printf("type:DOUBLE_TYPE; value: %f\n",cur->c.car->d);
+                break;
+            case STR_TYPE:
+                printf("type:STRING_TYPE; value: %s\n",cur->c.car->s);
+                break;
+            default:
+                printf(" ");
+                break;     
+        }
+        cur = cur->c.cdr;
+    }
 }
 
 /*
@@ -69,7 +84,12 @@ Value *cdr(Value *list){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 bool isNull(Value *value){
-    
+    assert(value != NULL);
+    if (value->type == NULL_TYPE){
+        return true;
+    } else{
+        return false;
+    }
 }
 
 /*
@@ -77,7 +97,15 @@ bool isNull(Value *value){
  * (Uses assertions to ensure that this is a legitimate operation.)
  */
 int length(Value *value){
-    
+    assert(value != NULL);
+    int length = 0;
+    Value *cur;
+    cur = value;
+    while (cur->type != NULL_TYPE){
+        length++;
+        cur = cur->c.cdr;
+    }
+    return length;
 }
 
 
@@ -148,7 +176,6 @@ void cleanup(Value *list){
         display(next);
         free(cur->c.car);
     }
-    
 }
 
 
