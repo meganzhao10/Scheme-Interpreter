@@ -92,6 +92,7 @@ int main(void) {
     display(head);
     display(reversed);
     cleanup(head);
+    cleanup(reverse);
     return 0;
 }
 
