@@ -18,22 +18,14 @@
  * Create an empty list (a new Value object of type NULL_TYPE).
  */
 Value *makeNull(){
-        Value *emptyList = malloc(sizeof(Value));
-        emptyList->type = NULL_TYPE;
-        return emptyList;
+
 }
 
 /*
  * Create a nonempty list (a new Value object of type CONS_TYPE).
  */
 Value *cons(Value *car, Value *cdr){
-    struct ConsCell newCell;
-    newCell.car = car;
-    newCell.cdr = cdr;
-    Value *newList = malloc(sizeof(Value));
-    newList->type = CONS_TYPE;
-    newList->c = newCell;
-    return newList;
+
 }
 
 /*
@@ -131,17 +123,5 @@ Value *reverse(Value *list){
  *      be after we've got an easier way of managing memory.
 */
 void cleanup(Value *list){
-        assert(list != NULL);
-        Value *next;
-        //always free() what we malloc()
-        
-        for (Value *cur = list; cur->type!=NULL_TYPE; cur = next){
-            if (cur->c.car->type == STR_TYPE){
-                free(cur->c.car->s);
-            }
-            next = cur->c.cdr;
-            free(cur->c.car);            
-            free(cur);
-        }  
-        free(next);
+
 }
