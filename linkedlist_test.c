@@ -33,11 +33,11 @@ int main(void) {
     Value *head = makeNull();
     assert(head->type == NULL_TYPE);
     assert(isNull(head));
-    assert(length(head), 0);
+    assert(length(head) == 0);
     
     // Test the result of cons value with empty list
     head = cons(val1, head);
-    assert(length(head), 1);
+    assert(length(head) == 1);
     assert(head->type == CONS_TYPE);
     assert(car(head) == val1);
     assert(!isNull(head));
@@ -46,7 +46,7 @@ int main(void) {
     
     // Test the result of cons value to non-emptylist
     head = cons(val2, head);
-    assert(length(head), 2);
+    assert(length(head) == 2);
     assert(head->type == CONS_TYPE);
     assert(car(head) == val2);
     assert(car(cdr(head)) == val1);
@@ -55,17 +55,17 @@ int main(void) {
     
     // Add another value
     head = cons(val3, head);
-    assert(length(head), 3);
+    assert(length(head) == 3);
     display(head);
     
     // Test the reverse method
     Value *reversed = reverse(head);
     assert(!isNull(reversed));
-    assert(length(reversed), 3);
+    assert(length(reversed) == 3);
     // reversed actually reverse the list
     assert(car(head)->d == DOUBLE);
     assert(!strcmp(car(cdr(head))->s, STR));
-    assert(car(cdr(cdr(head)))->i, INT);
+    assert(car(cdr(cdr(head)))->i == INT);
     // reversed should be a deep copy, so changing head should
     // not affect reversed
     head->c.car->s = "string";
@@ -76,6 +76,6 @@ int main(void) {
     cleanup(head);
     cleanup(reversed);
     return 0;
-}
 
+}
 
