@@ -22,6 +22,6 @@ int main(void) {
    printf("Length = %i\n", length(head));
    printf("Empty? %i\n", isNull(head));
    cleanup(head);
-
+   
    return 0;
 }
