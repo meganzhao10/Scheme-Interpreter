@@ -3,17 +3,13 @@
  * Due: Friday, 04/27 at 22:00
  * Yitong Chen, Yingying Wang, Megan Zhao
  * 
- * Yitong (1 2 8)
- * Yingying (4 5 9) 
- * Megan (3 6 7)
- * in 1 or 2 sentences describe the
- * purpose of this file.
+ * This project implements the Scheme list as an linkedlist
+ * using C.
  */
 
-
 #include "linkedlist.h"
-
 #include <stdlib.h>
+#include <string.h>
 #include <stdio.h>
 #include <assert.h>
 
@@ -28,8 +24,10 @@ Value *makeNull() {
 
 /*
  * Create a nonempty list (a new Value object of type CONS_TYPE).
+ * Assume that car is not a list (so no nested list)
  */
 Value *cons(Value *car, Value *cdr) {
+    assert(car->type != CONS_TYPE && car->type != NULL_TYPE);
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
@@ -41,43 +39,81 @@ Value *cons(Value *car, Value *cdr) {
 
 /*
  * Print a representation of the contents of a linked list.
+ * Assume that list is CONS_TYPE 
  */
 void display(Value *list){
-    
+    assert(list->type == CONS_TYPE);
+    Value *cur = list;
+    while(cur->type != NULL_TYPE){
+        switch(cur->c.car->type){
+            case INT_TYPE:
+                printf("type:INT_TYPE; value: %i\n",cur->c.car->i);
+                break;
+            case DOUBLE_TYPE:
+                printf("type:DOUBLE_TYPE; value: %f\n",cur->c.car->d);
+                break;
+            case STR_TYPE:
+                printf("type:STRING_TYPE; value: %s\n",cur->c.car->s);
+                break;
+            default:
+                printf(" ");
+                break;     
+        }
+        cur = cur->c.cdr;
+    }
 }
 
 /*
  * Get the car value of a given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ * 
+ * Asserts that this function can only be called on a non-empty list 
+ * (Value of type CONS_TYPE).
  */
 Value *car(Value *list){
-    assert(list->type = CONS_TYPE);
+    assert(list->type == CONS_TYPE);
     return list->c.car;
 }
 
 /*
  * Get the cdr value of a given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ * 
+ * Asserts that this function can only be called on a non-empty list 
+ * (Value of type CONS_TYPE).
  */
 Value *cdr(Value *list){
-    assert(list->type = CONS_TYPE);
+    assert(list->type == CONS_TYPE);
     return list->c.cdr;
 }
 
 /*
  * Test if the given value is a NULL_TYPE value.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ *
+ * Asserts that the list has been allocated.
  */
 bool isNull(Value *value){
-    
+    assert(value != NULL);
+    if (value->type == NULL_TYPE){
+        return true;
+    } else{
+        return false;
+    }
 }
 
 /*
  * Compute the length of the given list.
- * (Uses assertions to ensure that this is a legitimate operation.)
+ * 
+ * Asserts that the list has been allocated.
  */
 int length(Value *value){
-    
+    assert(value != NULL);
+    int length = 0;
+    Value *cur;
+    cur = value;
+    while (cur->type != NULL_TYPE){
+        length++;
+        cur = cur->c.cdr;
+    }
+    return length;
 }
 
 
@@ -85,7 +121,8 @@ int length(Value *value){
  * Create a new linked list whose entries correspond to the given list's
  * entries, but in reverse order.  The resulting list is a deep copy of the
  * original.
- * Reversing a non-list Value results in assertion failure.
+ * 
+ * Asserts that the reverse function can only be called on a list.
  */
 Value *reverse(Value *list) {
     // Reverse can only be applied to an empty list or a non-empty list 
@@ -107,7 +144,8 @@ Value *reverse(Value *list) {
                 new_value->d = cur->c.car->d;
                 break;
             case STR_TYPE:
-                new_value->s = cur->c.car->s;
+                new_value->s = malloc(10 * sizeof(char));
+                strcpy(new_value->s, cur->c.car->s);
                 break;
             case CONS_TYPE:
                 new_value->c = cur->c.car->c;
@@ -124,31 +162,25 @@ Value *reverse(Value *list) {
 /*
  * Frees up all memory directly or indirectly referred to by list.
  *
- * (Uses assertions to ensure that this is a legitimate operation.)
- *
- * FAQ: What if there are nested lists inside that list?
- * ANS: There won't be for this assignment. There will be later, but that will
- *      be after we've got an easier way of managing memory.
+ * Asserts that the list to be cleaned up has been allocated.
 */
 void cleanup(Value *list){
-   //probably wrong... need to check 
-    assert(list != NULL);
-    
+
+    assert(list->type == CONS_TYPE || list->type == NULL_TYPE);
     Value *next;
-    printf("first free:\n");
-    
-    free(list->c.car);
-    
-    //always free() what we malloc()
-    for (Value *cur = list->c.cdr; cur; cur = next){
-        printf("cur:\n");
-        display(cur);
-        next = cur->c.cdr;
-        printf("next:\n");
-        display(next);
-        free(cur->c.car);
+                         
+    for (Value *cur = list; cur->type!=NULL_TYPE; cur = next){
+        if (cur->c.car->type == STR_TYPE){   
+            free(cur->c.car->s);
+         }a
+         next = cur->c.cdr;
+         free(cur->c.car);
+         free(cur);
     }
-    
+    if (list->type == NULL_TYPE){
+       free(list);
+    }
+    free(next);
 }
 
 
