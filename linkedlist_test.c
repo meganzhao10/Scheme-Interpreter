@@ -24,6 +24,8 @@ int main(void) {
     val3->type = DOUBLE_TYPE;
     val3->d = DOUBLE;
 
+    Value *nullHead = makeNull();
+
     // Test the values are stored properly
     assert(val1->i == INT);
     assert(!strcmp(val2->s, STR));
@@ -75,6 +77,7 @@ int main(void) {
     
     // cleanup the original list and the reversed list
     cleanup(head);
+    cleanup(nullHead);
     cleanup(reversed);
     return 0;
 

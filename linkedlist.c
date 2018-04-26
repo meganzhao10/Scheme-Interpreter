@@ -166,9 +166,10 @@ Value *reverse(Value *list) {
 */
 void cleanup(Value *list){
 
-    assert(list->type == CONS_TYPE);
+    assert(list->type == CONS_TYPE || list->type == NULL_TYPE);
     Value *next;
-                         
+    next = list;                     
+
     for (Value *cur = list; cur->type!=NULL_TYPE; cur = next){
         if (cur->c.car->type == STR_TYPE){   
             free(cur->c.car->s);
