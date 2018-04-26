@@ -24,7 +24,8 @@ Value *makeNull() {
 
 /*
  * Create a nonempty list (a new Value object of type CONS_TYPE).
- * Assume that car is not a list (so no nested list)
+ *
+ * Asserts that car is not a list (so no nested list)
  */
 Value *cons(Value *car, Value *cdr) {
     assert(car->type != CONS_TYPE && car->type != NULL_TYPE);
@@ -39,7 +40,9 @@ Value *cons(Value *car, Value *cdr) {
 
 /*
  * Print a representation of the contents of a linked list.
- * Assume that list is CONS_TYPE 
+ *
+ * Asserts that input is a list (Value of type CONS_TYPE or 
+ * NULL_TYPE).
  */
 void display(Value *list){
     assert(list->type == CONS_TYPE);
