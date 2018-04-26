@@ -24,8 +24,10 @@ Value *makeNull() {
 
 /*
  * Create a nonempty list (a new Value object of type CONS_TYPE).
+ * Assume that car is not a list (so no nested list)
  */
 Value *cons(Value *car, Value *cdr) {
+    assert(car->type != CONS_TYPE && car->type != NULL_TYPE);
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
@@ -37,8 +39,10 @@ Value *cons(Value *car, Value *cdr) {
 
 /*
  * Print a representation of the contents of a linked list.
+ * Assume that list is CONS_TYPE 
  */
 void display(Value *list){
+    assert(list->type == CONS_TYPE);
     Value *cur = list;
     while(cur->type != NULL_TYPE){
         switch(cur->c.car->type){
@@ -66,7 +70,7 @@ void display(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *car(Value *list){
-    assert(list->type = CONS_TYPE);
+    assert(list->type == CONS_TYPE);
     return list->c.car;
 }
 
@@ -77,7 +81,7 @@ Value *car(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *cdr(Value *list){
-    assert(list->type = CONS_TYPE);
+    assert(list->type == CONS_TYPE);
     return list->c.cdr;
 }
 
