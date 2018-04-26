@@ -1,98 +1,87 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 #include "value.h"
 #include "linkedlist.h"
 
+#define INT 23
+#define DOUBLE 2.3
+#define STR "tofu"
+
+
 int main(void) {
-   Value *val1 = malloc(sizeof(Value));
-   val1->type = INT_TYPE;
-   val1->i = 23;
+    Value *val1 = malloc(sizeof(Value));
+    val1->type = INT_TYPE;
+    val1->i = INT;
 
-   Value *val2 = malloc(sizeof(Value));
-   val2->type = STR_TYPE;
-   val2->s = malloc(10 * sizeof(char));
-   strcpy(val2->s, "tofu");
-  
-    printf("val1 value: %i\n", val1->i);
-    printf("val1 address: %p\n", val1);
-    printf("val2 value: %s\n", val2->s);
+    Value *val2 = malloc(sizeof(Value));
+    val2->type = STR_TYPE;
+    val2->s = malloc(10 * sizeof(char));
+    strcpy(val2->s, STR);
 
-    printf("------------------------------\n");
+    Value *val4 = makeNull();
+   
     
-   Value *head = makeNull();
-    printf("type head: %i\n", head->type);
-    printf("head address: %p\n", head);
-   head = cons(val1, head);
-    printf("type head after first cons: %i\n", head->type);
-    printf("head address: %p\n", head);
-    printf("&head: %p\n", &head);
-    printf("head car type: %i\n", head->c.car->type);
-    printf("head car value: %i\n", head->c.car->i);
-    printf("head cdr type: %i\n", head->c.cdr->type);
     
-    printf("------------------------------\n");
-   head = cons(val2, head);
-    printf("type head after first cons: %i\n", head->type);
-    printf("head address: %p\n", head);
-    printf("&head: %p\n", &head);
-    printf("head car type: %i\n", head->c.car->type);
-    printf("head car value: %s\n", head->c.car->s);
-    printf("head cdr type: %i\n", head->c.cdr->type);
-    printf("head cadr type: %i\n", head->c.cdr->c.car->type);
-    printf("head cadr value: %i\n", head->c.cdr->c.car->i);
-    printf("head cddr type: %i\n", head->c.cdr->c.cdr->type);
-    
-    printf("------------------------------\n");
+    Value *val3 = malloc(sizeof(Value));
+    val3->type = DOUBLE_TYPE;
+    val3->d = DOUBLE;
 
-    printf("display whole list: ");
-    printf("head address: %p\n", head);
-    printf("&head: %p\n", &head);
-//    
-    printf("display car: \n");
-////    printf("head car type: %s\n", head->c.car->s);
-    printf("type is: %i\n", car(head)->type);
-    printf("value is: %s\n", car(head)->s);
-    display(car(head));
-////
-////
+    // Test the values are stored properly
+    assert(val1->i == INT);
+    assert(!strcmp(val2->s, STR));
+    assert(val3->d == DOUBLE);
     
-        
-    printf("------------------------------\n");
-   Value *reversed;
-   reversed = reverse(head);
-    printf("reversed type: %i\n", reversed->type);
-    printf("reverse car type: %i\n", reversed->c.car->type);
+    // Test that makeNull creates an empty list
+    Value *head = makeNull();
+    assert(head->type == NULL_TYPE);
+    assert(isNull(head));
+    assert(length(head) == 0);
+    
+    // Test the result of cons value with empty list
+    head = cons(val1, head);
+    assert(length(head) == 1);
+    assert(head->type == CONS_TYPE);
+    assert(car(head) == val1);
+    assert(!isNull(head));
+    assert(isNull(cdr(head)));
+    display(head);
+    
+    // Test the result of cons value to non-emptylist
+    head = cons(val2, head);
+    assert(length(head) == 2);
+    assert(head->type == CONS_TYPE);
+    assert(car(head) == val2);
+    assert(car(cdr(head)) == val1);
+    assert(isNull(cdr(cdr(head))));
+    display(head);
+    
+    // Add another value
+    head = cons(val3, head);
+    assert(length(head) == 3);
+    display(head);
+    
+    // Test the reverse method
+    Value *reversed = reverse(head);
+    assert(!isNull(reversed));
+    assert(length(reversed) == 3);
+    // reversed actually reverse the list
+    assert(car(head)->d == DOUBLE);
+    assert(!strcmp(car(cdr(head))->s, STR));
+    assert(car(cdr(cdr(head)))->i == INT);
+    // reversed should be a deep copy, so changing head should
+    // not affect reversed
+    car(head)->d = 3.2;
+    strcpy(car(cdr(head))->s, "soup");
     display(head);
     display(reversed);
-//    printf("&reversed: %p\n", &reversed);
-//    printf("head cadr type: %i\n", head->c.cdr->c.car->type);
-//    printf("head cadr value: %i\n", head->c.cdr->c.car->i);
-//    printf("&head car: %p\n", &(head->c.car));
-//    printf("reversed car type: %i\n", reversed->c.car->type);
-//    printf("reversed car value: %i\n", reversed->c.car->i);
-//    printf("&reversed car: %p\n", &(reversed->c.car));
-//    printf("reversed cdr type: %i\n", reversed->c.cdr->type);
-//    printf("reversed cadr type: %i\n", reversed->c.cdr->c.car->type);
-//    printf("reversed cadr value: %s\n", reversed->c.cdr->c.car->s);
-//    printf("reversed cddr type: %i\n", reversed->c.cdr->c.cdr->type);
-//////   printf("Length = %i\n", length(head));
-////   printf("Empty? %i\n", isNull(head));
-
-//
-//    Value *val3 = malloc(sizeof(Value));
-//    val3->type = INT_TYPE;
-//    val3->i = 33332;
-//    
-//    head->c.car = val3;
-//    display(head);
-//    display(reversed);
     
-    head->c.car->s = "string";
-    display(head);
-    display(reversed);
+    // cleanup the original list and the reversed list
     cleanup(head);
     cleanup(reversed);
+    cleanup(val4);
+    
     return 0;
-}
 
+}
