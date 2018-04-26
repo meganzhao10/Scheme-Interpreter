@@ -45,6 +45,7 @@ int main(void) {
     assert(!isNull(head));
     assert(isNull(cdr(head)));
     display(head);
+    printf("------------------------\n");
     
     // Test the result of cons value to non-emptylist
     head = cons(val2, head);
@@ -54,11 +55,13 @@ int main(void) {
     assert(car(cdr(head)) == val1);
     assert(isNull(cdr(cdr(head))));
     display(head);
+    printf("------------------------\n");
     
     // Add another value
     head = cons(val3, head);
     assert(length(head) == 3);
     display(head);
+    printf("------------------------\n");
     
     // Test the reverse method
     Value *reversed = reverse(head);
@@ -72,7 +75,9 @@ int main(void) {
     // not affect reversed
     car(head)->d = 3.2;
     strcpy(car(cdr(head))->s, "soup");
+    printf("head: \n");
     display(head);
+    printf("reversed: \n");
     display(reversed);
     
     // cleanup the original list and the reversed list
