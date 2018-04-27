@@ -15,9 +15,16 @@
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
+ *
+ * Returns a pointer to an empty list.
+ * If memory allocation fails, returns a null pointer.
  */
 Value *makeNull() {
     Value *nullList = malloc(sizeof(Value));
+    if (!nullList) {
+        printf("Out of memory!\n");
+        return nullList;
+    }
     nullList->type = NULL_TYPE;
     return nullList;
 }
@@ -25,6 +32,8 @@ Value *makeNull() {
 /*
  * Create a nonempty list (a new Value object of type CONS_TYPE).
  *
+ * Returns a pointer to a non-empty list.
+ * If memory allocation fails, returns a null pointer.
  * Asserts that car is not a list (so no nested list)
  */
 Value *cons(Value *car, Value *cdr) {
@@ -33,6 +42,10 @@ Value *cons(Value *car, Value *cdr) {
     cell.car = car;
     cell.cdr = cdr;
     Value *newValue = malloc(sizeof(Value));
+    if (!newValue) {
+        printf("Out of memory!\n");
+        return newValue;
+    }
     newValue->type = CONS_TYPE;
     newValue->c = cell;
     return newValue;
@@ -40,7 +53,7 @@ Value *cons(Value *car, Value *cdr) {
 
 /*
  * Print a representation of the contents of a linked list.
- *
+ * 
  * Asserts that input is a list (Value of type CONS_TYPE or 
  * NULL_TYPE).
  */
@@ -125,6 +138,8 @@ int length(Value *value){
  * entries, but in reverse order.  The resulting list is a deep copy of the
  * original.
  * 
+ * Returns pointer to the reversed list.
+ * If memory allocation fails, returns a null pointer.
  * Asserts that the reverse function can only be called on a list.
  */
 Value *reverse(Value *list) {
@@ -138,6 +153,10 @@ Value *reverse(Value *list) {
     for (Value *cur = list; cur->type != NULL_TYPE; cur = cur->c.cdr) {
         // Allocate space for the deep copy and make the copy
         Value *new_value = malloc(sizeof(Value));
+        if (!new_value) {
+            printf("Out of memory!\n");
+            return new_value;
+        }
         new_value->type = cur->c.car->type;
         switch (cur->c.car->type) {
             case INT_TYPE:
@@ -147,7 +166,12 @@ Value *reverse(Value *list) {
                 new_value->d = cur->c.car->d;
                 break;
             case STR_TYPE:
-                new_value->s = malloc(10 * sizeof(char));
+                char *new_str = malloc(10 * sizeof(char));
+                new_value->s = new_str;
+                if (!new_str) {
+                    printf("Out of memory!\n");
+                    return new_str;
+                }
                 strcpy(new_value->s, cur->c.car->s);
                 break;
             case CONS_TYPE:
