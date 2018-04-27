@@ -166,11 +166,10 @@ Value *reverse(Value *list) {
                 new_value->d = cur->c.car->d;
                 break;
             case STR_TYPE:
-                char *new_str = malloc(10 * sizeof(char));
-                new_value->s = new_str;
-                if (!new_str) {
+                new_value->s = malloc(10 * sizeof(char));
+                if (!(new_value->s)) {
                     printf("Out of memory!\n");
-                    return new_str;
+                    return NULL;
                 }
                 strcpy(new_value->s, cur->c.car->s);
                 break;
