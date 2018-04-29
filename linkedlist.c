@@ -12,7 +12,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-
+#include "talloc.h"
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  *
@@ -20,7 +20,7 @@
  * If memory allocation fails, returns a null pointer.
  */
 Value *makeNull() {
-    Value *nullList = malloc(sizeof(Value));
+    Value *nullList = talloc(sizeof(Value));
     if (!nullList) {
         printf("Out of memory!\n");
         return nullList;
@@ -41,7 +41,7 @@ Value *cons(Value *car, Value *cdr) {
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
-    Value *newValue = malloc(sizeof(Value));
+    Value *newValue =talloc(sizeof(Value));
     if (!newValue) {
         printf("Out of memory!\n");
         return newValue;
