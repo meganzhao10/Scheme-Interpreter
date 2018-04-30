@@ -8,6 +8,7 @@
  */
 
 #include "linkedlist.h"
+#include "talloc.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -20,7 +21,7 @@
  * If memory allocation fails, returns a null pointer.
  */
 Value *makeNull() {
-    Value *nullList = malloc(sizeof(Value));
+    Value *nullList = talloc(sizeof(Value));
     if (!nullList) {
         printf("Out of memory!\n");
         return nullList;
@@ -41,7 +42,7 @@ Value *cons(Value *car, Value *cdr) {
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
-    Value *newValue = malloc(sizeof(Value));
+    Value *newValue = talloc(sizeof(Value));
     if (!newValue) {
         printf("Out of memory!\n");
         return newValue;
@@ -135,9 +136,9 @@ int length(Value *value){
 
 /*
  * Create a new linked list whose entries correspond to the given list's
- * entries, but in reverse order.  The resulting list is a deep copy of the
+ * entries, but in reverse order.  The resulting list is a shallow copy of the
  * original.
- * 
+  *
  * Returns pointer to the reversed list.
  * If memory allocation fails, returns a null pointer.
  * Asserts that the reverse function can only be called on a list.
@@ -151,58 +152,36 @@ Value *reverse(Value *list) {
         return reversed;
     }
     for (Value *cur = list; cur->type != NULL_TYPE; cur = cur->c.cdr) {
-        // Allocate space for the deep copy and make the copy
-        Value *new_value = malloc(sizeof(Value));
-        if (!new_value) {
-            printf("Out of memory!\n");
-            return new_value;
-        }
-        new_value->type = cur->c.car->type;
-        switch (cur->c.car->type) {
-            case INT_TYPE:
-                new_value->i = cur->c.car->i;
-                break;
-            case DOUBLE_TYPE:
-                new_value->d = cur->c.car->d;
-                break;
-            case STR_TYPE:
-                new_value->s = malloc(10 * sizeof(char));
-                if (!(new_value->s)) {
-                    printf("Out of memory!\n");
-                    return NULL;
-                }
-                strcpy(new_value->s, cur->c.car->s);
-                break;
-            case CONS_TYPE:
-                new_value->c = cur->c.car->c;
-                break;
-            case NULL_TYPE:
-                break;
-        } 
-        reversed = cons(new_value, reversed);
+        reversed = cons(cur->c.car, reversed);
+//        // Allocate space for the deep copy and make the copy
+//        Value *new_value = malloc(sizeof(Value));
+//        if (!new_value) {
+//            printf("Out of memory!\n");
+//            return new_value;
+//        }
+//        new_value->type = cur->c.car->type;
+//        switch (cur->c.car->type) {
+//            case INT_TYPE:
+//                new_value->i = cur->c.car->i;
+//                break;
+//            case DOUBLE_TYPE:
+//                new_value->d = cur->c.car->d;
+//                break;
+//            case STR_TYPE:
+//                new_value->s = malloc(10 * sizeof(char));
+//                if (!(new_value->s)) {
+//                    printf("Out of memory!\n");
+//                    return NULL;
+//                }
+//                strcpy(new_value->s, cur->c.car->s);
+//                break;
+//            case CONS_TYPE:
+//                new_value->c = cur->c.car->c;
+//                break;
+//            case NULL_TYPE:
+//                break;
+//        } 
+//        reversed = cons(new_value, reversed);
     }
     return reversed;
-}
-
-
-/*
- * Frees up all memory directly or indirectly referred to by list.
- *
- * Asserts that the list to be cleaned up has been allocated.
-*/
-void cleanup(Value *list){
-
-    assert(list->type == CONS_TYPE || list->type == NULL_TYPE);
-    Value *next;
-    next = list;                     
-
-    for (Value *cur = list; cur->type!=NULL_TYPE; cur = next){
-        if (cur->c.car->type == STR_TYPE){   
-            free(cur->c.car->s);
-         }
-         next = cur->c.cdr;
-         free(cur->c.car);
-         free(cur);
-    }
-    free(next);
 }
