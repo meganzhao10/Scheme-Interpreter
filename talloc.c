@@ -7,7 +7,7 @@
 #include "talloc.h"
 
 // The global static variable
-static Value* active_list;
+static Value* activeList;
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
@@ -55,11 +55,11 @@ Value *talloc_cons(Value *car, Value *cdr) {
  * modify the linked list to use talloc instead of malloc.)
  */
 void *talloc(size_t size) {
-    if (active_list == NULL) {
-        active_list = talloc_makeNull();
-        if (!active_list) {
+    if (activeList == NULL) {
+        activeList = talloc_makeNull();
+        if (!activeList) {
             printf("Out of memory!\n");
-            return active_list;
+            return activeList;
         }
     }
     void *new_pointer = malloc(size);
@@ -67,7 +67,10 @@ void *talloc(size_t size) {
         printf("Out of memory!\n");
         return new_pointer;
     }
-    active_list = talloc_cons(new_pointer, active_list);
+    Value *activeListEntry = malloc(sizeof(Value));
+    activeListEntry->type = PTR_TYPE;
+    activeListEntry->p = new_pointer;
+    activeList = talloc_cons(activeListEntry, activeList);
     return new_pointer;
 }
 
@@ -77,14 +80,15 @@ void *talloc(size_t size) {
  */
 void tfree() {
     Value *next;
-    next = active_list;                     
-    for (Value *cur = active_list; cur->type!=NULL_TYPE; cur = next){
+    next = activeList;                     
+    for (Value *cur = activeList; cur->type!=NULL_TYPE; cur = next){
         next = cur->c.cdr;
+        free(cur->c.car->p);
         free(cur->c.car);
         free(cur);
     }
     free(next);
-    active_list = NULL;
+    activeList = NULL;
 }
 
 /*
