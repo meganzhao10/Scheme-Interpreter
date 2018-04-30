@@ -63,7 +63,7 @@ void *talloc(size_t size) {
         printf("Out of memory!\n");
         return new_pointer;
     }
-    talloc_cons(new_pointer, active_list);
+    active_list = talloc_cons(new_pointer, active_list);
     return new_pointer;
 }
 
@@ -74,13 +74,13 @@ void *talloc(size_t size) {
 void tfree() {
     Value *next;
     next = active_list;                     
-
     for (Value *cur = active_list; cur->type!=NULL_TYPE; cur = next){
-         next = cur->c.cdr;
-         free(cur->c.car);
-         free(cur);
+        next = cur->c.cdr;
+        free(cur->c.car);
+        free(cur);
     }
     free(next);
+    active_list = NULL;
 }
 
 /*
@@ -91,5 +91,5 @@ void tfree() {
  */
 void texit(int status) {
     tfree();
-    exit(0);
+    exit(status);
 }
