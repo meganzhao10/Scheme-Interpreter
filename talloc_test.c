@@ -4,6 +4,10 @@
 #include "talloc.h"
 #include "linkedlist.h"
 
+#define INT 23
+#define DOUBLE 2.3
+#define STR "tofu"
+
 int main(void) {
    Value *val1 = malloc(sizeof(Value));
     if (!val1) {
