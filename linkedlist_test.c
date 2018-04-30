@@ -11,7 +11,7 @@
 
 
 int main(void) {
-    Value *val1 = malloc(sizeof(Value));
+     Value *val1 = malloc(sizeof(Value));
     if (!val1) {
         printf("Out of memory!\n");
         return 1;
@@ -125,5 +125,4 @@ int main(void) {
     cleanup(nullHead);
     cleanup(reversed);
     return 0;
-
 }
