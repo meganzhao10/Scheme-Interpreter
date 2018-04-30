@@ -57,6 +57,10 @@ Value *talloc_cons(Value *car, Value *cdr) {
 void *talloc(size_t size) {
     if (active_list == NULL) {
         active_list = talloc_makeNull();
+        if (!active_list) {
+            printf("Out of memory!\n");
+            return active_list;
+        }
     }
     void *new_pointer = malloc(size);
     if (!new_pointer) {
