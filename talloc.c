@@ -2,9 +2,9 @@
 #include "value.h"
 #include <assert.h>
 #include <stdio.h>
+#include "talloc.h"
 
-#ifndef TALLOC_H
-#define TALLOC_H
+
 
 static Value *head;
 
@@ -80,4 +80,4 @@ void texit(int status){
 	exit(status);
 }
 
-#endif
+
