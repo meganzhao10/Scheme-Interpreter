@@ -17,6 +17,11 @@ int main(void) {
    Value *head = makeNull();
    head = cons(val1, head);
    head = cons(val2, head);
+    
+   display(head);
+   Value *reversed = reverse(head);
+   printf("After reversing:\n");
+   display(reversed);
 
    tfree();
    printf("I can see this.\n");
