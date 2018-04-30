@@ -12,7 +12,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-#include "talloc.h" //是cfile还是hfile？
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
@@ -21,7 +20,7 @@
  * If memory allocation fails, returns a null pointer.
  */
 Value *makeNull() {
-    Value *nullList = talloc(sizeof(Value));
+    Value *nullList = malloc(sizeof(Value));
     if (!nullList) {
         printf("Out of memory!\n");
         return nullList;
@@ -42,7 +41,7 @@ Value *cons(Value *car, Value *cdr) {
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
-    Value *newValue = talloc(sizeof(Value));
+    Value *newValue = malloc(sizeof(Value));
     if (!newValue) {
         printf("Out of memory!\n");
         return newValue;
@@ -69,9 +68,6 @@ void display(Value *list){
             case DOUBLE_TYPE:
                 printf("type:DOUBLE_TYPE; value: %f\n",cur->c.car->d);
                 break;
-            case PTR_TYPE:
-                printf("type:POINTER_TYPE; value: %p\n",cur->c.car->p);
-                break;
             case STR_TYPE:
                 printf("type:STRING_TYPE; value: %s\n",cur->c.car->s);
                 break;
@@ -91,7 +87,6 @@ void display(Value *list){
  */
 Value *car(Value *list){
     assert(list->type == CONS_TYPE);
-    //用不用 assert (list->c.car != NULL); ? 
     return list->c.car;
 }
 
@@ -118,7 +113,6 @@ bool isNull(Value *value){
     } else{
         return false;
     }
-    //直接 return (value->type == NULL_TYPE); ? 
 }
 
 /*
@@ -158,7 +152,7 @@ Value *reverse(Value *list) {
     }
     for (Value *cur = list; cur->type != NULL_TYPE; cur = cur->c.cdr) {
         // Allocate space for the deep copy and make the copy
-        Value *new_value = talloc(sizeof(Value));
+        Value *new_value = malloc(sizeof(Value));
         if (!new_value) {
             printf("Out of memory!\n");
             return new_value;
@@ -172,7 +166,7 @@ Value *reverse(Value *list) {
                 new_value->d = cur->c.car->d;
                 break;
             case STR_TYPE:
-                new_value->s = talloc(10 * sizeof(char));
+                new_value->s = malloc(10 * sizeof(char));
                 if (!(new_value->s)) {
                     printf("Out of memory!\n");
                     return NULL;
@@ -212,7 +206,3 @@ void cleanup(Value *list){
     }
     free(next);
 }
-
-
-
-
