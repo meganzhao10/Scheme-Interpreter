@@ -37,7 +37,8 @@ Value *makeNull() {
  * Asserts that car is not a list (so no nested list)
  */
 Value *cons(Value *car, Value *cdr) {
-    assert(car->type != CONS_TYPE && car->type != NULL_TYPE);
+    assert(car != NULL && cdr != NULL && car->type != CONS_TYPE 
+            && car->type != NULL_TYPE);
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
@@ -58,7 +59,7 @@ Value *cons(Value *car, Value *cdr) {
  * NULL_TYPE).
  */
 void display(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL && list->type == CONS_TYPE);
     Value *cur = list;
     while(cur->type != NULL_TYPE){
         switch(cur->c.car->type){
@@ -86,7 +87,7 @@ void display(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *car(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL && list->type == CONS_TYPE);
     return list->c.car;
 }
 
@@ -97,7 +98,7 @@ Value *car(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *cdr(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL && list->type == CONS_TYPE);
     return list->c.cdr;
 }
 
@@ -144,7 +145,7 @@ int length(Value *value){
  */
 Value *reverse(Value *list) {
     // Reverse can only be applied to an empty list or a non-empty list 
-    assert(list->type == NULL_TYPE || list->type == CONS_TYPE);
+    assert(list != NULL && (list->type == NULL_TYPE || list->type == CONS_TYPE));
     // Create new linked list
     Value *reversed = makeNull();
     if (list->type == NULL_TYPE) {
