@@ -35,7 +35,8 @@ Value *talloc_makeNull() {
  * Asserts that car is not a list (so no nested list)
  */
 Value *talloc_cons(Value *car, Value *cdr) {
-    assert(car->type != CONS_TYPE && car->type != NULL_TYPE);
+    assert(car != NULL && cdr != NULL && car->type != CONS_TYPE &&
+            car->type != NULL_TYPE);
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
