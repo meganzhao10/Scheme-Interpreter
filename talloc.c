@@ -74,12 +74,12 @@ void *talloc(size_t size) {
 void tfree() {
     Value *next;
     next = active_list;                     
-
-    for (Value *cur = active_list; cur->type!=NULL_TYPE; cur = next){
-         next = cur->c.cdr;
-         free(cur->c.car);
-         free(cur);
-    }
+//
+//    for (Value *cur = active_list; cur->type!=NULL_TYPE; cur = next){
+//         next = cur->c.cdr;
+//         free(cur->c.car);
+//         free(cur);
+//    }
     free(next);
 }
 
