@@ -75,6 +75,7 @@ void *talloc(size_t size){
 	newHead->p = malloc(size);
 	if (!newHead->p){
 		printf("Out of memory!\n");
+        return newHead->p;
 	}
 	head = talloc_cons(newHead, head);
 	return newHead->p;
