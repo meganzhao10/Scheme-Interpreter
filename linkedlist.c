@@ -34,7 +34,7 @@ Value *makeNull() {
  *
  * Returns a pointer to a non-empty list.
  * If memory allocation fails, returns a null pointer.
- * Asserts that car is not a list (so no nested list)
+ * Asserts that car is not a list (so no nested list).
  */
 Value *cons(Value *car, Value *cdr) {
     assert(car != NULL && cdr != NULL && car->type != CONS_TYPE 
@@ -59,7 +59,11 @@ Value *cons(Value *car, Value *cdr) {
  * NULL_TYPE).
  */
 void display(Value *list){
-    assert(list != NULL && list->type == CONS_TYPE);
+    assert(list != NULL 
+           && (list->type == CONS_TYPE || list->type == NULL_TYPE));
+    if (list->type == NULL_TYPE) {
+        printf("()");
+    }
     Value *cur = list;
     while(cur->type != NULL_TYPE){
         switch(cur->c.car->type){
@@ -105,7 +109,7 @@ Value *cdr(Value *list){
 /*
  * Test if the given value is a NULL_TYPE value.
  *
- * Asserts that the list has been allocated.
+ * Asserts that the value has been allocated.
  */
 bool isNull(Value *value){
     assert(value != NULL);
@@ -119,10 +123,13 @@ bool isNull(Value *value){
 /*
  * Compute the length of the given list.
  * 
- * Asserts that the list has been allocated.
+ * Asserts that value has been allocated and that 
+ * value must be a list (Value of type CONS_TYPE 
+ * or NULL_TYPE)
  */
 int length(Value *value){
-    assert(value != NULL);
+    assert(value != NULL &&
+          (value->type == CONS_TYPE || value->type == NULL_TYPE));
     int length = 0;
     Value *cur;
     cur = value;
@@ -145,7 +152,8 @@ int length(Value *value){
  */
 Value *reverse(Value *list) {
     // Reverse can only be applied to an empty list or a non-empty list 
-    assert(list != NULL && (list->type == NULL_TYPE || list->type == CONS_TYPE));
+    assert(list != NULL && 
+           (list->type == NULL_TYPE || list->type == CONS_TYPE));
     // Create new linked list
     Value *reversed = makeNull();
     if (list->type == NULL_TYPE) {
