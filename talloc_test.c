@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #include "value.h"
 #include "talloc.h"
 #include "linkedlist.h"
@@ -10,7 +9,7 @@
 #define STR "tofu"
 
 int main(void) {
-    Value *val1 = malloc(sizeof(Value));
+    Value *val1 = talloc(sizeof(Value));
     if (!val1) {
         printf("Out of memory!\n");
         return 1;
@@ -18,20 +17,22 @@ int main(void) {
     val1->type = INT_TYPE;
     val1->i = INT;
 
-    Value *val2 = malloc(sizeof(Value));
+    Value *val2 = talloc(sizeof(Value));
     if (!val2) {
         printf("Out of memory!\n");
         return 1;
     }
     val2->type = STR_TYPE;
-    val2->s = malloc(10 * sizeof(char));
+    
+    val2->s = talloc(10 * sizeof(char));
     if (!(val2->s)) {
         printf("Out of memory!\n");
         return 1;
     }
     strcpy(val2->s, STR);
     
-    Value *val3 = malloc(sizeof(Value));
+
+    Value *val3 = talloc(sizeof(Value));
     if (!val3) {
         printf("Out of memory!\n");
         return 1;

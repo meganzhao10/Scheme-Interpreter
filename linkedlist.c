@@ -13,7 +13,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-
+#include "talloc.h"
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  *
@@ -38,11 +38,12 @@ Value *makeNull() {
  * Asserts that car is not a list (so no nested list)
  */
 Value *cons(Value *car, Value *cdr) {
-    assert(car->type != CONS_TYPE && car->type != NULL_TYPE);
+    assert(car != NULL && cdr != NULL && car->type != CONS_TYPE 
+            && car->type != NULL_TYPE);
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
-    Value *newValue = talloc(sizeof(Value));
+    Value *newValue =talloc(sizeof(Value));
     if (!newValue) {
         printf("Out of memory!\n");
         return newValue;
@@ -59,7 +60,11 @@ Value *cons(Value *car, Value *cdr) {
  * NULL_TYPE).
  */
 void display(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL 
+           && (list->type == CONS_TYPE || list->type == NULL_TYPE));
+    if (list->type == NULL_TYPE) {
+        printf("()");
+    }
     Value *cur = list;
     while(cur->type != NULL_TYPE){
         switch(cur->c.car->type){
@@ -87,7 +92,7 @@ void display(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *car(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL && list->type == CONS_TYPE);
     return list->c.car;
 }
 
@@ -98,14 +103,18 @@ Value *car(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *cdr(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL && list->type == CONS_TYPE);
     return list->c.cdr;
 }
 
 /*
  * Test if the given value is a NULL_TYPE value.
  *
+<<<<<<< HEAD
  * Asserts that the list has been allocated.
+=======
+ * Asserts that the value has been allocated.
+>>>>>>> master
  */
 bool isNull(Value *value){
     assert(value != NULL);
@@ -119,10 +128,13 @@ bool isNull(Value *value){
 /*
  * Compute the length of the given list.
  * 
- * Asserts that the list has been allocated.
+ * Asserts that value has been allocated and that 
+ * value must be a list (Value of type CONS_TYPE 
+ * or NULL_TYPE)
  */
 int length(Value *value){
-    assert(value != NULL);
+    assert(value != NULL &&
+          (value->type == CONS_TYPE || value->type == NULL_TYPE));
     int length = 0;
     Value *cur;
     cur = value;
@@ -138,50 +150,22 @@ int length(Value *value){
  * Create a new linked list whose entries correspond to the given list's
  * entries, but in reverse order.  The resulting list is a shallow copy of the
  * original.
-  *
+ * 
  * Returns pointer to the reversed list.
  * If memory allocation fails, returns a null pointer.
  * Asserts that the reverse function can only be called on a list.
  */
 Value *reverse(Value *list) {
     // Reverse can only be applied to an empty list or a non-empty list 
-    assert(list->type == NULL_TYPE || list->type == CONS_TYPE);
+    assert(list != NULL && 
+           (list->type == NULL_TYPE || list->type == CONS_TYPE));
     // Create new linked list
     Value *reversed = makeNull();
     if (list->type == NULL_TYPE) {
         return reversed;
     }
     for (Value *cur = list; cur->type != NULL_TYPE; cur = cur->c.cdr) {
-        reversed = cons(cur->c.car, reversed);
-//        // Allocate space for the deep copy and make the copy
-//        Value *new_value = malloc(sizeof(Value));
-//        if (!new_value) {
-//            printf("Out of memory!\n");
-//            return new_value;
-//        }
-//        new_value->type = cur->c.car->type;
-//        switch (cur->c.car->type) {
-//            case INT_TYPE:
-//                new_value->i = cur->c.car->i;
-//                break;
-//            case DOUBLE_TYPE:
-//                new_value->d = cur->c.car->d;
-//                break;
-//            case STR_TYPE:
-//                new_value->s = malloc(10 * sizeof(char));
-//                if (!(new_value->s)) {
-//                    printf("Out of memory!\n");
-//                    return NULL;
-//                }
-//                strcpy(new_value->s, cur->c.car->s);
-//                break;
-//            case CONS_TYPE:
-//                new_value->c = cur->c.car->c;
-//                break;
-//            case NULL_TYPE:
-//                break;
-//        } 
-//        reversed = cons(new_value, reversed);
+       reversed = cons(cur->c.car, reversed);
     }
     return reversed;
 }
