@@ -110,11 +110,7 @@ Value *cdr(Value *list){
 /*
  * Test if the given value is a NULL_TYPE value.
  *
-<<<<<<< HEAD
- * Asserts that the list has been allocated.
-=======
  * Asserts that the value has been allocated.
->>>>>>> master
  */
 bool isNull(Value *value){
     assert(value != NULL);

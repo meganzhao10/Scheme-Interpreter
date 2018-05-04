@@ -1,5 +1,7 @@
 #include <stdlib.h>
 #include "value.h"
+#include "linkedlist.h"
+#include "talloc.h"
 
 #ifndef TOKENIZER_H
 #define TOKENIZER_H
@@ -10,7 +12,8 @@
  */
 Value *tokenize();
 
-/* The displayTokens function takes a linked list of tokens as 
+/* 
+ * The displayTokens function takes a linked list of tokens as 
  * input, and displays those tokens, one per line, with each 
  * token's type.
  */
