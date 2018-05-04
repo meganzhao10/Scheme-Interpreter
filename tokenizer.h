@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include "value.h"
 
+#ifndef TOKENIZER_H
+#define TOKENIZER_H
+
 /* The tokenize function should read stdin (the standard input 
  * stream in C) in its entirety and return a linked list consisting 
  * of all tokens found.
@@ -12,3 +15,5 @@ Value *tokenize();
  * token's type.
  */
 void displayTokens(Value *list);
+
+#endif

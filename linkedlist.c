@@ -8,6 +8,7 @@
  */
 
 #include "linkedlist.h"
+#include "talloc.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -34,7 +35,7 @@ Value *makeNull() {
  *
  * Returns a pointer to a non-empty list.
  * If memory allocation fails, returns a null pointer.
- * Asserts that car is not a list (so no nested list).
+ * Asserts that car is not a list (so no nested list)
  */
 Value *cons(Value *car, Value *cdr) {
     assert(car != NULL && cdr != NULL && car->type != CONS_TYPE 
@@ -109,7 +110,11 @@ Value *cdr(Value *list){
 /*
  * Test if the given value is a NULL_TYPE value.
  *
+<<<<<<< HEAD
+ * Asserts that the list has been allocated.
+=======
  * Asserts that the value has been allocated.
+>>>>>>> master
  */
 bool isNull(Value *value){
     assert(value != NULL);
@@ -143,7 +148,7 @@ int length(Value *value){
 
 /*
  * Create a new linked list whose entries correspond to the given list's
- * entries, but in reverse order.  The resulting list is a deep copy of the
+ * entries, but in reverse order.  The resulting list is a shallow copy of the
  * original.
  * 
  * Returns pointer to the reversed list.
@@ -164,4 +169,3 @@ Value *reverse(Value *list) {
     }
     return reversed;
 }
-

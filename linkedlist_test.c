@@ -21,11 +21,13 @@ int main(void) {
     val1->i = INT;
 
     Value *val2 = talloc(sizeof(Value));
+
     if (!val2) {
         printf("Out of memory!\n");
         return 1;
     }
     val2->type = STR_TYPE;
+
     val2->s = talloc(10 * sizeof(char));
     if (!(val2->s)) {
         printf("Out of memory!\n");
@@ -121,11 +123,6 @@ int main(void) {
     printf("reversed: \n");
     display(reversed);
     
-    // cleanup the original list and the reversed list
-//    cleanup(head);
-//    cleanup(nullHead);
-//    cleanup(reversed);
     return 0;
 
 }
-

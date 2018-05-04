@@ -9,7 +9,7 @@
 #define STR "tofu"
 
 int main(void) {
-   Value *val1 = talloc(sizeof(Value));
+    Value *val1 = talloc(sizeof(Value));
     if (!val1) {
         printf("Out of memory!\n");
         return 1;
@@ -23,6 +23,7 @@ int main(void) {
         return 1;
     }
     val2->type = STR_TYPE;
+    
     val2->s = talloc(10 * sizeof(char));
     if (!(val2->s)) {
         printf("Out of memory!\n");
@@ -30,6 +31,7 @@ int main(void) {
     }
     strcpy(val2->s, STR);
     
+
     Value *val3 = talloc(sizeof(Value));
     if (!val3) {
         printf("Out of memory!\n");
