@@ -19,5 +19,4 @@ Value *tokenize(){
  * token's type.
  */
 void displayTokens(Value *list){
-
 }
