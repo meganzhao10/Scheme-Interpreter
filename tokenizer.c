@@ -11,7 +11,7 @@
  * of all tokens found.
  */
 Value *tokenize(){
-
+    return NULL;
 }
 
 /* The displayTokens function takes a linked list of tokens as 
