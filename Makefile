@@ -3,7 +3,7 @@
 CC = clang
 CFLAGS = -g
 
-SRCS = linkedlist.c talloc_test.c talloc.c
+SRCS = linkedlist.c linkedlist_test.c talloc.c
 HDRS = linkedlist.h value.h talloc.h
 OBJS = $(SRCS:.c=.o)
 
