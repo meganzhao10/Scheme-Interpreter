@@ -214,12 +214,12 @@ bool parseNumber(Value *entry) {
             isFloat = true;
             char follow = fgetc(stdin);
             if (!isDigit(follow)) {
-                printf("Error! Unrecognized sequence!\n");
+                printf("Error! Unrecognized sequence with %c!\n", follow);
                 return false;
             }
             ungetc(follow, stdin);
         } else {
-            printf("Error! Unrecognized sequence!\n");
+            printf("Error! Unrecognized sequence with %c!\n", nextChar);
             return false;
         }
     } 
@@ -229,13 +229,14 @@ bool parseNumber(Value *entry) {
         if (nextChar == '.') { 
             // Multiple decimal points are not allowed
             if (isFloat) { 
-                printf("Error! Unrecognized sequence!\n");
+                printf("Error! Unrecognized sequence"
+                       "with multiple decimal points!\n");
                 return false;
             } else {
                 isFloat = true;
             }
         } else if (!isDigit(nextChar)) {
-            printf("Error! Unrecognized sequence!\n");
+            printf("Error! Unrecognized sequence with %c in number!\n", nextChar);
             return false;
         }
         addVector(vector, 0, nextChar);
