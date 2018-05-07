@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include "value.h"
+#include <assert.h>
 
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H

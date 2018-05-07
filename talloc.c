@@ -1,13 +1,15 @@
-/* This code implements a garbage collector to manage memory 
- * usage throughout the interpreter project.
- *
- * Author: Yitong Chen, Megan Zhao, Yingying Wang
+/* This code implements a garbage collector to manage memory
+ * usage throughout the interpreter project. 
+ * 
+ * Authors: Yitong Chen, Yingying Wang, Megan Zhao
  */
+
+#include <assert.h>
 #include <stdio.h>
 #include "talloc.h"
 
-// The global static variable
-static Value* activeList;
+// The golbal static variable
+static Value *head;
 
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
@@ -54,41 +56,45 @@ Value *talloc_cons(Value *car, Value *cdr) {
  * Otherwise you'll end up with circular dependencies, since you're going to
  * modify the linked list to use talloc instead of malloc.)
  */
-void *talloc(size_t size) {
-    if (activeList == NULL) {
-        activeList = talloc_makeNull();
-        if (!activeList) {
-            printf("Out of memory!\n");
-            return activeList;
-        }
-    }
-    void *new_pointer = malloc(size);
-    if (!new_pointer) {
-        printf("Out of memory!\n");
-        return new_pointer;
-    }
-    Value *activeListEntry = malloc(sizeof(Value));
-    activeListEntry->type = PTR_TYPE;
-    activeListEntry->p = new_pointer;
-    activeList = talloc_cons(activeListEntry, activeList);
-    return new_pointer;
+void *talloc(size_t size){
+	if (head == NULL){
+		head = talloc_makeNull();
+		if (!head){
+			printf("Out of memory!\n");
+			return head;
+		}
+	}
+	Value *newHead = malloc(sizeof(Value));
+	if (!newHead){
+		printf("Out of memory!\n");
+		return newHead;
+	}
+	newHead->type = PTR_TYPE;
+	newHead->p = malloc(size);
+	if (!newHead->p){
+		printf("Out of memory!\n");
+        return newHead->p;
+	}
+	head = talloc_cons(newHead, head);
+	return newHead->p;
 }
 
 /*
  * Free all pointers allocated by talloc, as well as whatever memory you
  * malloc'ed to create/update the active list.
  */
-void tfree() {
-    Value *next;
-    next = activeList;                     
-    for (Value *cur = activeList; cur->type!=NULL_TYPE; cur = next){
-        next = cur->c.cdr;
-        free(cur->c.car->p);
-        free(cur->c.car);
-        free(cur);
-    }
-    free(next);
-    activeList = NULL;
+void tfree(){
+	Value *cur = head;
+	Value *next;
+	while (cur->type != NULL_TYPE){
+		next = cur->c.cdr;
+		free(cur->c.car->p);
+		free(cur->c.car);
+		free(cur);
+		cur = next;
+	} 
+	free(next);
+	head = NULL;
 }
 
 /*
@@ -97,7 +103,7 @@ void tfree() {
  * your interpreter when you encounter an error: so memory can be automatically
  * cleaned up when exiting.)
  */
-void texit(int status) {
-    tfree();
-    exit(status);
+void texit(int status){
+	tfree();
+	exit(status);
 }

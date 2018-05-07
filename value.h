@@ -3,6 +3,10 @@
 
 typedef enum {
    PTR_TYPE,
+   OPEN_TYPE,
+   CLOSE_TYPE,
+   BOOL_TYPE,
+   SYMBOL_TYPE,
    INT_TYPE,
    DOUBLE_TYPE,
    STR_TYPE,
