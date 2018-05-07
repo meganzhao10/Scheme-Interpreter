@@ -171,10 +171,12 @@ char *convertVector(Vector *list, bool isStr) {
             result[i] = list->data[list->size - i];
         }
         result[list->size + 1] = '"';
+        result[list->size + 2] = '\0';
     } else {
         for (int i = 0; i < list->size; i ++) {
             result[i] = list->data[list->size - i - 1];
         }
+        result[list->size] = '\0';
     }
     return result;
 }
@@ -400,7 +402,6 @@ Value *tokenize(){
     }
     charRead = fgetc(stdin);
     while (charRead != EOF) {
-//        printf("new: %c\n", charRead);
         Value *entry = talloc(sizeof(Value));
         if (!entry) {
             printf("Error! Not enough memory!\n");

@@ -12,9 +12,8 @@
 int main(void) {
     Value *list = tokenize();
     if (list == NULL) {
-        return 1;
+        texit(1);
     }
     displayTokens(list);
-    tfree();
-    return 0;
+    texit(0);
 }
