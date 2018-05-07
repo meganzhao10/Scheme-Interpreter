@@ -11,22 +11,34 @@
 #include <stdbool.h>
 #include "tokenizer.h"
 
+/* 
+ * Check whether the input character is a delimiter.
+ *
+ * Return true if it is and false otherwise.
+ * TODO: check whether the ch as a \t is a delimiter.
+ */
+bool isDelimiter(char ch) {
+    return (ch == ' ' || ch == '(' || ch == ')' || ch == '\n'
+           || ch == EOF || ch == ';');
+}
+
 /*
  * Check whether the input character is a letter.
  * 
  * Returns true if ch is a letter, false otherwise.
  */
 bool isLetter(char ch){
-    return (ch == 'a' || ch == 'b' || ch == 'c' || ch == 'd' || ch == 'e' ||
-        ch == 'g' || ch == 'h' || ch == 'i' || ch == 'j' || ch == 'k' ||
-        ch == 'l' || ch == 'm' || ch == 'n' || ch == 'o' || ch == 'p' ||
-        ch == 'q' || ch == 'r' || ch == 's' || ch == 't' || ch == 'u' ||
-        ch == 'v' || ch == 'w' || ch == 'x' || ch == 'y' || ch == 'z' ||
-        ch == 'A' || ch == 'B' || ch == 'C' || ch == 'D' || ch == 'E' ||
-        ch == 'G' || ch == 'H' || ch == 'I' || ch == 'J' || ch == 'K' ||
-        ch == 'L' || ch == 'M' || ch == 'N' || ch == 'O' || ch == 'P' ||
-        ch == 'Q' || ch == 'R' || ch == 'S' || ch == 'T' || ch == 'F' ||
-        ch == 'V' || ch == 'W' || ch == 'X' || ch == 'Y' || ch == 'Z');
+    return (ch == 'a' || ch == 'b' || ch == 'c' || ch == 'd' || ch == 'e' 
+            || ch == 'f' || ch == 'g' || ch == 'h' || ch == 'i' || ch == 'j' 
+            || ch == 'k' || ch == 'l' || ch == 'm' || ch == 'n' || ch == 'o' 
+            || ch == 'p' || ch == 'q' || ch == 'r' || ch == 's' || ch == 't' 
+            || ch == 'u' || ch == 'v' || ch == 'w' || ch == 'x' || ch == 'y' 
+            || ch == 'z' || ch == 'A' || ch == 'B' || ch == 'C' || ch == 'D' 
+            || ch == 'E' || ch == 'F' || ch == 'G' || ch == 'H' || ch == 'I' 
+            || ch == 'J' || ch == 'K' || ch == 'L' || ch == 'M' || ch == 'N' 
+            || ch == 'O' || ch == 'P' || ch == 'Q' || ch == 'R' || ch == 'S' 
+            || ch == 'T' || ch == 'U' || ch == 'V' || ch == 'W' || ch == 'X' 
+            || ch == 'Y' || ch == 'Z');
 }
 
 /*
@@ -69,10 +81,9 @@ bool isSubsequent(char ch){
  * internal values of the Vector to initialize it to be empty.  The initial
  * size of the internally stored array is the given capacity.
  *
- * Returns: 0 for success
- *          1 for failure
+ * Returns: 0 for success and 1 for failure
  */
-int init_vector(Vector *list, int initialCapacity) {
+int initVector(Vector *list, int initialCapacity) {
     list->capacity = initialCapacity;
     list->size = 0;
     char* data = talloc(sizeof(char) * initialCapacity);
@@ -91,7 +102,7 @@ int init_vector(Vector *list, int initialCapacity) {
  * Returns: 0 for success
  *          1 for failure
  */
-int ensure_capacity_vector(Vector *list) {
+int ensureCapacityVector(Vector *list) {
     if (list->size == list->capacity) {
         list->capacity = list->capacity * 2;
         char* new_data = talloc(sizeof(char) * list->capacity);
@@ -114,7 +125,7 @@ int ensure_capacity_vector(Vector *list) {
 /* 
  * Helper function to make room for the new entry.
  */
-void make_room_vector(int index, Vector *list) {
+void makeRoomVector(int index, Vector *list) {
     for (int i = list->size - 1; i >= index; i --) {
         list->data[i + 1] = list->data[i];
     }
@@ -126,16 +137,16 @@ void make_room_vector(int index, Vector *list) {
  * Returns: 0 for success
  *          1 for failure
  */
-int add(Vector *list, int index, char value) {
+int addVector(Vector *list, int index, char value) {
     // Check whether the index is valid
     if ((index < 0) || (index > list->size)) {
         return 1;
     }
-    if (ensure_capacity_vector(list)) {
+    if (ensureCapacityVector(list)) {
         return 1;
     } else {
         // Insert to the valid indicated position
-        make_room_vector(index, list);
+        makeRoomVector(index, list);
         list->data[index] = value;
         list->size ++;
         return 0;
@@ -143,7 +154,10 @@ int add(Vector *list, int index, char value) {
 }
 
 /*
- * Return the values stored in a vector as a string.
+ * Convert the given vector into a string.
+ * 
+ * Returns a string constructed from the values stored in the vector.
+ * Appends additional quotation marks when if isStr is true.
  */
 char *convertVector(Vector *list, bool isStr) {
     char *result = talloc(sizeof(char) * (list->size) + 3);
@@ -156,7 +170,7 @@ char *convertVector(Vector *list, bool isStr) {
         for (int i = 1; i <= list->size; i ++) {
             result[i] = list->data[list->size - i];
         }
-        result[list->size+1] = '"';
+        result[list->size + 1] = '"';
     } else {
         for (int i = 0; i < list->size; i ++) {
             result[i] = list->data[list->size - i - 1];
@@ -165,6 +179,11 @@ char *convertVector(Vector *list, bool isStr) {
     return result;
 }
 
+/*
+ * Helper function to parse a number.
+ *
+ * Return true if the parsing is successful, false if the parsing fails.
+ */
 bool parseNumber(Value *entry) {
     char sign = fgetc(stdin);
     bool neg;
@@ -176,14 +195,17 @@ bool parseNumber(Value *entry) {
         ungetc(sign, stdin);
     }
     
+    // Construct vector to store the number
     Vector *vector = talloc(sizeof(Vector));
-    init_vector(vector, 10);
+    initVector(vector, 10);
     if (!vector) {
         printf("Error! Out of memory!\n");
         return false;            
     }
+    
     bool isFloat = false;
     
+    // Check if the number starts with a decimal point
     char nextChar = fgetc(stdin);
     if (!isDigit(nextChar)) {
         if (nextChar == '.') {
@@ -199,11 +221,12 @@ bool parseNumber(Value *entry) {
             return false;
         }
     } 
-    add(vector, 0, nextChar);
+    addVector(vector, 0, nextChar);
     nextChar = fgetc(stdin);
-    while (nextChar != EOF && nextChar != ' ' && nextChar != ')') {
-        if (nextChar == '.') {
-            if (isFloat) {
+    while (!isDelimiter(nextChar)) {
+        if (nextChar == '.') { 
+            // Multiple decimal points are not allowed
+            if (isFloat) { 
                 printf("Error! Unrecognized sequence!\n");
                 return false;
             } else {
@@ -213,10 +236,13 @@ bool parseNumber(Value *entry) {
             printf("Error! Unrecognized sequence!\n");
             return false;
         }
-        add(vector, 0, nextChar);
+        addVector(vector, 0, nextChar);
         nextChar = fgetc(stdin);
     }
+    // Convert vector into string
     char *valueStr = convertVector(vector, false);
+    
+    // Convert string into numeric values
     if (isFloat) {
         entry->type = DOUBLE_TYPE;
         double value = atof(valueStr);
@@ -233,18 +259,23 @@ bool parseNumber(Value *entry) {
         entry->i = value;
     }
     
-    if (nextChar == ')') {
-        ungetc(')', stdin);
-    }
+    // Restore the delimiter
+    ungetc(nextChar, stdin);
     return true;
 }
 
+
+/*
+ * Helper function to parse a string.
+ *
+ * Return true if the parsing is successful, false if the parsing fails.
+ */
 bool parseString(Value *entry) {
     bool balanced = false;
-    entry->type = STR_TYPE;
+    
     // Create a vector to store the string
     Vector *vector = talloc(sizeof(Vector));
-    init_vector(vector, 10);
+    initVector(vector, 10);
     if (!vector) {
         printf("Error! Out of memory!\n");
         return false;            
@@ -259,74 +290,96 @@ bool parseString(Value *entry) {
             char escaped = fgetc(stdin);
             switch (escaped) {
                 case 'n':
-                    add(vector, 0, '\n');
+                    addVector(vector, 0, '\n');
                     break;
                 case 't':
-                    add(vector, 0, '\t');
+                    addVector(vector, 0, '\t');
                     break;
                 case '"':
-                    add(vector, 0, '\"');
+                    addVector(vector, 0, '\"');
                     break;
                 case '\'':
-                    add(vector, 0, '\'');
+                    addVector(vector, 0, '\'');
                     break;
                 case '\\':
-                    add(vector, 0, '\\');
+                    addVector(vector, 0, '\\');
                     break; 
                 default:
                     printf("Error! Unknown escape string!\n");
                     return false;
             }
         } else {
-            add(vector, 0, nextChar);
+            addVector(vector, 0, nextChar);
         }
         nextChar = fgetc(stdin);
     }
+    // Raise error if the string is not closed
     if (!balanced) {
         printf("Error! Expected a closing \"!\n");
         return false;
     }
+    entry->type = STR_TYPE;
     entry->s = convertVector(vector, true);
     return true;
 }
 
-
+/*
+ * Helper function to parse a boolean.
+ *
+ * Return true if the parsing is successful, false if the parsing fails.
+ */
 bool parseBool(Value *entry) {
-    entry->type = BOOL_TYPE;
-            char lookAhead = fgetc(stdin);
+    char lookAhead = fgetc(stdin);
+    if (lookAhead == 't' || lookAhead == 'f') {
+        char follow = fgetc(stdin);
+        if (isDelimiter(follow)) {
+            ungetc(follow, stdin);
+            entry->type = BOOL_TYPE;
             if (lookAhead == 't') {
-                entry->s = "#t";
-            } else if (lookAhead == 'f') {
-                entry->s = "#f";
+                entry->s = "t";
             } else {
-                printf("Error! Unrecognized symbol!\n");
-                return false;
+                entry->s = "f";
             }
+        } else {
+            printf("Error! Unrecognized boolean sequence!\n");
+            return false;
+        }
+    } else {
+            printf("Error! Unrecognized boolean sequence!\n");
+            return false;
+    }
     return true;
 }
 
+/*
+ * Helper function to parse an identifier.
+ *
+ * Return true if the parsing is successful, false if the parsing fails.
+ */
 bool parseIdentifier(Value *entry) {
-    entry->type = SYMBOL_TYPE;
+    // Construct vector to store the identifier
     Vector *vector = talloc(sizeof(Vector));
-    init_vector(vector, 10);
+    initVector(vector, 10);
     if (!vector) {
         printf("Error! Out of memory!\n");
-        return NULL;            
+        return false;            
     }
+    
     char nextChar = fgetc(stdin);
-    while (nextChar != EOF && nextChar != ')' && nextChar != ' ') {
+    
+    while (!isDelimiter(nextChar)) {
         if (isSubsequent(nextChar)) {
-            add(vector, 0, nextChar);
+            addVector(vector, 0, nextChar);
         } else {
-            printf("Error! Unrecognized sequence!\n");
+            printf("Error! Unrecognized identifier sequence!\n");
             return false;
         }
         nextChar = fgetc(stdin);
     }
+    entry->type = SYMBOL_TYPE;
     entry->s = convertVector(vector, false);
-    if (nextChar == ')') {
-        ungetc(')', stdin);
-    }
+    // Restore the delimiter
+    ungetc(nextChar, stdin);
     return true;
 }
 
@@ -372,7 +425,7 @@ Value *tokenize(){
             }
         } else if (charRead == '+' || charRead == '-') {
             char nextChar = fgetc(stdin);
-            if (nextChar == ' ' || nextChar == ')') {
+            if (isDelimiter(nextChar)) {
                 entry->type = SYMBOL_TYPE;
                 switch (charRead) {
                     case '+':
@@ -382,9 +435,7 @@ Value *tokenize(){
                         entry->s = "-";
                         break;
                 }
-                if (nextChar == ')') {
-                    ungetc(')', stdin);
-                } 
+                ungetc(nextChar, stdin);
             } else if (isDigit(nextChar)) {
                 ungetc(nextChar, stdin);
                 ungetc(charRead, stdin);
@@ -397,14 +448,12 @@ Value *tokenize(){
                 return NULL;
             }
         } else if (isInitial(charRead)) {
-//            printf("run here! %c\n", charRead);
             ungetc(charRead, stdin);
             bool success = parseIdentifier(entry);
             if (!success) {
                 return NULL;
             }
         } else if (charRead == ';') {
-
             char nextChar = fgetc(stdin);
             while (nextChar != EOF && nextChar != '\n') {
                 nextChar = fgetc(stdin);
@@ -420,7 +469,10 @@ Value *tokenize(){
             if (!success) {
                 return NULL;
             }
-        } 
+        } else {
+            printf("Error! Unrecognized symbol %c in input!\n", charRead);
+            return NULL;
+        }
         list = cons(entry, list);
         charRead = fgetc(stdin);
     }
