@@ -1,0 +1,17 @@
+;;tokenizer test cases for symbols and lists
+() 
+;;These should all be symbols!
+! $  % &  * / : < = >  ? ~ _ 
+^tofu23s
++
+-
+A
+AC
+CYT+
+WYY+
+ZZX+
+;;not symbols
+
+(
+(
+))
