@@ -10,9 +10,10 @@
 #include "talloc.h"
 
 int main(void) {
-//    Value *list = tokenize();
-//    displayTokens(list);
-//    tfree();
-//    return 0;
-    printf("hello world\nYouknow\n");
+    Value *list = tokenize();
+    if (list == NULL) {
+        texit(1);
+    }
+    displayTokens(list);
+    texit(0);
 }

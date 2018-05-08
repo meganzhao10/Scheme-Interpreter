@@ -1,0 +1,11 @@
+"This is a string":string
+"foo;; still a string":string
+";This ; is still a STRING,":string
+"how are you?
+":string
+"
+this should have a new line":string
+"	this should have a tab":string
+"\this should have a backslash":string
+"this should have a 'single quote":string
+"this should have a "double quote":string

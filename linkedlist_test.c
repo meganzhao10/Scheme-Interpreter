@@ -124,5 +124,9 @@ int main(void) {
     display(reversed);
     
     return 0;
+<<<<<<< HEAD
+}
+=======
 
 }
+>>>>>>> f0b82c1980d608a5228f60d124664e15100d4454

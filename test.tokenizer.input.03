@@ -1,0 +1,24 @@
+; This is a test file 03
+
+(define (length L)         ; # elements in a list
+   (cond ( (null? L) 0)
+         (else (+ (length (cdr L)) 1))
+  )
+)
+
+(> 2 0)
+(!= 2.0 33)
+(let* 2 3)
+(+ 1 2. 2)
+
+;;; This function takes a lazy list llst and an integer n and
+;;; returns the n-th value in the lazy list 
+(define nth
+  (lambda (llst n)
+    (cond ((null? llst) #f)
+          ((= 1 n) (list (car llst)))
+          ((nth ((cdr llst)) (- n 1)))
+          (else #f))))
+
+(check-equal? (nth (quote ()) 10) #f)
+(check-equal? (nth (lazy-range 1 6) 100) #f)
