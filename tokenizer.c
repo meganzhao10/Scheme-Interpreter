@@ -19,7 +19,7 @@
  */
 bool isDelimiter(char ch) {
     return (ch == ' ' || ch == '(' || ch == ')' || ch == '\n'
-           || ch == EOF || ch == ';');
+           || ch == EOF || ch == ';' || ch == '\t');
 }
 
 /*
@@ -465,6 +465,9 @@ Value *tokenize(){
         } else if (charRead == '\n') {
             entry->type = SYMBOL_TYPE;
             entry->s = "\\n";
+        } else if (charRead == '\t') {
+            entry->type = SYMBOL_TYPE;
+            entry->s = "\\t";
         } else if (isDigit(charRead) || charRead == '.') {
             ungetc(charRead, stdin);
             bool success = parseNumber(entry);
@@ -504,7 +507,8 @@ void displayTokens(Value *list){
             case SYMBOL_TYPE:
                 if ((strcmp(car(cur)->s, " ") != 0) 
                     && (strcmp(car(cur)->s, "\\n") != 0)
-                    && (strcmp(car(cur)->s, ";") != 0)) {
+                    && (strcmp(car(cur)->s, ";") != 0)
+                    && (strcmp(car(cur)->s, "\\t") != 0)) {
                     printf("%s:symbol\n", car(cur)->s);
                 }
                 break;
