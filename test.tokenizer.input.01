@@ -1,0 +1,14 @@
+;tokenizer test cases for comments and strings
+"This is a string"
+"foo;; still a string"  ;; now it's a comment!
+; this is a comment + - x /
+
+";This ; is still a STRING," ; but now this is a comment!
+"how are you?
+" 
+"\nthis should have a new line"
+
+"\tthis should have a tab"
+"\\this should have a backslash"
+"this should have a \'single quote"
+"this should have a \"double quote"

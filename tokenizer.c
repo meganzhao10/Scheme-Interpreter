@@ -339,9 +339,9 @@ bool parseBool(Value *entry) {
             ungetc(follow, stdin);
             entry->type = BOOL_TYPE;
             if (lookAhead == 't') {
-                entry->s = "t";
+                entry->s = "#t";
             } else {
-                entry->s = "f";
+                entry->s = "#f";
             }
         } else {
             printf("Error! Unrecognized boolean sequence!\n");
@@ -438,7 +438,7 @@ Value *tokenize(){
                         break;
                 }
                 ungetc(nextChar, stdin);
-            } else if (isDigit(nextChar)) {
+            } else if (isDigit(nextChar) || nextChar == '.') {
                 ungetc(nextChar, stdin);
                 ungetc(charRead, stdin);
                 bool success = parseNumber(entry);
