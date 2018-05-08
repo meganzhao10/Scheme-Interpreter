@@ -190,7 +190,7 @@ char *convertVector(Vector *list, bool isStr) {
  */
 bool parseNumber(Value *entry) {
     char sign = fgetc(stdin);
-    bool neg;
+    bool neg = false;
     if (sign == '+') {
         neg = false;
     } else if (sign == '-') {
