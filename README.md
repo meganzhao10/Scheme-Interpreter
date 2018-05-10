@@ -6,6 +6,10 @@ To implement a linked list that will be used throughout the interpreter project.
 To create a garbage collector to manage memory usage throughout the interpreter project.
 ## Phase 3: Tokenizer
 To implement a tokenizer for Scheme in C.
+## Phase 4: Parser
+To parse the tokens into a syntax tree.
+## Phase 5: Eval
+To evaluate the Scheme code
 
 ## Author: 
 * **Yitong Chen** - [yitongc19](https://github.com/yitongc19)
