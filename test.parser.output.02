@@ -1,0 +1,1 @@
+(define inorder (lambda (bst) (cond ((null? bst) (quote ())) ((not (bst? bst)) (quote ("not valid bst"))) (else (append (inorder (left bst)) (list (entry bst)) (inorder (right bst)))))))

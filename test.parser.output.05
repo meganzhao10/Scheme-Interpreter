@@ -1,0 +1,1 @@
+ (define make-matrix (lambda (rows columns) (do ((m (make-vector rows)) (i 0 (+ i 1))) ((= i rows) m) (vector-set! m i (make-vector columns))))) (define matrix? (lambda (x) (and (vector? x) (> (vector-length x) 0) (vector? (vector-ref x 0)))))

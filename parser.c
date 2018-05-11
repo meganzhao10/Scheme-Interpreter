@@ -22,6 +22,16 @@ bool isAtom(Value *token) {
            tokenType == STR_TYPE);
 }
 
+bool specialChar(Value *ch){
+    if ((strcmp(ch->s, " ") != 0)
+        && (strcmp(ch->s, "\\n") != 0)
+        && (strcmp(ch->s, ";") != 0)
+        && (strcmp(ch->s, "\\t") != 0)) {
+    	return false;
+    }
+    return true;
+}
+
 /*
  * Helper function for displaying a parse tree to the screen.
  */
@@ -36,10 +46,7 @@ void printTreeHelper(Value *tree, Value *prev) {
                     printf("%s", car(cur)->s);
                     break;
                 case SYMBOL_TYPE:
-                    if ((strcmp(car(cur)->s, " ") != 0)
-                        && (strcmp(car(cur)->s, "\\n") != 0)
-                        && (strcmp(car(cur)->s, ";") != 0)
-                        && (strcmp(car(cur)->s, "\\t") != 0)) {
+		    if (!specialChar((car(cur)))){
                             if (prev != NULL && prev->type != OPEN_TYPE)
                                 printf(" ");
                             printf("%s", car(cur)->s);
@@ -121,7 +128,16 @@ Value *parse(Value *tokens) {
             // Push the list back on to the stack
             if (!isNull(inner)) {
                 stack = cons(inner, stack);
-            }
+            } else {
+		inner = talloc(sizeof(Value));
+		inner->type = STR_TYPE;
+		inner->s = "()";
+		if (!inner){
+		    printf("Error! Not enough memory!\n");
+		    return NULL;
+		}
+		stack = cons(inner, stack);
+	    }
         } else {
             stack = cons(token, stack);
         }
@@ -149,6 +165,6 @@ void printTree(Value *tree) {
         printf("Error! Not enough memory!\n");
         return;
     }
-    prev->type = NULL_TYPE;
+    prev->type = NULL_TYPE; 
     printTreeHelper(tree, prev);
 }
