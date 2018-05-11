@@ -1,6 +1,6 @@
 /*
- * This program builds a parser for Scheme code and adds functionality
- * to display the parse tree.
+ * This program implements a parser for Scheme code with 
+ * functionality to display the parse tree.
  *
  * Author: Yitong Chen, Megan Zhao and Yingying Wang
  */
