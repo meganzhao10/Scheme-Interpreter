@@ -11,6 +11,7 @@ int main(void) {
     if (tree == NULL) {
         texit(1);
     }
+
     printTree(tree);
     printf("\n");
     texit(0);

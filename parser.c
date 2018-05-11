@@ -22,6 +22,61 @@ bool isAtom(Value *token) {
            tokenType == STR_TYPE);
 }
 
+/*
+ * Helper function for displaying a parse tree to the screen.
+ */
+void printTreeHelper(Value *tree, Value *prev) {
+    Value *cur = tree;
+    while (cur != NULL && cur->type != NULL_TYPE) {
+        if (isAtom(car(cur))) {
+            switch(car(cur)->type) {
+                case BOOL_TYPE:
+                    if (prev != NULL && prev->type != OPEN_TYPE)
+                        printf(" ");
+                    printf("%s", car(cur)->s);
+                    break;
+                case SYMBOL_TYPE:
+                    if ((strcmp(car(cur)->s, " ") != 0)
+                        && (strcmp(car(cur)->s, "\\n") != 0)
+                        && (strcmp(car(cur)->s, ";") != 0)
+                        && (strcmp(car(cur)->s, "\\t") != 0)) {
+                            if (prev != NULL && prev->type != OPEN_TYPE)
+                                printf(" ");
+                            printf("%s", car(cur)->s);
+                    }
+                    break;
+                case INT_TYPE:
+                    if (prev != NULL && prev->type != OPEN_TYPE)
+                        printf(" ");
+                    printf("%d", car(cur)->i);
+                    break;
+                case DOUBLE_TYPE:
+                    if (prev != NULL && prev->type != OPEN_TYPE)
+                        printf(" ");
+                    printf("%f", car(cur)->d);
+                    break;
+                case STR_TYPE:
+                    if (prev != NULL && prev->type != OPEN_TYPE)
+                        printf(" ");
+                    printf("%s", car(cur)->s);
+                    break;
+                default:
+                    printf("ERROR\n");
+            }
+            prev = car(cur);
+        } else {
+            if (prev != NULL && prev->type != NULL_TYPE && prev->type != OPEN_TYPE)
+                printf(" ");
+            printf("(");
+            prev->type = OPEN_TYPE;
+            printTreeHelper(car(cur), prev);
+            printf(")");
+            prev->type = CLOSE_TYPE;
+        }
+        cur = cdr(cur);
+    }
+}
+
 /* 
  * This function returns a parse tree representing a Scheme
  * program on the input of a linkedlist of tokens from that 
@@ -89,39 +144,11 @@ void printTree(Value *tree) {
         printf("()");
         return;
     }
-    Value *cur = tree;
-    while (cur != NULL && cur->type != NULL_TYPE) {
-        if (isAtom(car(cur))) {
-        
-            switch(car(cur)->type) {
-                case BOOL_TYPE:
-                    printf("%s ", car(cur)->s);
-                    break;
-                case SYMBOL_TYPE:
-                    if ((strcmp(car(cur)->s, " ") != 0) 
-                        && (strcmp(car(cur)->s, "\\n") != 0)
-                        && (strcmp(car(cur)->s, ";") != 0)
-                        && (strcmp(car(cur)->s, "\\t") != 0)) {
-                            printf("%s ", car(cur)->s);
-                    }
-                    break;
-                case INT_TYPE:
-                    printf("%d ", car(cur)->i);
-                    break;
-                case DOUBLE_TYPE:
-                    printf("%f ", car(cur)->d);
-                    break;
-                case STR_TYPE:
-                    printf("%s ", car(cur)->s);
-                    break;
-                default:
-                    printf("ERROR\n");
-            }
-        } else {
-            printf("(");
-            printTree(car(cur));
-            printf(") ");
-        }
-        cur = cdr(cur);
+    Value *prev = talloc(sizeof(Value));
+    if (!prev) {
+        printf("Error! Not enough memory!\n");
+        return;
     }
+    prev->type = NULL_TYPE;
+    printTreeHelper(tree, prev);
 }
