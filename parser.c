@@ -139,7 +139,13 @@ Value *parse(Value *tokens) {
 		stack = cons(inner, stack);
 	    }
         } else {
-            stack = cons(token, stack);
+            if (token->type == STR_TYPE) {
+                if (!specialChar(token)) {
+                   stack = cons(token, stack); 
+                }
+            } else {
+                stack = cons(token, stack);
+            }
         }
         current = cdr(current);
     }
