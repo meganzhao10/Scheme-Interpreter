@@ -126,18 +126,7 @@ Value *parse(Value *tokens) {
             // Pop off the (
             stack = cdr(stack);
             // Push the list back on to the stack
-            if (!isNull(inner)) {
-                stack = cons(inner, stack);
-            } else {
-		inner = talloc(sizeof(Value));
-		inner->type = STR_TYPE;
-		inner->s = "()";
-		if (!inner){
-		    printf("Error! Not enough memory!\n");
-		    return NULL;
-		}
-		stack = cons(inner, stack);
-	    }
+            stack = cons(inner, stack);
         } else {
             stack = cons(token, stack);
         }
