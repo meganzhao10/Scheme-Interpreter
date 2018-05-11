@@ -92,7 +92,7 @@ Value *parse(Value *tokens) {
         printf("Error! Unbalanced use of parentheses!\n");
         return NULL;
     }
-    return stack;
+    return reverse(stack);
 }
 
 /* 
