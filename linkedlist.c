@@ -35,10 +35,10 @@ Value *makeNull() {
  *
  * Returns a pointer to a non-empty list.
  * If memory allocation fails, returns a null pointer.
- * Asserts that car is not a list (so no nested list)
+ * Asserts that car is not an empty list.
  */
 Value *cons(Value *car, Value *cdr) {
-    assert(car != NULL && cdr != NULL && car->type != CONS_TYPE 
+    assert(car != NULL && cdr != NULL 
             && car->type != NULL_TYPE);
     struct ConsCell cell;
     cell.car = car;
@@ -66,16 +66,22 @@ void display(Value *list){
         printf("()");
     }
     Value *cur = list;
+    printf("(");
     while(cur->type != NULL_TYPE){
         switch(cur->c.car->type){
             case INT_TYPE:
-                printf("type:INT_TYPE; value: %i\n",cur->c.car->i);
+                printf("%i ",cur->c.car->i);
                 break;
             case DOUBLE_TYPE:
-                printf("type:DOUBLE_TYPE; value: %f\n",cur->c.car->d);
+                printf("%f ",cur->c.car->d);
                 break;
             case STR_TYPE:
-                printf("type:STRING_TYPE; value: %s\n",cur->c.car->s);
+                printf("%s ",cur->c.car->s);
+                break;
+            case CONS_TYPE:
+                printf("(");
+                display(cur->c.car);
+                printf(")");
                 break;
             default:
                 printf(" ");
@@ -83,6 +89,7 @@ void display(Value *list){
         }
         cur = cur->c.cdr;
     }
+    printf(")");
 }
 
 /*
