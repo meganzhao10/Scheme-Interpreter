@@ -16,27 +16,6 @@ bool isAtom(Value *token) {
            tokenType == STR_TYPE);
 }
 
-///*
-// * Helper function to parse an input
-// */
-//Value *addToParseTree(Value *tree, int *depth, Value *token) {
-//    Value *newNode = talloc(sizeof(Value));
-//    if (!newNode) {
-//        printf("Error! Out of memory!");
-//        return NULL;
-//    }
-//    if (isAtom(token)) {
-//        newNode = token;
-//    } 
-////    else if (token->type == OPEN_TYPE) {
-////        *depth += 1;
-////        newNode->type = CONS_TYPE;
-////    } else if (token->type == CLOSE_TYPE) {
-////        *depth -= 1;
-////    }
-//    return cons(newNode, tree);
-//}
-
 /* 
  * This function returns a parse tree representing a Scheme
  * program on the input of a linkedlist of tokens from that 
@@ -46,9 +25,8 @@ bool isAtom(Value *token) {
  * the parsing fails.
  */
 Value *parse(Value *tokens) {
-    Value *tree = makeNull();
     Value *stack = makeNull();
-    if (!tree || !stack) {
+    if (!stack) {
         return NULL;
     }
     
@@ -61,7 +39,7 @@ Value *parse(Value *tokens) {
             depth ++;
             stack = cons(token, stack);
         } else if (token->type == CLOSE_TYPE) {
-            // Pop until reaching (
+            // Pop from the stack until reaching (
             if (depth == 0) {
                 printf("Error! Unbalanced use of parentheses!\n");
                 return NULL;
@@ -79,7 +57,7 @@ Value *parse(Value *tokens) {
             }
             // Pop off the (
             stack = cdr(stack);
-            // Push back on to the stack
+            // Push the list back on to the stack
             if (!isNull(inner)) {
                 stack = cons(inner, stack);
             }
