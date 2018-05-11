@@ -128,7 +128,7 @@ Value *parse(Value *tokens) {
             // Push the list back on to the stack
             stack = cons(inner, stack);
         } else {
-            if (token->type == STR_TYPE) {
+            if (token->type == SYMBOL_TYPE) {
                 if (!specialChar(token)) {
                    stack = cons(token, stack); 
                 }
