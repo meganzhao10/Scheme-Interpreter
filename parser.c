@@ -23,6 +23,15 @@ bool isAtom(Value *token) {
 }
 
 /*
+ * Helper function to add space.
+ */
+void printSpace(Value *prev) {
+    if (prev != NULL && prev->type != OPEN_TYPE) {
+        printf(" ");
+    }
+}
+
+/*
  * Helper function for displaying a parse tree to the screen.
  */
 void printTreeHelper(Value *tree, Value *prev) {
@@ -31,33 +40,23 @@ void printTreeHelper(Value *tree, Value *prev) {
         if (isAtom(car(cur))) {
             switch(car(cur)->type) {
                 case BOOL_TYPE:
-                    if (prev != NULL && prev->type != OPEN_TYPE)
-                        printf(" ");
+                    printSpace(prev);
                     printf("%s", car(cur)->s);
                     break;
                 case SYMBOL_TYPE:
-                    if ((strcmp(car(cur)->s, " ") != 0)
-                        && (strcmp(car(cur)->s, "\\n") != 0)
-                        && (strcmp(car(cur)->s, ";") != 0)
-                        && (strcmp(car(cur)->s, "\\t") != 0)) {
-                            if (prev != NULL && prev->type != OPEN_TYPE)
-                                printf(" ");
-                            printf("%s", car(cur)->s);
-                    }
+                    printSpace(prev);     
+                    printf("%s", car(cur)->s);
                     break;
                 case INT_TYPE:
-                    if (prev != NULL && prev->type != OPEN_TYPE)
-                        printf(" ");
+                    printSpace(prev); 
                     printf("%d", car(cur)->i);
                     break;
                 case DOUBLE_TYPE:
-                    if (prev != NULL && prev->type != OPEN_TYPE)
-                        printf(" ");
+                    printSpace(prev);
                     printf("%f", car(cur)->d);
                     break;
                 case STR_TYPE:
-                    if (prev != NULL && prev->type != OPEN_TYPE)
-                        printf(" ");
+                    printSpace(prev);
                     printf("%s", car(cur)->s);
                     break;
                 default:
