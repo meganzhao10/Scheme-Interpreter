@@ -108,9 +108,9 @@ void addBinding(Value *var, Value *expr, Frame *frame){
 Value *evalLet(Value *args, Frame *frame){
     Value *cur = car(args);
     Value *body = car(cdr(args));
-    if (cur->type != CONS_TYPE || isNull(cdr(cdr(args)))){
+    /*if (cur->type != CONS_TYPE || isNull(cdr(cdr(args)))){
 	evaluationError();
-    }   
+    } */  
     Frame *frameG = talloc(sizeof(Frame));
     frameG->parent = frame;
     frameG->bindings = makeNull();
