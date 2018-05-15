@@ -53,6 +53,7 @@ void displayEval(Value *list){
  */
 void interpret(Value *tree){
     Frame *topFrame = talloc(sizeof(Frame));
+    topFrame->bindings = makeNull();
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
 	Value *result = eval(car(cur), topFrame);
@@ -63,7 +64,7 @@ void interpret(Value *tree){
 }
 
 void evaluationError(){
-    printf("Error: not a recognized special form.\n");
+    printf("Evaluation error: not a recognized special form.\n");
     texit(1);
 }
 
@@ -72,7 +73,7 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
     Value *binding = frame->bindings;
     Frame *curF = frame;
     while (curF != NULL){
-       assert(binding != NULL && binding->type == CONS_TYPE);      
+       assert(binding != NULL);      
        while (binding->type != NULL_TYPE){
            Value *curBinding = car(binding);
 	   Value *name = car(curBinding);
@@ -90,26 +91,32 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
 }
 
 Value *evalIf(Value *args, Frame *frame){
-    if (!strcmp(car(args)->s, "#f")){
+    if (eval(car(args), frame)->type == BOOL_TYPE &&
+	!strcmp(eval(car(args), frame)->s, "#f")){
 	return eval(car(cdr(cdr(args))), frame);
     }
     return eval(car(cdr(args)), frame);
 }
 
 void addBinding(Value *var, Value *expr, Frame *frame){
-    Value *list = cons(var, expr);
+    Value *list = cons(expr, makeNull());
+    list = cons(var, list);
     Value *bindings = frame->bindings;
-    cons(list, bindings);
+    frame->bindings = cons(list, bindings);
 }
 
 Value *evalLet(Value *args, Frame *frame){
-    Value *cur = car(car(args));
-    Value *body = cdr(args);   
+    Value *cur = car(args);
+    Value *body = car(cdr(args));
+    if (cur->type != CONS_TYPE || isNull(cdr(cdr(args)))){
+	evaluationError();
+    }   
     Frame *frameG = talloc(sizeof(Frame));
     frameG->parent = frame;
+    frameG->bindings = makeNull();
     while (cur != NULL && cur->type != NULL_TYPE){
-	Value *v = eval(car(cdr(cur)), frame);
-	addBinding(car(cur), v, frameG);
+	Value *v = eval(car(cdr(car(cur))), frame);
+	addBinding(car(car(cur)), v, frameG);
 	cur = cdr(cur);
     }
     return eval(body, frameG);    
