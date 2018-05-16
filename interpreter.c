@@ -88,6 +88,9 @@ void evaluationError(){
     texit(1);
 }
 
+/*
+ * Helper function to lookup symbols in the given environment.
+ */
 Value *lookUpSymbol(Value *expr, Frame *frame){
     // Get binding of the frame in which the expression is evaluated
     Value *binding = frame->bindings;
@@ -111,6 +114,9 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
     return NULL;
 }
 
+/*
+ * Helper function to evaluate the IF special form.
+ */
 Value *evalIf(Value *args, Frame *frame){
     if (eval(car(args), frame)->type == BOOL_TYPE &&
 	!strcmp(eval(car(args), frame)->s, "#f")){
@@ -119,6 +125,10 @@ Value *evalIf(Value *args, Frame *frame){
     return eval(car(cdr(args)), frame);
 }
 
+/* 
+ * Helper function to check whether a variable is already bounded in
+ * the current frame.
+ */
 bool isBounded(Value *var, Frame *frame) {
     Value *binding = frame->bindings;
     while (binding->type != NULL_TYPE){
@@ -134,6 +144,10 @@ bool isBounded(Value *var, Frame *frame) {
     return false;
         
 }
+
+/* 
+ * Helper function to create new bindings.
+ */
 void addBindingLet(Value *var, Value *expr, Frame *frame){
     if (isBounded(var, frame)) {
         printf("Duplicate identifier in 'let'. ");
@@ -145,6 +159,10 @@ void addBindingLet(Value *var, Value *expr, Frame *frame){
     frame->bindings = cons(list, bindings);
 }
 
+/*
+ * Helper function to evaluate the LET special form by 
+ * creating bindings and then evaluate the body.
+ */
 Value *evalLet(Value *args, Frame *frame){
     Value *cur = car(args);
     if (!isNull(cur) && cur->type != CONS_TYPE) {
