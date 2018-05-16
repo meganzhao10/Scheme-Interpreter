@@ -1,0 +1,4 @@
+;((lambda (x) 23) (/ 1 0))
+(if #f (/ 1 0) 23)
+(if 12 (quote 23) "tofu")
+(if 12 (/ 1 0) "tofu")

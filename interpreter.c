@@ -239,6 +239,7 @@ Value *eval(Value *expr, Frame *frame){
 	    }
 	    else{
 		// not a recognized special form
+        printf("Unrecognized forms! ");
 		evaluationError();
 	    }		
 	    break;
