@@ -93,9 +93,10 @@ void evaluationError(){
  */
 Value *lookUpSymbol(Value *expr, Frame *frame){
     // Get binding of the frame in which the expression is evaluated
-    Value *binding = frame->bindings;
     Frame *curF = frame;
+    Value *binding = curF->bindings;
     while (curF != NULL){
+        binding = curF->bindings;
        assert(binding != NULL);      
        while (binding->type != NULL_TYPE){
            Value *curBinding = car(binding);
