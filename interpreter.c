@@ -46,7 +46,7 @@ void displayEval(Value *list){
                 break;
             case NULL_TYPE:
                 printf("()");
-            break;
+                break;
             default:
                 printf(" ");
                 break;     
@@ -121,7 +121,15 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
 Value *evalIf(Value *args, Frame *frame){
     if (eval(car(args), frame)->type == BOOL_TYPE &&
 	!strcmp(eval(car(args), frame)->s, "#f")){
-	    return eval(car(cdr(cdr(args))), frame);
+	    if (cdr(cdr(args))->type != NULL_TYPE){
+            return eval(car(cdr(cdr(args))), frame);
+        } else{
+            Value *emptyValue = talloc(sizeof(Value));
+            if (!emptyValue){
+                printf("Error: not enough memory");
+            }
+            return emptyValue;
+        }
     }
     return eval(car(cdr(args)), frame);
 }
@@ -228,8 +236,8 @@ Value *eval(Value *expr, Frame *frame){
 	    Value *first = car(expr);
 	    Value *args = cdr(expr);
 	    if (!strcmp(first->s, "if")){
-    		if (length(args) != 3){
-	            printf("Number of arguments for 'if' has to be 3.\n");
+    		if (length(args) != 3 && length(args) != 2){
+	            printf("Number of arguments for 'if' has to be 2 or 3.\n");
                 evaluationError();
     		}
     		return evalIf(args, frame);
