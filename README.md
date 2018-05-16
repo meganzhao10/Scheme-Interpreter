@@ -1,4 +1,4 @@
-Interpreter for Scheme (R5RS) written in C.
+# Interpreter for Scheme (R5RS) written in C.
 
 ## Phase 1: Linked List
 To implement a linked list that will be used throughout the interpreter project.

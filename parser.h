@@ -1,3 +1,9 @@
+/*
+ * This program implements a parser for Scheme code with 
+ * functionality to display the parse tree.
+ *
+ * Author: Yitong Chen, Megan Zhao and Yingying Wang
+ */
 #include <stdlib.h>
 #include "value.h"
 

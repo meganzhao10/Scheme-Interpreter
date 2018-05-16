@@ -1,3 +1,9 @@
+/* 
+ * This program executes parsing.
+ *
+ * Authors: Yitong Chen, Yingying Wang, Megan Zhao
+ */
+
 #include <stdio.h>
 #include "parser.h"
 #include "tokenizer.h"

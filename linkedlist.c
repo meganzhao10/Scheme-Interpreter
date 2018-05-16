@@ -38,8 +38,7 @@ Value *makeNull() {
  * Asserts that car is not an empty list.
  */
 Value *cons(Value *car, Value *cdr) {
-    assert(car != NULL && cdr != NULL 
-            && car->type != NULL_TYPE);
+    assert(car != NULL && cdr != NULL);
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;

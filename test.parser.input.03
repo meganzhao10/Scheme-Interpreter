@@ -1,0 +1,2 @@
+(car (car (cdr (cdr (car (quote (((jane) (elizabeth) (mary) (kitty) (lydia)))))))))
+(()()(()()(23)228))
