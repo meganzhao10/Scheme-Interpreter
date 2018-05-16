@@ -134,7 +134,7 @@ char *convertVector(Vector *list, bool isStr) {
     char *result = talloc(sizeof(char) * (list->size) + 3);
     if (!result) {
         printf("Error! Not enough memory!\n");
-        return NULL;
+        texit(1);
     }
     if (isStr) {
         result[0] = '"';
@@ -377,7 +377,7 @@ Value *tokenize(){
         Value *entry = talloc(sizeof(Value));
         if (!entry) {
             printf("Error! Not enough memory!\n");
-            return entry;
+            exit(1);
         }
         if (charRead == '(') {
             entry->type = OPEN_TYPE;
@@ -389,12 +389,12 @@ Value *tokenize(){
         } else if (charRead == '#') {
             bool success = parseBool(entry);
             if (!success) {
-                return NULL;
+                texit(1);
             }
         } else if (charRead == '"') {
             bool success = parseString(entry);
             if (!success) {
-                return NULL;
+                texit(1);
             }
         } else if (charRead == '+' || charRead == '-') {
             char nextChar = fgetc(stdin);
@@ -414,17 +414,17 @@ Value *tokenize(){
                 ungetc(charRead, stdin);
                 bool success = parseNumber(entry);
                 if (!success) {
-                    return NULL;
+                    texit(1);
                 }
             } else {
                 printf("Error! Illegal identifier!\n");
-                return NULL;
+                texit(1);
             }
         } else if (isInitial(charRead)) {
             ungetc(charRead, stdin);
             bool success = parseIdentifier(entry);
             if (!success) {
-                return NULL;
+                texit(1);
             }
         } else if (charRead == ';') {
             char nextChar = fgetc(stdin);
@@ -443,11 +443,11 @@ Value *tokenize(){
             ungetc(charRead, stdin);
             bool success = parseNumber(entry);
             if (!success) {
-                return NULL;
+                texit(1);
             }
         } else {
             printf("Error! Unrecognized symbol %c in input!\n", charRead);
-            return NULL;
+            texit(1);
         }
         list = cons(entry, list);
 

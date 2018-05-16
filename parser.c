@@ -95,7 +95,7 @@ void printTreeHelper(Value *tree, Value *prev) {
 Value *parse(Value *tokens) {
     Value *stack = makeNull();
     if (!stack) {
-        return NULL;
+        texit(1);
     }
     
     int depth = 0;
@@ -110,7 +110,7 @@ Value *parse(Value *tokens) {
             // Pop from the stack until reaching (
             if (depth == 0) {
                 printf("Error! Unbalanced use of parentheses!\n");
-                return NULL;
+                texit(1);
             }
             depth --;
             // Access top item in the list
@@ -140,7 +140,7 @@ Value *parse(Value *tokens) {
     }
     if (depth != 0) {
         printf("Error! Unbalanced use of parentheses!\n");
-        return NULL;
+        texit(1);
     }
     return reverse(stack);
 }
