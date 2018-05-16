@@ -1,15 +1,1 @@
-(quote "yolo"228);should be error - will add later
-(quote "yolo228")
-(quote yolo228)
-(quote ())
-(quote hizhaoxia)
-(quote (quote (2 2 8)))
-(quote (car(2 2 8)))
-(quote (+ (* 2 2) 8))
-(if #t (let ((x 228))
-        (quote x)))
-(if #f (let ((x 22))
-        (quote x)) 8)
-(if #f (let ((x 22))
-        (quote x)))
-        
+(quote "yolo"228);should be error 

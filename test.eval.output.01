@@ -1,2 +1,2 @@
-228 
-Invalid syntax in 'let' bindings. Evaluation error!
+Number of arguments for 'quote' has to be 1.
+Evaluation error!
