@@ -28,8 +28,14 @@ void displayEval(Value *list){
 	    case SYMBOL_TYPE:
 		printf("%s ",cur->s);
             	break;
-	    case CONS_TYPE:
-                displayEval(car(cur));
+	    case CONS_TYPE: 
+		{if (length(car(cur)) == 1) {
+		    displayEval(car(cur));
+		} else {
+		    printf("(");
+		    displayEval(car(cur));
+		    printf("(");
+		}}
                 break;
 	    case NULL_TYPE:
 		printf("()");
