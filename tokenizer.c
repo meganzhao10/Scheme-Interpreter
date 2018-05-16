@@ -383,9 +383,6 @@ Value *tokenize(){
             entry->type = OPEN_TYPE;
         } else if (charRead == ')') {
             entry->type = CLOSE_TYPE;
-        } else if (charRead == ' ') {
-            entry->type = SYMBOL_TYPE;
-            entry->s = " ";
         } else if (charRead == '#') {
             bool success = parseBool(entry);
             if (!success) {
@@ -431,14 +428,11 @@ Value *tokenize(){
             while (nextChar != EOF && nextChar != '\n') {
                 nextChar = fgetc(stdin);
             }
-            entry->type = SYMBOL_TYPE;
-            entry->s = ";";
-        } else if (charRead == '\n') {
-            entry->type = SYMBOL_TYPE;
-            entry->s = "\\n";
-        } else if (charRead == '\t') {
-            entry->type = SYMBOL_TYPE;
-            entry->s = "\\t";
+            charRead = fgetc(stdin);
+            continue;
+        } else if (charRead == '\n' || charRead == '\t' || charRead == ' ') {
+            charRead = fgetc(stdin);
+            continue;
         } else if (isdigit(charRead) || charRead == '.') {
             ungetc(charRead, stdin);
             bool success = parseNumber(entry);
@@ -477,12 +471,7 @@ void displayTokens(Value *list){
                 printf("%s:boolean\n", car(cur)->s);
                 break;
             case SYMBOL_TYPE:
-                if ((strcmp(car(cur)->s, " ") != 0) 
-                    && (strcmp(car(cur)->s, "\\n") != 0)
-                    && (strcmp(car(cur)->s, ";") != 0)
-                    && (strcmp(car(cur)->s, "\\t") != 0)) {
-                    printf("%s:symbol\n", car(cur)->s);
-                }
+                printf("%s:symbol\n", car(cur)->s);
                 break;
             case INT_TYPE:
                 printf("%d:integer\n", car(cur)->i);
