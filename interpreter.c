@@ -1,4 +1,10 @@
+/*
+ * This program implements the evaluator for Scheme.
+ *
+ * Authors: Yitong Chen, Yingying Wang, Megan Zhao.
+ */
 #include <stdio.h>
+#include <stdbool.h>
 #include <string.h>
 #include "linkedlist.h"
 #include "interpreter.h"
@@ -25,21 +31,22 @@ void displayEval(Value *list){
             case STR_TYPE:
                 printf("%s ",cur->s);
                 break;
-	    case SYMBOL_TYPE:
-		printf("%s ",cur->s);
+            case SYMBOL_TYPE:
+                printf("%s ",cur->s);
             	break;
-	    case CONS_TYPE: 
-		{if (length(car(cur)) == 1) {
-		    displayEval(car(cur));
-		} else {
-		    printf("(");
-		    displayEval(car(cur));
-		    printf("(");
-		}}
+	        case CONS_TYPE:
+                {if (car(cur)->type == CONS_TYPE) {
+                    printf("(");
+                    displayEval(car(cur));
+                    printf(")");
+                } else {
+                    displayEval(car(cur));
+                }
+                }
                 break;
-	    case NULL_TYPE:
-		printf("()");
-		break;
+            case NULL_TYPE:
+                printf("()");
+            break;
             default:
                 printf(" ");
                 break;     
@@ -59,6 +66,10 @@ void displayEval(Value *list){
  */
 void interpret(Value *tree){
     Frame *topFrame = talloc(sizeof(Frame));
+    if (!topFrame) {
+        printf("Error! Not enough space! ");
+        texit(1);
+    }
     topFrame->bindings = makeNull();
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
@@ -69,8 +80,11 @@ void interpret(Value *tree){
     }
 }
 
+/* 
+ * Helper function for displaying evaluation err message.
+ */
 void evaluationError(){
-    printf("Evaluation error: not a recognized special form.\n");
+    printf("Evaluation error!\n");
     texit(1);
 }
 
@@ -92,6 +106,7 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
 	}
        curF = curF->parent;
     }
+    printf("The symbol %s is unbounded! ", expr->s);
     evaluationError();
     return NULL;
 }
@@ -104,7 +119,26 @@ Value *evalIf(Value *args, Frame *frame){
     return eval(car(cdr(args)), frame);
 }
 
-void addBinding(Value *var, Value *expr, Frame *frame){
+bool isBounded(Value *var, Frame *frame) {
+    Value *binding = frame->bindings;
+    while (binding->type != NULL_TYPE){
+           Value *curBinding = car(binding);
+	   Value *name = car(curBinding);
+	   Value *value = car(cdr(curBinding));
+	   assert(name->type == SYMBOL_TYPE);
+	   if (!strcmp(name->s, var->s)){
+		return true;	      
+	   }
+       	   binding = cdr(binding);
+	}
+    return false;
+        
+}
+void addBindingLet(Value *var, Value *expr, Frame *frame){
+    if (isBounded(var, frame)) {
+        printf("Duplicate identifier in 'let'. ");
+        evaluationError();
+    }
     Value *list = cons(expr, makeNull());
     list = cons(var, list);
     Value *bindings = frame->bindings;
@@ -113,16 +147,36 @@ void addBinding(Value *var, Value *expr, Frame *frame){
 
 Value *evalLet(Value *args, Frame *frame){
     Value *cur = car(args);
+    if (!isNull(cur) && cur->type != CONS_TYPE) {
+        printf("Invalid syntax in 'let'. ");
+        evaluationError();
+    }
+    if (isNull(cdr(args))) {
+        printf("Empty body in 'let'. ");
+        evaluationError();
+    }
     Value *body = car(cdr(args));
     /*if (cur->type != CONS_TYPE || isNull(cdr(cdr(args)))){
 	evaluationError();
     } */  
     Frame *frameG = talloc(sizeof(Frame));
+    if (!frameG) {
+        printf("Error! Not enough space! ");
+        texit(1);
+    }
     frameG->parent = frame;
     frameG->bindings = makeNull();
     while (cur != NULL && cur->type != NULL_TYPE){
+        if (car(cur)->type != CONS_TYPE || length(car(cur)) != 2) {
+            printf("Invalid syntax in 'let' bindings. ");
+            evaluationError();
+        }
 	Value *v = eval(car(cdr(car(cur))), frame);
-	addBinding(car(car(cur)), v, frameG);
+    if (car(car(cur))->type != SYMBOL_TYPE) {
+        printf("Invalid syntax in 'let'. Not a valid identifier! ");
+        evaluationError();
+    }    
+	addBindingLet(car(car(cur)), v, frameG);
 	cur = cdr(cur);
     }
     return eval(body, frameG);    
