@@ -11,7 +11,8 @@ typedef enum {
    DOUBLE_TYPE,
    STR_TYPE,
    CONS_TYPE,
-   NULL_TYPE
+   NULL_TYPE,
+    VOID_TYPE
 } valueType;
 
 struct Value {

@@ -47,6 +47,8 @@ void displayEval(Value *list){
             case NULL_TYPE:
                 printf("()");
                 break;
+        case VOID_TYPE: 
+                break;
             default:
                 printf(" ");
                 break;     
@@ -128,6 +130,7 @@ Value *evalIf(Value *args, Frame *frame){
             if (!emptyValue){
                 printf("Error: not enough memory");
             }
+            emptyValue->type = VOID_TYPE;
             return emptyValue;
         }
     }
@@ -237,14 +240,14 @@ Value *eval(Value *expr, Frame *frame){
 	    Value *args = cdr(expr);
 	    if (!strcmp(first->s, "if")){
     		if (length(args) != 3 && length(args) != 2){
-	            printf("Number of arguments for 'if' has to be 2 or 3.\n");
+	            printf("Number of arguments for 'if' has to be 2 or 3. ");
                 evaluationError();
     		}
     		return evalIf(args, frame);
 	    } 
 	    else if (!strcmp(first->s, "quote")){
     		if (length(args) != 1){
-                printf("Number of arguments for 'quote' has to be 1.\n"); 
+                printf("Number of arguments for 'quote' has to be 1. "); 
                 evaluationError();
             }
             return args;
