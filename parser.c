@@ -1,6 +1,6 @@
 /*
- * This program builds a parser for Scheme code and adds functionality
- * to display the parse tree.
+ * This program implements a parser for Scheme code with 
+ * functionality to display the parse tree.
  *
  * Author: Yitong Chen, Megan Zhao and Yingying Wang
  */
@@ -20,6 +20,16 @@ bool isAtom(Value *token) {
     return (tokenType == BOOL_TYPE || tokenType == SYMBOL_TYPE ||
            tokenType == INT_TYPE || tokenType == DOUBLE_TYPE ||
            tokenType == STR_TYPE);
+}
+
+bool specialChar(Value *ch){
+    if ((strcmp(ch->s, " ") != 0)
+        && (strcmp(ch->s, "\\n") != 0)
+        && (strcmp(ch->s, ";") != 0)
+        && (strcmp(ch->s, "\\t") != 0)) {
+    	return false;
+    }
+    return true;
 }
 
 /*
@@ -118,11 +128,15 @@ Value *parse(Value *tokens) {
             // Pop off the (
             stack = cdr(stack);
             // Push the list back on to the stack
-            if (!isNull(inner)) {
-                stack = cons(inner, stack);
-            }
+            stack = cons(inner, stack);
         } else {
-            stack = cons(token, stack);
+            if (token->type == SYMBOL_TYPE) {
+                if (!specialChar(token)) {
+                   stack = cons(token, stack); 
+                }
+            } else {
+                stack = cons(token, stack);
+            }
         }
         current = cdr(current);
     }
@@ -148,6 +162,6 @@ void printTree(Value *tree) {
         printf("Error! Not enough memory!\n");
         return;
     }
-    prev->type = NULL_TYPE;
+    prev->type = NULL_TYPE; 
     printTreeHelper(tree, prev);
 }

@@ -1,0 +1,7 @@
+(define lazy-add
+  (lambda (llst1 llst2)
+    (cond 
+          ((null? llst1) llst2)
+          ((null? llst2) llst1)
+          (else (cons (+ (car llst1) (car llst2))
+                      (lambda ()(lazy-add ((cdr llst1)) ((cdr llst2))))))))) 

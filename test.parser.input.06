@@ -1,0 +1,2 @@
+(define test
+  (lambda () x)
