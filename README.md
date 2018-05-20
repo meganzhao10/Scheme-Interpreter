@@ -9,7 +9,10 @@ To implement a tokenizer for Scheme in C.
 ## Phase 4: Parser
 To parse the tokens into a syntax tree.
 ## Phase 5: Eval
-To evaluate the Scheme code
+To evaluate the Scheme code. Specifically allow the evaluation of
+bounded variables, if, let and quote special forms.
+## Phase 6: Apply
+Extend the evaluator's ability to handle define and lambda special forms.
 
 ## Author: 
 * **Yitong Chen** - [yitongc19](https://github.com/yitongc19)

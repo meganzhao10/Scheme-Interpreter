@@ -19,7 +19,7 @@ parser: $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@
 
 interpreter: $(OBJS)
-	     $(CC) $(CFLAGS) $^ -o $@
+    $(CC) $(CFLAGS) $^ -o $@
 
 memtest: interpreter
 	valgrind --leak-check=full --show-leak-kinds=all ./$<    
