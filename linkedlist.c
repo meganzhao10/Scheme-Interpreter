@@ -67,7 +67,7 @@ void display(Value *list){
     Value *cur = list;
     printf("(");
     while(cur->type != NULL_TYPE){
-        switch(cur->c.car->type){
+	   switch(cur->c.car->type){
             case INT_TYPE:
                 printf("%i ",cur->c.car->i);
                 break;

@@ -1,3 +1,8 @@
+/*
+ * This program implements the evaluator for Scheme.
+ *
+ * Authors: Yitong Chen, Yingying Wang, Megan Zhao.
+ */
 #include <stdlib.h>
 #include "value.h"
 
