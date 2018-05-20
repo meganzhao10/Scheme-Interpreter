@@ -27,8 +27,19 @@ struct Value {
          struct Value *car;
          struct Value *cdr;
       } c;
+      struct Closure {
+         struct Value *formal;
+         struct Value *body;
+         struct Frame *frame;    
+      } closure;
    };
 };
+
+struct Frame {
+    struct Value *bindings;
+    struct Frame *parent;
+};
+typedef struct Frame Frame;
 
 typedef struct Value Value;
 
