@@ -12,7 +12,8 @@ typedef enum {
    STR_TYPE,
    CONS_TYPE,
    NULL_TYPE,
-    VOID_TYPE
+   VOID_TYPE,
+   CLOSURE_TYPE
 } valueType;
 
 struct Value {
@@ -26,6 +27,11 @@ struct Value {
          struct Value *car;
          struct Value *cdr;
       } c;
+      struct Closure {
+	struct Value *parameters;
+	struct Value *body;
+	struct Frame *frame;
+      } o;
    };
 };
 
