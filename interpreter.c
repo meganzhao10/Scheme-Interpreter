@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include "parser.h"
 #include "linkedlist.h"
 #include "interpreter.h"
 #include <assert.h>
@@ -80,6 +81,7 @@ void interpret(Value *tree){
         texit(1);
     }
     topFrame->bindings = makeNull();
+    topFrame->parent = NULL;
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
     	Value *result = eval(car(cur), topFrame);
@@ -220,8 +222,11 @@ Value *evalLet(Value *args, Frame *frame){
         printf("Empty body in 'let'. ");
         evaluationError();
     }
-    Value *body = args;
+    Value *body = cdr(args);
+    // Evaluate all expressions but 
+    // only return the last expression in body
     while (cdr(body)->type != NULL_TYPE){
+        eval(car(body), frame);
         body = cdr(body);
     }
     body = car(body);
@@ -302,7 +307,12 @@ Value *apply(Value *function, Value *args) {
         curFormal = cdr(curFormal);
         curActual = cdr(curActual);
     }
-    return eval(body, newFrame);
+    // Evaluate multiple expressions
+    while (cdr(body)->type != NULL_TYPE){
+        eval(car(body), newFrame);
+        body = cdr(body);
+    }
+    return eval(car(body), newFrame);
 }
 
 /*
@@ -348,11 +358,16 @@ Value *eval(Value *expr, Frame *frame){
 	    	return evalLet(args, frame);
 	    }
         else if (!strcmp(first->s, "define")) {
+            if (frame->parent != NULL) {
+                printf("'define' expressions only allowed"
+                       " in the global environment. ");
+                evaluationError();
+            }
             return evalDefine(args, frame);
         }
         else if (!strcmp(first->s, "lambda")) {
-            if (length(args) != 2) {
-                printf("Number of arguments for 'lambda' has to be 2. ");
+            if (length(args) < 2) {
+                printf("There has to be at least 2 arguments for 'lambda'. ");
                 evaluationError();
             }
             Value *closure = talloc(sizeof(Value));
@@ -362,7 +377,7 @@ Value *eval(Value *expr, Frame *frame){
             }
             closure->type = CLOSURE_TYPE;
             closure->closure.formal = car(args);
-            closure->closure.body = car(cdr(args));
+            closure->closure.body = cdr(args);
             closure->closure.frame = frame;
             return closure;
         }
