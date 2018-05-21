@@ -325,7 +325,6 @@ Value *eval(Value *expr, Frame *frame){
 		return createProcedure(args, frame);
 	    }
 	    else{
-		// doesn't support ((lambda (x) 3) 5)?
 		Value *cur = expr;
 		Value *evalList = makeNull();
 		while (cur != NULL && cur->type != NULL_TYPE){
