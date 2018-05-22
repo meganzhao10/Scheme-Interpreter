@@ -1,0 +1,19 @@
+
+(define no
+  (lambda (bool)
+    (if bool #f #t)))
+
+(define tofu
+  (lambda (cond conseq alt)
+    (let ((nconseq (no conseq))
+          (nalt (no alt)))
+      (if cond nconseq nalt))))
+
+(tofu 23 #f #t)
+
+
+((lambda (x) x)
+   1)
+
+((lambda (x) x) ((lambda (y) 3)4))
+x

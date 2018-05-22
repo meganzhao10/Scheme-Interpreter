@@ -9,12 +9,6 @@
 #ifndef INTERPRETER_H
 #define INTERPRETER_H
 
-struct Frame {
-    Value *bindings;
-    struct Frame *parent;
-};
-typedef struct Frame Frame;
-
 /*
  * This function takes a list of S-expressions and call eval on 
  * each S-expression in the top-level environment and prints each
