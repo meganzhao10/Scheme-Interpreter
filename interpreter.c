@@ -223,13 +223,6 @@ Value *evalLet(Value *args, Frame *frame){
         evaluationError();
     }
     Value *body = cdr(args);
-    // Evaluate all expressions but 
-    // only return the last expression in body
-    while (cdr(body)->type != NULL_TYPE){
-        eval(car(body), frame);
-        body = cdr(body);
-    }
-    body = car(body);
     Frame *frameG = talloc(sizeof(Frame));
     if (!frameG) {
         printf("Error! Not enough memory!\n");
@@ -250,6 +243,13 @@ Value *evalLet(Value *args, Frame *frame){
 	    addBindingLocal(car(car(cur)), v, frameG);
 	    cur = cdr(cur);
     }
+    // Evaluate all expressions but 
+    // only return the last expression in body
+    while (cdr(body)->type != NULL_TYPE){
+        eval(car(body), frameG);
+        body = cdr(body);
+    }
+    body = car(body);
     return eval(body, frameG);    
 }
 
