@@ -12,6 +12,93 @@
 #include <assert.h>
 #include "talloc.h"
 
+
+
+
+
+Value *primitiveAdd(Value *args){
+    double sum = 0;
+    Value *n=makeNull();
+    n->type = INT_TYPE;
+    Value *cur = args;
+    Value *val;
+    
+    while (cur->type!=NULL_TYPE){
+        val = car(cur);
+        if (val->type !=INT_TYPE && val->type!=DOUBLE_TYPE){
+            printf("+ should take numbers as arguments!");
+            evaluationError();
+        }
+        if (val->type == DOUBLE_TYPE){
+            n->type = DOUBLE_TYPE;
+            sum = sum+val->d;
+        }
+        else{
+            sum=sum+val->i;
+        }
+        cur = cdr(cur);
+        
+    }
+    if (n->type ==DOUBLE_TYPE){
+        n->d = sum;
+    }else{
+        n->i = (int) sum;
+    }
+    return n;
+}
+
+Value *primitiveIsNull(Value *args) {
+	if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Incorrect number of argument for null?");
+        evaluationError();
+
+    }
+
+	Value *n = makeNull();
+	n->type = BOOL_TYPE;
+	if (car(args)->type != NULL_TYPE){
+		n->s = #f;
+	}else{
+		n->s = #t;
+	}
+	return n;
+}
+
+Value *primitiveCar(Value *args) {
+    	if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Incorrect number of argument for car");
+        evaluationError();
+
+    }
+    else if (car(args)->type != CONS_TYPE){
+        printf("Not cons type");
+        evaluationError();
+	}
+	return car(car(args));
+}
+
+Value *primitiveCdr(Value *args) {
+    if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Incorrect number of argument for cdr");
+        evaluationError();
+
+    } else if (car(args)->type != CONS_TYPE){
+        printf("Not cons type");
+        evaluationError();
+	}
+	return cdr(car(args));
+}
+
+Value *primitiveCons(Value *args) {
+    if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Needs two argument!");
+        evaluationError();
+
+    }
+    return cons(car(args), car(cdr(args)));
+}
+
+
 /*
  * Print a representation of the contents of a linked list.
  */
@@ -433,85 +520,3 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame) {
    frame->bindings = cons(bindings, frame->bindings);
 }
 
-
-Value *primitiveAdd(Value *args){
-    double sum = 0;
-    Value *n=makeNull();
-    n->type = INT_TYPE;
-    Value *cur = args;
-    Value *val;
-    
-    while (cur->type!=NULL_TYPE){
-        val = car(cur);
-        if (val->type !=INT_TYPE && val->type!=DOUBLE_TYPE){
-            printf("+ should take numbers as arguments!");
-            evaluationError();
-        }
-        if (val->type == DOUBLE_TYPE){
-            n->type = DOUBLE_TYPE;
-            sum = sum+val->d;
-        }
-        else{
-            sum=sum+val->i;
-        }
-        cur = cdr(cur);
-        
-    }
-    if (n->type ==DOUBLE_TYPE){
-        n->d = sum;
-    }else{
-        n->i = (int) sum;
-    }
-    return n;
-}
-
-Value *primitiveIsNull(Value *args) {
-	if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
-        printf("Incorrect number of argument for null?");
-        evaluationError();
-
-    }
-
-	Value *n = makeNull();
-	n->type = BOOL_TYPE;
-	if (car(args)->type != NULL_TYPE){
-		n->s = #f;
-	}else{
-		n->s = #t;
-	}
-	return n;
-}
-
-Value *primitiveCar(Value *args) {
-    	if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
-        printf("Incorrect number of argument for car");
-        evaluationError();
-
-    }
-    else if (car(args)->type != CONS_TYPE){
-        printf("Not cons type");
-        evaluationError();
-	}
-	return car(car(args));
-}
-
-Value *primitiveCdr(Value *args) {
-    if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
-        printf("Incorrect number of argument for cdr");
-        evaluationError();
-
-    } else if (car(args)->type != CONS_TYPE){
-        printf("Not cons type");
-        evaluationError();
-	}
-	return cdr(car(args));
-}
-
-Value *primitiveCons(Value *args) {
-    if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
-        printf("Needs two argument!");
-        evaluationError();
-
-    }
-    return cons(car(args), car(cdr(args)));
-}
