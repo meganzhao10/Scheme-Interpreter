@@ -5,6 +5,7 @@
 #ifndef LINKEDLIST_H
 #define LINKEDLIST_H
 
+
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  */
