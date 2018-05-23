@@ -75,19 +75,29 @@ void displayEval(Value *list, bool newline){
  * result 
  */
 void interpret(Value *tree){
-    Frame *topFrame = talloc(sizeof(Frame));
-    if (!topFrame) {
+    assert(tree!=NULL);
+
+    Frame *top = talloc(sizeof(Frame));
+    if (!top) {
         printf("Error! Not enough memory!\n");
         texit(1);
     }
-    topFrame->bindings = makeNull();
-    topFrame->parent = NULL;
+    top->bindings = makeNull();
+    top->parent = NULL;
+     bind("+", primitiveAdd, top);
+   bind("null?", primitiveIsNull, top);
+   bind("car", primitiveCar, top);
+    bind("cdr", primitiveCdr, top);
+    bind("cons",primitiveCons, top);
+    
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
-    	Value *result = eval(car(cur), topFrame);
+    	Value *result = eval(car(cur), top);
     	displayEval(result, true);
     	cur = cdr(cur);
     }
+  
+    
 }
 
 /* 
@@ -420,33 +430,12 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame) {
     variable->s = name;
     
     Value *bindings = cons (variable, value);
-   frame->bindings = cons(binding, frame->bindings);
+   frame->bindings = cons(bindings, frame->bindings);
 }
 
-void interpret(Value *tree) {
-   assert(tree!=NULL);
-   Frame *top = makeFrame(NULL);
-   bind("+", primitiveAdd, top);
-   bind("null?", primitiveIsNull, top);
-   bind("car", primitiveCar, top);
-    bind("cdr", primitiveCdr, top);
-    bind("cons",primitiveCons, top);
-    
-    Valut *cur = tree;
-    while (cur->type != NULL_TYPE){
-        level = 0;
-        Value *res = eval(car(cur),top);
-        //print(res);
-        if(res->type !=VOID_TYPE){
-            printf("\n");
-            
-        }
-        cur = cdr(cur);
-    }
-}
 
 Value *primitiveAdd(Value *args){
-    doubel sum = 0;
+    double sum = 0;
     Value *n=makeNull();
     n->type = INT_TYPE;
     Value *cur = args;
@@ -454,7 +443,7 @@ Value *primitiveAdd(Value *args){
     
     while (cur->type!=NULL_TYPE){
         val = car(cur);
-        if (val->type !=INT_type && val->type!=DOUBLE_TYPE){
+        if (val->type !=INT_TYPE && val->type!=DOUBLE_TYPE){
             printf("+ should take numbers as arguments!");
             evaluationError();
         }
@@ -486,9 +475,9 @@ Value *primitiveIsNull(Value *args) {
 	Value *n = makeNull();
 	n->type = BOOL_TYPE;
 	if (car(args)->type != NULL_TYPE){
-		n->s = false;
+		n->s = #f;
 	}else{
-		n->s = true;
+		n->s = #t;
 	}
 	return n;
 }
