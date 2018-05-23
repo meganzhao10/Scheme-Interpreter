@@ -1,0 +1,8 @@
+(define myand
+  (lambda (x y)
+    (if x
+        y
+        #f)))
+
+(myand #t #f)
+(myand 2 4)

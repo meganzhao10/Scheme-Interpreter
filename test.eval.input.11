@@ -1,0 +1,7 @@
+(define nop
+  (lambda (bool)
+    (if bool #f #t)))
+(nop #t)
+(nop #f)
+(nop 228)
+(nop "228")

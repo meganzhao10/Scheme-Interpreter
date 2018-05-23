@@ -13,7 +13,8 @@ typedef enum {
    CONS_TYPE,
    NULL_TYPE,
    VOID_TYPE,
-   CLOSURE_TYPE
+   CLOSURE_TYPE,
+   PRIMITIVE_TYPE
 } valueType;
 
 struct Value {
@@ -28,12 +29,22 @@ struct Value {
          struct Value *cdr;
       } c;
       struct Closure {
-	struct Value *parameters;
-	struct Value *body;
-	struct Frame *frame;
-      } o;
+         struct Value *formal;
+         struct Value *body;
+         struct Frame *frame;    
+      } closure;
+       /* A pointer to a C implementation of a Scheme primitive function.
+       * Note: `pf' is the variable name I chose for the function pointer.
+       */
+      struct Value *(*pf)(struct Value *);
    };
 };
+
+struct Frame {
+    struct Value *bindings;
+    struct Frame *parent;
+};
+typedef struct Frame Frame;
 
 typedef struct Value Value;
 

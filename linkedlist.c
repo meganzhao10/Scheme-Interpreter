@@ -77,6 +77,9 @@ void display(Value *list){
             case STR_TYPE:
                 printf("%s ",cur->c.car->s);
                 break;
+            case SYMBOL_TYPE:
+                printf("%s ",cur->c.car->s);
+                break;
             case CONS_TYPE:
                 printf("(");
                 display(cur->c.car);

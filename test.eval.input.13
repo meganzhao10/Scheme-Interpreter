@@ -1,0 +1,21 @@
+(define x 1)
+
+(let ((x 23))
+        (let ((x 42)
+                (f (lambda () x)))
+        (f)))
+
+
+(define check (lambda (x) (if x #t #f)))
+(check #f)
+(check 1)
+
+
+(define x (quote "123"))
+((lambda (y) y) x)
+
+(define x 1)
+(define x 2)
+(quote x)
+x
+
