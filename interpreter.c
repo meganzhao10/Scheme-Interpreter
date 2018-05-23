@@ -281,6 +281,9 @@ Value *evalDefine(Value *args, Frame *frame){
  * Right now only supports applying closure type functions.
  */
 Value *apply(Value *function, Value *args) {
+    if (function->type == PRIMITIVE_TYPE){
+        return (function->pf)(args);
+    }
     if (function->type != CLOSURE_TYPE) {
         printf("Expected the first argument to be a procedure! ");
         evaluationError();
@@ -407,5 +410,119 @@ Value *eval(Value *expr, Frame *frame){
     return NULL;   
 }
 
+void bind(char *name, Value *(*function)(Value *), Frame *frame) {
+   Value *value = makeNull();
+   value->type = PRIMITIVE_TYPE;
+   value->pf = function;
 
+    Value *variable = makeNull();
+    variable->type = SYMBOL_TYPE;
+    variable->s = name;
+    
+    Value *bindings = cons (variable, value);
+   frame->bindings = cons(binding, frame->bindings);
+}
 
+void interpret(Value *tree) {
+   assert(tree!=NULL);
+   Frame *top = makeFrame(NULL);
+   bind("+", primitiveAdd, top);
+   bind("null?", primitiveIsNull, top);
+   bind("car", primitiveCar, top);
+    bind("cdr", primitiveCdr, top);
+    bind("cons",primitiveCons, top);
+    
+    Valut *cur = tree;
+    while (cur->type != NULL_TYPE){
+        level = 0;
+        Value *res = eval(car(cur),top);
+        //print(res);
+        if(res->type !=VOID_TYPE){
+            printf("\n");
+            
+        }
+        cur = cdr(cur);
+    }
+}
+
+Value *primitiveAdd(Value *args){
+    doubel sum = 0;
+    Value *n=makeNull();
+    n->type = INT_TYPE;
+    Value *cur = args;
+    Value *val;
+    
+    while (cur->type!=NULL_TYPE){
+        val = car(cur);
+        if (val->type !=INT_type && val->type!=DOUBLE_TYPE){
+            printf("+ should take numbers as arguments!");
+            evaluationError();
+        }
+        if (val->type == DOUBLE_TYPE){
+            n->type = DOUBLE_TYPE;
+            sum = sum+val->d;
+        }
+        else{
+            sum=sum+val->i;
+        }
+        cur = cdr(cur);
+        
+    }
+    if (n->type ==DOUBLE_TYPE){
+        n->d = sum;
+    }else{
+        n->i = (int) sum;
+    }
+    return n;
+}
+
+Value *primitiveIsNull(Value *args) {
+	if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Incorrect number of argument for null?");
+        evaluationError();
+
+    }
+
+	Value *n = makeNull();
+	n->type = BOOL_TYPE;
+	if (car(args)->type != NULL_TYPE){
+		n->s = false;
+	}else{
+		n->s = true;
+	}
+	return n;
+}
+
+Value *primitiveCar(Value *args) {
+    	if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Incorrect number of argument for car");
+        evaluationError();
+
+    }
+    else if (car(args)->type != CONS_TYPE){
+        printf("Not cons type");
+        evaluationError();
+	}
+	return car(car(args));
+}
+
+Value *primitiveCdr(Value *args) {
+    if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Incorrect number of argument for cdr");
+        evaluationError();
+
+    } else if (car(args)->type != CONS_TYPE){
+        printf("Not cons type");
+        evaluationError();
+	}
+	return cdr(car(args));
+}
+
+Value *primitiveCons(Value *args) {
+    if (args->type != CONS_TYPE || cdr(args)->type != NULL_TYPE){
+        printf("Needs two argument!");
+        evaluationError();
+
+    }
+    return cons(car(args), car(cdr(args)));
+}
