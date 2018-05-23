@@ -1,3 +1,21 @@
 Proj1: Linkedlist
 We consulted TutorialsPoint (https://www.tutorialspoint.com/c_standard_library/c_macro_assert.htm) on how to use assert in C. 
 We consulted this website (http://web.mit.edu/10.001/Web/Tips/tips_on_segmentation.html) for tips on dealing with segmentation fault.
+
+Proj2: Talloc 
+None 
+
+Proj3: Tokenizer
+We consulted the tutorial on the course website for writing makefiles.
+
+Proj4: Parser
+None
+
+Proj5: Eval
+None
+
+Proj6: Apply
+None
+
+Proj7: Primitives
+None
