@@ -8,12 +8,12 @@
  */
 
 #include "linkedlist.h"
+#include "talloc.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 #include <assert.h>
-#include "talloc.h" //是cfile还是hfile？
-
+#include "talloc.h"
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  *
@@ -35,14 +35,14 @@ Value *makeNull() {
  *
  * Returns a pointer to a non-empty list.
  * If memory allocation fails, returns a null pointer.
- * Asserts that car is not a list (so no nested list)
+ * Asserts that car is not an empty list.
  */
 Value *cons(Value *car, Value *cdr) {
-    assert(car->type != CONS_TYPE && car->type != NULL_TYPE);
+    assert(car != NULL && cdr != NULL);
     struct ConsCell cell;
     cell.car = car;
     cell.cdr = cdr;
-    Value *newValue = talloc(sizeof(Value));
+    Value *newValue =talloc(sizeof(Value));
     if (!newValue) {
         printf("Out of memory!\n");
         return newValue;
@@ -59,21 +59,31 @@ Value *cons(Value *car, Value *cdr) {
  * NULL_TYPE).
  */
 void display(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL 
+           && (list->type == CONS_TYPE || list->type == NULL_TYPE));
+    if (list->type == NULL_TYPE) {
+        printf("()");
+    }
     Value *cur = list;
+    printf("(");
     while(cur->type != NULL_TYPE){
-        switch(cur->c.car->type){
+	   switch(cur->c.car->type){
             case INT_TYPE:
-                printf("type:INT_TYPE; value: %i\n",cur->c.car->i);
+                printf("%i ",cur->c.car->i);
                 break;
             case DOUBLE_TYPE:
-                printf("type:DOUBLE_TYPE; value: %f\n",cur->c.car->d);
-                break;
-            case PTR_TYPE:
-                printf("type:POINTER_TYPE; value: %p\n",cur->c.car->p);
+                printf("%f ",cur->c.car->d);
                 break;
             case STR_TYPE:
-                printf("type:STRING_TYPE; value: %s\n",cur->c.car->s);
+                printf("%s ",cur->c.car->s);
+                break;
+            case SYMBOL_TYPE:
+                printf("%s ",cur->c.car->s);
+                break;
+            case CONS_TYPE:
+                printf("(");
+                display(cur->c.car);
+                printf(")");
                 break;
             default:
                 printf(" ");
@@ -81,6 +91,7 @@ void display(Value *list){
         }
         cur = cur->c.cdr;
     }
+    printf(")");
 }
 
 /*
@@ -90,8 +101,7 @@ void display(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *car(Value *list){
-    assert(list->type == CONS_TYPE);
-    //用不用 assert (list->c.car != NULL); ? 
+    assert(list != NULL && list->type == CONS_TYPE);
     return list->c.car;
 }
 
@@ -102,14 +112,14 @@ Value *car(Value *list){
  * (Value of type CONS_TYPE).
  */
 Value *cdr(Value *list){
-    assert(list->type == CONS_TYPE);
+    assert(list != NULL && list->type == CONS_TYPE);
     return list->c.cdr;
 }
 
 /*
  * Test if the given value is a NULL_TYPE value.
  *
- * Asserts that the list has been allocated.
+ * Asserts that the value has been allocated.
  */
 bool isNull(Value *value){
     assert(value != NULL);
@@ -118,16 +128,18 @@ bool isNull(Value *value){
     } else{
         return false;
     }
-    //直接 return (value->type == NULL_TYPE); ? 
 }
 
 /*
  * Compute the length of the given list.
  * 
- * Asserts that the list has been allocated.
+ * Asserts that value has been allocated and that 
+ * value must be a list (Value of type CONS_TYPE 
+ * or NULL_TYPE)
  */
 int length(Value *value){
-    assert(value != NULL);
+    assert(value != NULL &&
+          (value->type == CONS_TYPE || value->type == NULL_TYPE));
     int length = 0;
     Value *cur;
     cur = value;
@@ -141,7 +153,7 @@ int length(Value *value){
 
 /*
  * Create a new linked list whose entries correspond to the given list's
- * entries, but in reverse order.  The resulting list is a deep copy of the
+ * entries, but in reverse order.  The resulting list is a shallow copy of the
  * original.
  * 
  * Returns pointer to the reversed list.
@@ -150,69 +162,15 @@ int length(Value *value){
  */
 Value *reverse(Value *list) {
     // Reverse can only be applied to an empty list or a non-empty list 
-    assert(list->type == NULL_TYPE || list->type == CONS_TYPE);
+    assert(list != NULL && 
+           (list->type == NULL_TYPE || list->type == CONS_TYPE));
     // Create new linked list
     Value *reversed = makeNull();
     if (list->type == NULL_TYPE) {
         return reversed;
     }
     for (Value *cur = list; cur->type != NULL_TYPE; cur = cur->c.cdr) {
-        // Allocate space for the deep copy and make the copy
-        Value *new_value = talloc(sizeof(Value));
-        if (!new_value) {
-            printf("Out of memory!\n");
-            return new_value;
-        }
-        new_value->type = cur->c.car->type;
-        switch (cur->c.car->type) {
-            case INT_TYPE:
-                new_value->i = cur->c.car->i;
-                break;
-            case DOUBLE_TYPE:
-                new_value->d = cur->c.car->d;
-                break;
-            case STR_TYPE:
-                new_value->s = talloc(10 * sizeof(char));
-                if (!(new_value->s)) {
-                    printf("Out of memory!\n");
-                    return NULL;
-                }
-                strcpy(new_value->s, cur->c.car->s);
-                break;
-            case CONS_TYPE:
-                new_value->c = cur->c.car->c;
-                break;
-            case NULL_TYPE:
-                break;
-        } 
-        reversed = cons(new_value, reversed);
+       reversed = cons(cur->c.car, reversed);
     }
     return reversed;
 }
-
-
-/*
- * Frees up all memory directly or indirectly referred to by list.
- *
- * Asserts that the list to be cleaned up has been allocated.
-*/
-void cleanup(Value *list){
-
-    assert(list->type == CONS_TYPE || list->type == NULL_TYPE);
-    Value *next;
-    next = list;                     
-
-    for (Value *cur = list; cur->type!=NULL_TYPE; cur = next){
-        if (cur->c.car->type == STR_TYPE){   
-            free(cur->c.car->s);
-         }
-         next = cur->c.cdr;
-         free(cur->c.car);
-         free(cur);
-    }
-    free(next);
-}
-
-
-
-
