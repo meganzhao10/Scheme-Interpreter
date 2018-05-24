@@ -13,6 +13,8 @@ To evaluate the Scheme code. Specifically allow the evaluation of
 bounded variables, if, let and quote special forms.
 ## Phase 6: Apply
 Extend the evaluator's ability to handle define and lambda special forms.
+## Phase 7: Primitives
+To support applying Scheme primitive functions implemented in C; to implement a few primitive functions.
 
 ## Author: 
 * **Yitong Chen** - [yitongc19](https://github.com/yitongc19)
