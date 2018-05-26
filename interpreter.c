@@ -35,13 +35,21 @@ void displayEval(Value *list, bool newline){
             case BOOL_TYPE:
                 printf("%s ", cur->s);
                 break;
-	        case CONS_TYPE:
+	    case CONS_TYPE:
                 {if (car(cur)->type == CONS_TYPE) {
                     printf("(");
-                    displayEval(car(cur), false);
+                    displayEval(car(cur), false); 
                     printf(")");
+		    if (cdr(cur)->type != NULL_TYPE &&
+			cdr(cur)->type != CONS_TYPE){
+			printf(" . ");
+		    }		
                 } else {
                     displayEval(car(cur), false);
+		    if (cdr(cur)->type != NULL_TYPE &&
+			cdr(cur)->type != CONS_TYPE){
+			printf(". ");
+		    }		
                 }
                 }
                 break;
@@ -61,7 +69,7 @@ void displayEval(Value *list, bool newline){
         if (newline) {
             printf("\n");
         }
-	if (cur->type == CONS_TYPE && cdr(cur)->type != NULL_TYPE){
+	if (cur->type == CONS_TYPE && cdr(cur)->type != NULL_TYPE){ 
 	   cur = cdr(cur);
 	} else{
 	   cur = NULL;
@@ -326,7 +334,7 @@ Value *primitiveIsNull(Value *args) {
         evaluationError();
     }
     result->type = BOOL_TYPE;
-    if (isNull(car(car(args)))) {
+    if (isNull(car(args))) {
         result->s = "#t";
     } else {
         result->s = "#f";
@@ -343,11 +351,11 @@ Value *primitiveCar(Value *args) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
         evaluationError();
     }
-    if (car(car(args))->type != CONS_TYPE) {
+    if (car(args)->type != CONS_TYPE) {
         printf("Contract violation. Expected: non-empty list. ");
         evaluationError();
     }
-    return car(car(car(args)));
+    return car(car(args));
 }
 
 
@@ -359,12 +367,12 @@ Value *primitiveCdr(Value *args) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
         evaluationError();
     }
-    if (car(car(args))->type != CONS_TYPE) {
+    if (car(args)->type != CONS_TYPE) {
         printf("Contract violation. Expected: non-empty list. ");
         evaluationError();
     }
 //    printf("cdr len: %i\n", length(cdr(car(car(args)))));
-    return cons(cdr(car(car(args))), makeNull());
+    return cdr(car(args));
 }
 
 
@@ -376,22 +384,7 @@ Value *primitiveCons(Value *args) {
         printf("Arity mismatch. Expected: 2. Given: %i. ", length(args));
         evaluationError();
     }
-//    display(args);
-//    printf("\n==================\n");
-//    display(car(args));
-//    printf("\n==================\n");
-//    display(car(cdr(args)));
-//    printf("\n==================\n");
-    display(cons(car(args), car(cdr(args))));
-    printf("\n==================\n");
-    
-//    if (car(car(args))->type != CONS_TYPE) {
-//        printf("Contract violation. Expected: non-empty list. ");
-//        evaluationError();
-//    }
-////    printf("cdr len: %i\n", length(cdr(car(car(args)))));
-//    return cons(cdr(car(car(args))), makeNull());
-    return cons(car(args), car(cdr(args)));
+    return cons((car(args)),car(cdr(args)));
 }
 
 
@@ -478,7 +471,7 @@ Value *eval(Value *expr, Frame *frame){
                 printf("Number of arguments for 'quote' has to be 1. "); 
                 evaluationError();
             }
-            return args;
+            return car(args);
 	    } 
 	    else if (!strcmp(first->s, "let")){ 
 	    	return evalLet(args, frame);
@@ -557,9 +550,16 @@ void interpret(Value *tree){
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
     	Value *result = eval(car(cur), topFrame);
-//        printf("length result: %i\n", length(result));
-    	displayEval(result, true);
-    	cur = cdr(cur);
+  //      if (result->type == CONS_TYPE && (cdr(result)->type != NULL_TYPE || 
+//		car(result)->type == CONS_TYPE)){
+	  if (result->type == CONS_TYPE){
+	    printf("(");
+       	    displayEval(result, false);
+	    printf(")\n");
+        }else {
+	    displayEval(result, true);
+	}
+   	cur = cdr(cur);
     }
 }
 

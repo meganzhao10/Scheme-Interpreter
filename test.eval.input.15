@@ -1,0 +1,10 @@
+(cons 1 (quote ()))
+(cons 1 (cons 2 (quote ())))
+(cons (cons 1 (quote ())) (quote ()))
+
+(cons 1 (cons 2 3))
+(cons (cons 1 2) 3)
+(cons 1 (cons 2 (cons 3 (quote ()))))
+(cons (cons 4 5) (cons (quote ()) 4))
+(cons (cons 9 (cons 2 (quote ()))) 9)
+(cons (quote ()) (quote ()))
