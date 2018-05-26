@@ -35,16 +35,21 @@ void displayEval(Value *list, bool newline){
             case BOOL_TYPE:
                 printf("%s ", cur->s);
                 break;
-	        case CONS_TYPE:
+	    case CONS_TYPE:
                 {if (car(cur)->type == CONS_TYPE) {
                     printf("(");
-                    displayEval(car(cur), false);
+                    displayEval(car(cur), false); 
                     printf(")");
-                } else if (length(cur) == 1 && car(cur)->type == NULL_TYPE) {
-                    printf("()");
+		    if (cdr(cur)->type != NULL_TYPE &&
+			cdr(cur)->type != CONS_TYPE){
+			printf(" . ");
+		    }
                 } else {
-                    printf("run here");
                     displayEval(car(cur), false);
+		    if (cdr(cur)->type != NULL_TYPE &&
+			cdr(cur)->type != CONS_TYPE){
+			printf(". ");
+		    }		
                 }
                 }
                 break;
@@ -64,7 +69,7 @@ void displayEval(Value *list, bool newline){
         if (newline) {
             printf("\n");
         }
-	if (cur->type == CONS_TYPE && cdr(cur)->type != NULL_TYPE){
+	if (cur->type == CONS_TYPE && cdr(cur)->type != NULL_TYPE){ 
 	   cur = cdr(cur);
 	} else{
 	   cur = NULL;
@@ -80,6 +85,7 @@ void evaluationError(){
     printf("Evaluation error!\n");
     texit(1);
 }
+
 
 /*
  * Helper function to lookup symbols in the given environment.
@@ -128,6 +134,7 @@ Value *evalIf(Value *args, Frame *frame){
     return eval(car(cdr(args)), frame);
 }
 
+
 /* 
  * Helper function to check whether a variable is already bounded in
  * the current frame.
@@ -151,6 +158,7 @@ Value *isBounded(Value *var, Frame *frame) {
         
 }
 
+
 /* 
  * Helper function to create new let bindings.
  */
@@ -168,6 +176,7 @@ void addBindingLocal(Value *var, Value *expr, Frame *frame){
     Value *bindings = frame->bindings;
     frame->bindings = cons(list, bindings);
 }
+
 
 /* 
  * Helper function to create new define bindings.
@@ -191,6 +200,7 @@ void addBindingGlobal(Value *var, Value *expr, Frame *frame){
     }
 }
 
+
 /*
  * Bind the primitive functions in the top-level environment.
  */
@@ -210,6 +220,7 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame) {
     value->pf = function;
     addBindingGlobal(nameVar, value, frame);
 }
+
 
 /*
  * Helper function to evaluate the LET special form by 
@@ -256,6 +267,7 @@ Value *evalLet(Value *args, Frame *frame){
     return eval(body, frameG);    
 }
 
+
 /*
  * Helper function to evaluate the DEFINE special form by 
  * creating bindings and then evaluate the body.
@@ -276,6 +288,7 @@ Value *evalDefine(Value *args, Frame *frame){
     addBindingGlobal(car(args), expr, frame);
     return result;
 }
+
 
 /*
  * Implementing the Scheme primitive +.
@@ -329,7 +342,7 @@ Value *primitiveIsNull(Value *args) {
         evaluationError();
     }
     result->type = BOOL_TYPE;
-    if (isNull(car(car(args)))) {
+    if (isNull(car(args))) {
         result->s = "#t";
     } else {
         result->s = "#f";
@@ -346,11 +359,11 @@ Value *primitiveCar(Value *args) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
         evaluationError();
     }
-    if (car(car(args))->type != CONS_TYPE) {
+    if (car(args)->type != CONS_TYPE) {
         printf("Contract violation. Expected: non-empty list. ");
         evaluationError();
     }
-    return car(car(car(args)));
+    return car(car(args));
 }
 
 
@@ -362,12 +375,11 @@ Value *primitiveCdr(Value *args) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
         evaluationError();
     }
-    if (car(car(args))->type != CONS_TYPE) {
+    if (car(args)->type != CONS_TYPE) {
         printf("Contract violation. Expected: non-empty list. ");
         evaluationError();
     }
-//    printf("cdr len: %i\n", length(cdr(car(car(args)))));
-    return cons(cdr(car(car(args))), makeNull());
+    return cdr(car(args));
 }
 
 
@@ -379,7 +391,7 @@ Value *primitiveCons(Value *args) {
         printf("Arity mismatch. Expected: 2. Given: %i. ", length(args));
         evaluationError();
     }
-    return cons(car(args), car(cdr(args)));
+    return cons((car(args)),car(cdr(args)));
 }
 
 
@@ -544,18 +556,15 @@ void interpret(Value *tree){
     // Evaluate the program
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
-//        printf("run here\n");
     	Value *result = eval(car(cur), topFrame);
-//        printf("length result: %i\n", length(result));
-    	if (result->type == CONS_TYPE){
-            printf("here\n");
-	    printf("(");
-       	    displayEval(result, false);
-	    printf(")\n");
-        }else {
-	    displayEval(result, true);
-	}
-    	cur = cdr(cur);
+        if (result->type == CONS_TYPE){
+            printf("(");
+            displayEval(result, false);
+            printf(")\n");
+        } else {
+            displayEval(result, true);
+        }
+        cur = cdr(cur);
     }
 }
 
