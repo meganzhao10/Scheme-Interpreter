@@ -441,6 +441,21 @@ Value *apply(Value *function, Value *args) {
 }
 
 
+/* 
+ * Helper function to verify that all formal parameters are 
+ * identifiers.
+ */
+bool verifyFormal(Value *formals) {
+    Value *cur = formals;
+    while (cur->type != NULL_TYPE) {
+        if (cur->type != SYMBOL_TYPE) {
+            return false;
+        }
+        cur = cdr(cur);
+    }
+    return true;
+}
+
 /*
  * The function takes a parse tree of a single S-expression and 
  * an environment frame in which to evaluate the expression and 
@@ -502,6 +517,11 @@ Value *eval(Value *expr, Frame *frame){
                 texit(1);
             }
             closure->type = CLOSURE_TYPE;
+            // All formals should be identifiers
+            if (!verifyFormal(car(args))) {
+                printf("All formal parameters should be identifiers. ");
+                evaluationError();
+            }
             closure->closure.formal = car(args);
             closure->closure.body = cdr(args);
             closure->closure.frame = frame;
