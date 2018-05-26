@@ -40,7 +40,10 @@ void displayEval(Value *list, bool newline){
                     printf("(");
                     displayEval(car(cur), false);
                     printf(")");
+                } else if (length(cur) == 1 && car(cur)->type == NULL_TYPE) {
+                    printf("()");
                 } else {
+                    printf("run here");
                     displayEval(car(cur), false);
                 }
                 }
@@ -376,21 +379,6 @@ Value *primitiveCons(Value *args) {
         printf("Arity mismatch. Expected: 2. Given: %i. ", length(args));
         evaluationError();
     }
-//    display(args);
-//    printf("\n==================\n");
-//    display(car(args));
-//    printf("\n==================\n");
-//    display(car(cdr(args)));
-//    printf("\n==================\n");
-    display(cons(car(args), car(cdr(args))));
-    printf("\n==================\n");
-    
-//    if (car(car(args))->type != CONS_TYPE) {
-//        printf("Contract violation. Expected: non-empty list. ");
-//        evaluationError();
-//    }
-////    printf("cdr len: %i\n", length(cdr(car(car(args)))));
-//    return cons(cdr(car(car(args))), makeNull());
     return cons(car(args), car(cdr(args)));
 }
 
@@ -478,7 +466,7 @@ Value *eval(Value *expr, Frame *frame){
                 printf("Number of arguments for 'quote' has to be 1. "); 
                 evaluationError();
             }
-            return args;
+            return car(args);
 	    } 
 	    else if (!strcmp(first->s, "let")){ 
 	    	return evalLet(args, frame);
@@ -556,9 +544,17 @@ void interpret(Value *tree){
     // Evaluate the program
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
+//        printf("run here\n");
     	Value *result = eval(car(cur), topFrame);
 //        printf("length result: %i\n", length(result));
-    	displayEval(result, true);
+    	if (result->type == CONS_TYPE){
+            printf("here\n");
+	    printf("(");
+       	    displayEval(result, false);
+	    printf(")\n");
+        }else {
+	    displayEval(result, true);
+	}
     	cur = cdr(cur);
     }
 }
