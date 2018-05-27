@@ -35,13 +35,21 @@ void displayEval(Value *list, bool newline){
             case BOOL_TYPE:
                 printf("%s ", cur->s);
                 break;
-	        case CONS_TYPE:
+	    case CONS_TYPE:
                 {if (car(cur)->type == CONS_TYPE) {
                     printf("(");
-                    displayEval(car(cur), false);
+                    displayEval(car(cur), false); 
                     printf(")");
+		    if (cdr(cur)->type != NULL_TYPE &&
+			cdr(cur)->type != CONS_TYPE){
+			printf(" . ");
+		    }
                 } else {
                     displayEval(car(cur), false);
+		    if (cdr(cur)->type != NULL_TYPE &&
+			cdr(cur)->type != CONS_TYPE){
+			printf(". ");
+		    }		
                 }
                 }
                 break;
@@ -61,7 +69,7 @@ void displayEval(Value *list, bool newline){
         if (newline) {
             printf("\n");
         }
-	if (cur->type == CONS_TYPE && cdr(cur)->type != NULL_TYPE){
+	if (cur->type == CONS_TYPE && cdr(cur)->type != NULL_TYPE){ 
 	   cur = cdr(cur);
 	} else{
 	   cur = NULL;
@@ -69,26 +77,6 @@ void displayEval(Value *list, bool newline){
     }
 }
 
-/*
- * This function takes a list of S-expressions and call eval on 
- * each S-expression in the top-level environment and prints each
- * result 
- */
-void interpret(Value *tree){
-    Frame *topFrame = talloc(sizeof(Frame));
-    if (!topFrame) {
-        printf("Error! Not enough memory!\n");
-        texit(1);
-    }
-    topFrame->bindings = makeNull();
-    topFrame->parent = NULL;
-    Value *cur = tree;
-    while (cur != NULL && cur->type == CONS_TYPE){
-    	Value *result = eval(car(cur), topFrame);
-    	displayEval(result, true);
-    	cur = cdr(cur);
-    }
-}
 
 /* 
  * Helper function for displaying evaluation err message.
@@ -97,6 +85,7 @@ void evaluationError(){
     printf("Evaluation error!\n");
     texit(1);
 }
+
 
 /*
  * Helper function to lookup symbols in the given environment.
@@ -145,6 +134,7 @@ Value *evalIf(Value *args, Frame *frame){
     return eval(car(cdr(args)), frame);
 }
 
+
 /* 
  * Helper function to check whether a variable is already bounded in
  * the current frame.
@@ -168,6 +158,7 @@ Value *isBounded(Value *var, Frame *frame) {
         
 }
 
+
 /* 
  * Helper function to create new let bindings.
  */
@@ -186,10 +177,11 @@ void addBindingLocal(Value *var, Value *expr, Frame *frame){
     frame->bindings = cons(list, bindings);
 }
 
+
 /* 
  * Helper function to create new define bindings.
  */
-void addBindingDefine(Value *var, Value *expr, Frame *frame){
+void addBindingGlobal(Value *var, Value *expr, Frame *frame){
     Value *curBinding = isBounded(var, frame);
     Value *nullTail = makeNull();
     if (!nullTail) {
@@ -207,6 +199,28 @@ void addBindingDefine(Value *var, Value *expr, Frame *frame){
         frame->bindings = cons(list, bindings);
     }
 }
+
+
+/*
+ * Bind the primitive functions in the top-level environment.
+ */
+void bind(char *name, Value *(*function)(Value *), Frame *frame) {
+    Value *value = makeNull();
+    if (!value) {
+        texit(1);
+    }
+    Value *nameVar = talloc(sizeof(Value));
+    if (!name) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    nameVar->type = SYMBOL_TYPE;
+    nameVar->s = name;
+    value->type = PRIMITIVE_TYPE;
+    value->pf = function;
+    addBindingGlobal(nameVar, value, frame);
+}
+
 
 /*
  * Helper function to evaluate the LET special form by 
@@ -253,6 +267,7 @@ Value *evalLet(Value *args, Frame *frame){
     return eval(body, frameG);    
 }
 
+
 /*
  * Helper function to evaluate the DEFINE special form by 
  * creating bindings and then evaluate the body.
@@ -270,9 +285,115 @@ Value *evalDefine(Value *args, Frame *frame){
         evaluationError();
     } 
     Value *expr = eval(car(cdr(args)), frame);
-    addBindingDefine(car(args), expr, frame);
+    addBindingGlobal(car(args), expr, frame);
     return result;
 }
+
+
+/*
+ * Implementing the Scheme primitive +.
+ */
+Value *primitiveAdd(Value *args) {
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    result->type = INT_TYPE;
+    double result_num = 0;
+    
+    Value *cur_arg = args; 
+    while (cur_arg->type != NULL_TYPE) {
+        Value *cur_num = car(cur_arg);
+        if (cur_num->type != INT_TYPE) {
+            if (cur_num->type == DOUBLE_TYPE) {
+                result->type = DOUBLE_TYPE;
+                result_num += cur_num->d;
+            } else {
+                printf("Expected numerical arguments for addition. ");
+                evaluationError();
+            }
+        } else {
+            result_num += cur_num->i;    
+        }
+        cur_arg = cdr(cur_arg);
+    }
+    
+    if (result->type == INT_TYPE) {
+        result->i = (int) result_num;
+    } else {
+        result->d = result_num;
+    }
+    return result;
+}
+
+
+/*
+ * Implementing the Scheme primitive null? function.
+ */
+Value *primitiveIsNull(Value *args) {
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    result->type = BOOL_TYPE;
+    if (isNull(car(args))) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+
+
+/*
+ * Implementing the Scheme primitive car function.
+ */
+Value *primitiveCar(Value *args) {
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
+        evaluationError();
+    }
+    if (car(args)->type != CONS_TYPE) {
+        printf("Contract violation. Expected: non-empty list. ");
+        evaluationError();
+    }
+    return car(car(args));
+}
+
+
+/*
+ * Implementing the Scheme primitive cdr function.
+ */
+Value *primitiveCdr(Value *args) {
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
+        evaluationError();
+    }
+    if (car(args)->type != CONS_TYPE) {
+        printf("Contract violation. Expected: non-empty list. ");
+        evaluationError();
+    }
+    return cdr(car(args));
+}
+
+
+/*
+ * Implementing the Scheme primitive cons function.
+ */
+Value *primitiveCons(Value *args) {
+    if (length(args) != 2) {
+        printf("Arity mismatch. Expected: 2. Given: %i. ", length(args));
+        evaluationError();
+    }
+    return cons((car(args)),car(cdr(args)));
+}
+
 
 /*
  * Helper function that applies a function to a given set of 
@@ -281,6 +402,10 @@ Value *evalDefine(Value *args, Frame *frame){
  * Right now only supports applying closure type functions.
  */
 Value *apply(Value *function, Value *args) {
+    // Apply primitive f
+    if (function->type == PRIMITIVE_TYPE) {
+        return (function->pf)(args);
+    }
     if (function->type != CLOSURE_TYPE) {
         printf("Expected the first argument to be a procedure! ");
         evaluationError();
@@ -313,6 +438,22 @@ Value *apply(Value *function, Value *args) {
         body = cdr(body);
     }
     return eval(car(body), newFrame);
+}
+
+
+/* 
+ * Helper function to verify that all formal parameters are 
+ * identifiers.
+ */
+bool verifyFormal(Value *formals) {
+    Value *cur = formals;
+    while (cur->type != NULL_TYPE) {
+        if (car(cur)->type != SYMBOL_TYPE) {
+            return false;
+        }
+        cur = cdr(cur);
+    }
+    return true;
 }
 
 /*
@@ -352,7 +493,7 @@ Value *eval(Value *expr, Frame *frame){
                 printf("Number of arguments for 'quote' has to be 1. "); 
                 evaluationError();
             }
-            return args;
+            return car(args);
 	    } 
 	    else if (!strcmp(first->s, "let")){ 
 	    	return evalLet(args, frame);
@@ -376,6 +517,11 @@ Value *eval(Value *expr, Frame *frame){
                 texit(1);
             }
             closure->type = CLOSURE_TYPE;
+            // All formals should be identifiers
+            if (!verifyFormal(car(args))) {
+                printf("All formal parameters should be identifiers. ");
+                evaluationError();
+            }
             closure->closure.formal = car(args);
             closure->closure.body = cdr(args);
             closure->closure.frame = frame;
@@ -408,4 +554,37 @@ Value *eval(Value *expr, Frame *frame){
 }
 
 
+/*
+ * This function takes a list of S-expressions and call eval on 
+ * each S-expression in the top-level environment and prints each
+ * result 
+ */
+void interpret(Value *tree){
+    Frame *topFrame = talloc(sizeof(Frame));
+    if (!topFrame) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    topFrame->bindings = makeNull();
+    topFrame->parent = NULL;
+    // Bind the primitive functions
+    bind("+", primitiveAdd, topFrame);
+    bind("null?", primitiveIsNull, topFrame);
+    bind("car", primitiveCar, topFrame);
+    bind("cdr", primitiveCdr, topFrame);
+    bind("cons", primitiveCons, topFrame);
+    // Evaluate the program
+    Value *cur = tree;
+    while (cur != NULL && cur->type == CONS_TYPE){
+    	Value *result = eval(car(cur), topFrame);
+        if (result->type == CONS_TYPE){
+            printf("(");
+            displayEval(result, false);
+            printf(")\n");
+        } else {
+            displayEval(result, true);
+        }
+        cur = cdr(cur);
+    }
+}
 

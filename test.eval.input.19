@@ -1,0 +1,5 @@
+(define myFunc
+  (lambda (myIf)
+    (+ myIf myIf)))
+(myFunc 3)
+(myFunc 23.4)

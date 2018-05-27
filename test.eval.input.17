@@ -1,0 +1,14 @@
+;; This procedure takes a 2-parameter function f as input
+;; and returns a curried version of f.
+(define curry2
+  (lambda (f)
+    (lambda (a)
+      (lambda (b)
+        (f a b)))))
+        
+;; This curried function mult multiplies two integers
+;; and is defined using curry2.
+(define add (curry2 +))
+
+((add 1) 2)
+((add 1) ((add 2) 3))
