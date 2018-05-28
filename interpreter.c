@@ -278,6 +278,11 @@ Value *evalDefine(Value *args, Frame *frame){
         printf("Error! Not enough memory!\n");
         texit(1);
     }
+    if (car(args)->type != SYMBOL_TYPE) {
+        printf("Invalid syntax in 'define'. "
+               "First argument must be a symbol. ");
+        evaluationError();
+    }
     result->type = VOID_TYPE;
     if (length(args) != 2) {
         printf("Invalid syntax in 'define'. Multiple expressions"
@@ -456,6 +461,25 @@ bool verifyFormal(Value *formals) {
     return true;
 }
 
+
+/* 
+ * Check whether there are duplicated identifiers in the 
+ * formal parameters.
+ */
+bool containsDuplicate(Value *formals) {
+    Value *cur = formals;
+    while (cur->type != NULL_TYPE) {
+        Value *next = cdr(cur);
+        while (next->type != NULL_TYPE) {
+            if (!strcmp(cur->s, next->s)) {
+                return true;
+            }
+            next = cdr(next);
+        }
+        cur = cdr(cur);
+    }
+    return false;
+}
 /*
  * The function takes a parse tree of a single S-expression and 
  * an environment frame in which to evaluate the expression and 
@@ -520,6 +544,11 @@ Value *eval(Value *expr, Frame *frame){
             // All formals should be identifiers
             if (!verifyFormal(car(args))) {
                 printf("All formal parameters should be identifiers. ");
+                evaluationError();
+            }
+            // Check whether formal parameters are duplicated
+            if (containsDuplicate(car(args))) {
+                printf("Duplicated identifiers in lambda. ");
                 evaluationError();
             }
             closure->closure.formal = car(args);
