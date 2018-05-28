@@ -453,7 +453,7 @@ Value *apply(Value *function, Value *args) {
 bool verifyFormal(Value *formals) {
     Value *cur = formals;
     while (cur->type != NULL_TYPE) {
-        if (cur->type != SYMBOL_TYPE) {
+        if (car(cur)->type != SYMBOL_TYPE) {
             return false;
         }
         cur = cdr(cur);
