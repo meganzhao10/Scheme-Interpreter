@@ -278,6 +278,11 @@ Value *evalDefine(Value *args, Frame *frame){
         printf("Error! Not enough memory!\n");
         texit(1);
     }
+    if (car(args)->type != SYMBOL_TYPE) {
+        printf("Invalid syntax in 'define'. "
+               "First argument must be a symbol. ");
+        evaluationError();
+    }
     result->type = VOID_TYPE;
     if (length(args) != 2) {
         printf("Invalid syntax in 'define'. Multiple expressions"
