@@ -466,19 +466,19 @@ bool verifyFormal(Value *formals) {
  * Check whether there are duplicated identifiers in the 
  * formal parameters.
  */
-bool containsDuplicate(Value *formals) {
+char *containsDuplicate(Value *formals) {
     Value *cur = formals;
     while (cur->type != NULL_TYPE) {
         Value *next = cdr(cur);
         while (next->type != NULL_TYPE) {
             if (!strcmp(cur->s, next->s)) {
-                return true;
+                return cur->s;
             }
             next = cdr(next);
         }
         cur = cdr(cur);
     }
-    return false;
+    return NULL;
 }
 /*
  * The function takes a parse tree of a single S-expression and 
@@ -548,7 +548,7 @@ Value *eval(Value *expr, Frame *frame){
             }
             // Check whether formal parameters are duplicated
             if (containsDuplicate(car(args))) {
-                printf("Duplicated identifiers in lambda. ");
+                printf("Duplicated identifiers %s in lambda. ", containsDuplicate(car(args)));
                 evaluationError();
             }
             closure->closure.formal = car(args);
