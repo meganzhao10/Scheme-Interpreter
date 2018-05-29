@@ -471,8 +471,8 @@ char *containsDuplicate(Value *formals) {
     while (cur->type != NULL_TYPE) {
         Value *next = cdr(cur);
         while (next->type != NULL_TYPE) {
-            if (!strcmp(cur->s, next->s)) {
-                return cur->s;
+            if (!strcmp(car(cur)->s, car(next)->s)) {
+                return car(cur)->s;
             }
             next = cdr(next);
         }
