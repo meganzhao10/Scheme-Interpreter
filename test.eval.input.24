@@ -1,0 +1,4 @@
+(apply + 1 2 (quote (3 4)))
+(let ((add (lambda (x y) (+ x y))))
+    (apply add (quote (1  2))))
+(apply + 1 2 3)

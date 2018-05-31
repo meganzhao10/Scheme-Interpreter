@@ -716,14 +716,14 @@ Value *primitiveLeq(Value *args) {
  * Implementing the Scheme primitive pair? function.
  */
 Value *primitiveIsPair(Value *args) {
-    Value *result = talloc(sizeof(Value));
-    if (!result) {
-        printf("Error! Not enough memory!\n");
-        evaluationError();
-    }
     if (length(args) != 1) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", 
                length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
         evaluationError();
     }
     result->type = BOOL_TYPE; 
@@ -734,6 +734,77 @@ Value *primitiveIsPair(Value *args) {
     }
     return result;
 }
+
+
+/*
+ * Implementing the Scheme primitive eq? function.
+ */
+Value *primitiveIsEq(Value *args) {
+    if (length(args) != 2) {
+        printf("Arity mismatch. Expected: 2. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    } 
+    result->type = BOOL_TYPE;
+    bool resultBool = true;
+    
+    Value *first = car(args);
+    Value *second = car(cdr(args));
+    
+    switch (first->type) {
+        case BOOL_TYPE:
+            resultBool = (!strcmp(first->s, second->s) 
+                          && second->type == BOOL_TYPE);
+            break;
+        case SYMBOL_TYPE:
+            resultBool = (!strcmp(first->s, second->s) 
+                          && second->type == SYMBOL_TYPE);
+            break;
+        case INT_TYPE:
+            resultBool = (first->i == second->i 
+                          && second->type == INT_TYPE);
+            break;
+        case DOUBLE_TYPE:
+            resultBool = (first->d == second->d
+                          && second->type == DOUBLE_TYPE);
+            break;
+        case STR_TYPE:
+            resultBool = (!strcmp(first->s, second->s) 
+                          && second->type == STR_TYPE);
+            break;
+        case NULL_TYPE:
+            resultBool = second->type == NULL_TYPE;
+            break;
+        case CONS_TYPE:
+            resultBool = (&first->c == &second->c
+                          && second->type == CONS_TYPE);
+            break;
+        case CLOSURE_TYPE:
+            resultBool = (&first->closure == &second->closure
+                          && second->type == CLOSURE_TYPE);
+            break;
+        case PRIMITIVE_TYPE:
+            resultBool = (&first->pf == &second->pf
+                          && second->type == PRIMITIVE_TYPE);
+            break;
+        default:
+            resultBool = (&first == &second
+                          && second->type == CLOSURE_TYPE);
+            break;
+    }
+    if (resultBool) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+
 
 /*
  * Helper function that applies a function to a given set of 
@@ -779,6 +850,54 @@ Value *apply(Value *function, Value *args, Frame *frame) {
     }
     return eval(car(body), newFrame);
 }
+
+
+/* 
+ * Implementing the Scheme primitive apply function.
+ */
+Value *primitiveApply(Value *args) {
+    // Retrieve procedure
+    Value *procedure = car(args);
+    
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    } 
+    // Create the list of arguments
+    Value *arguments = makeNull();
+    
+    Value *cur_arg = cdr(args);
+    while (cdr(cur_arg)->type != NULL_TYPE) {        
+        arguments = cons(car(cur_arg), arguments);
+        cur_arg = cdr(cur_arg);
+    }
+//    printf("type: %i\n", cur_arg->type);
+    if (!primitiveIsPair(cur_arg)
+        && car(cur_arg)->type != NULL_TYPE) {
+        printf("Contract violation. Last argument must be a proper list. ");
+        evaluationError();
+    } 
+    else {
+        cur_arg = car(cur_arg);
+//        printf("type: %i\n", cur_arg->type);
+        while (cur_arg->type != NULL_TYPE) {
+            if (cur_arg->type != CONS_TYPE) {
+                printf("Contract violation. Last argument must be a proper list. ");
+                evaluationError();
+            }
+            arguments = cons(car(cur_arg), arguments);
+            cur_arg = cdr(cur_arg);
+        }
+    }
+    
+    Frame *frame = talloc(sizeof(Frame));
+    frame->bindings = makeNull();
+    frame->parent = NULL;
+    
+    return apply(procedure, arguments, frame);
+}
+
 
 /*
  * The function takes a parse tree of a single S-expression and 
@@ -870,10 +989,10 @@ void interpret(Value *tree){
     bind("-", primitiveSub, topFrame);
     bind("/", primitiveDiv, topFrame);
     bind("<=", primitiveLeq, topFrame);
-//    bind("eq?", primitiveIsEq, topFrame);
+    bind("eq?", primitiveIsEq, topFrame);
     bind("pair?", primitiveIsPair, topFrame);
     bind("null?", primitiveIsNull, topFrame);
-//    bind("apply", primitiveApply, topFrame);
+    bind("apply", primitiveApply, topFrame);
     bind("car", primitiveCar, topFrame);
     bind("cdr", primitiveCdr, topFrame);
     bind("cons", primitiveCons, topFrame);
