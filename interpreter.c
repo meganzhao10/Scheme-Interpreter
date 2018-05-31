@@ -244,7 +244,7 @@ void addBindingGlobal(Value *var, Value *expr, Frame *frame){
 /*
  * Bind the primitive functions in the top-level environment.
  */
-void bind(char *name, Value *(*function)(Value *, Frame *), Frame *frame) {
+void bind(char *name, Value *(*function)(Value *), Frame *frame) {
     Value *value = makeNull();
     if (!value) {
         texit(1);
@@ -375,30 +375,15 @@ Value *evalLambda(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive +.
  */
-Value *primitiveAdd(Value *args, Frame *frame) {
+Value *primitiveAdd(Value *args) {
     Value *result = talloc(sizeof(Value));
     if (!result) {
         printf("Error! Not enough memory!\n");
         evaluationError();
     }
     result->type = INT_TYPE;
-    double result_num = 0;
-    
-    // Eval args before applying /
-    Value *cur_arg = args;
-    Value *values = makeNull();
-    if (!values) {
-        texit(1);
-    }
-    display(cdr(cur_arg));
-    while (cur_arg->type != NULL_TYPE) {
-        values = cons(eval(car(cur_arg), frame), values);
-        cur_arg = cdr(cur_arg);
-    }
-    values = reverse(values);
-    
-    
-    cur_arg = values; 
+    double result_num = 0;    
+    Value *cur_arg = args; 
     while (cur_arg->type != NULL_TYPE) {
         Value *cur_num = car(cur_arg);
         if (cur_num->type != INT_TYPE) {
@@ -427,7 +412,7 @@ Value *primitiveAdd(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive *.
  */
-Value *primitiveMult(Value *args, Frame *frame) {
+Value *primitiveMult(Value *args) {
     Value *result = talloc(sizeof(Value));
     if (!result) {
         printf("Error! Not enough memory!\n");
@@ -436,19 +421,7 @@ Value *primitiveMult(Value *args, Frame *frame) {
     result->type = INT_TYPE;
     double result_num = 1;
     
-    // Eval args before applying /
-    Value *cur_arg = args;
-    Value *values = makeNull();
-    if (!values) {
-        texit(1);
-    }
-    while (cur_arg->type != NULL_TYPE) {
-        values = cons(eval(car(cur_arg), frame), values);
-        cur_arg = cdr(cur_arg);
-    }
-    values = reverse(values);
-    
-    cur_arg = values; 
+    Value *cur_arg = args; 
     while (cur_arg->type != NULL_TYPE) {
         Value *cur_num = car(cur_arg);
         if (cur_num->type != INT_TYPE) {
@@ -477,7 +450,7 @@ Value *primitiveMult(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive -.
  */
-Value *primitiveSub(Value *args, Frame *frame) {
+Value *primitiveSub(Value *args) {
     Value *result = talloc(sizeof(Value));
     if (!result) {
         printf("Error! Not enough memory!\n");
@@ -487,42 +460,30 @@ Value *primitiveSub(Value *args, Frame *frame) {
         printf("Arity mismatch. Expected: at least 1. Given: 0. ");
         evaluationError();
     }
-    
-    // Eval args before applying /
-    Value *cur_arg = args;
-    Value *values = makeNull();
-    if (!values) {
-        texit(1);
-    }
-    while (cur_arg->type != NULL_TYPE) {
-        values = cons(eval(car(cur_arg), frame), values);
-        cur_arg = cdr(cur_arg);
-    }
-    values = reverse(values);
-    
-    result->type = car(values)->type;
+
+    result->type = car(args)->type;
     double result_num;
     
     if (result->type == INT_TYPE) {
-        if (length(values) == 1) {
-            result->i = 0 - car(values)->i;
+        if (length(args) == 1) {
+            result->i = 0 - car(args)->i;
             return result;
         } else {
-            result_num = car(values)->i;
+            result_num = car(args)->i;
         } 
     } else if (result->type == DOUBLE_TYPE) {
-        if (length(values) == 1) {
-            result->d = 0 - car(values)->d;
+        if (length(args) == 1) {
+            result->d = 0 - car(args)->d;
             return result;
         } else {
-            result_num = car(values)->d;
+            result_num = car(args)->d;
         }
     } else {
         printf("Expected numerical arguments for subtraction. ");
         evaluationError();
     }
 
-    cur_arg = cdr(values); 
+    Value *cur_arg = cdr(args); 
     while (cur_arg->type != NULL_TYPE) {
         Value *cur_num = car(cur_arg);
         if (cur_num->type != INT_TYPE) {
@@ -551,7 +512,7 @@ Value *primitiveSub(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive /.
  */
-Value *primitiveDiv(Value *args, Frame *frame) {
+Value *primitiveDiv(Value *args) {
     Value *result = talloc(sizeof(Value));
     if (!result) {
         printf("Error! Not enough memory!\n");
@@ -561,49 +522,37 @@ Value *primitiveDiv(Value *args, Frame *frame) {
         printf("Arity mismatch. Expected: at least 1. Given: 0. ");
         evaluationError();
     }
-    // Eval args before applying /
-    Value *cur_arg = args;
-    Value *values = makeNull();
-    if (!values) {
-        texit(1);
-    }
-    while (cur_arg->type != NULL_TYPE) {
-        values = cons(eval(car(cur_arg), frame), values);
-        cur_arg = cdr(cur_arg);
-    }
-    values = reverse(values);
-    
-    result->type = car(values)->type;
+    result->type = car(args)->type;
     double result_num;
     
     if (result->type == INT_TYPE) {
-        if (length(values) == 1) {
-            if (car(values)->i == 0) {
+        if (length(args) == 1) {
+            if (car(args)->i == 0) {
                 printf("/: division by 0. ");
                 evaluationError();
             }
-            result->i = 1 / car(values)->i;
+            result->i = 1 / car(args)->i;
             return result;
         } else {
-            result_num = car(values)->i;
+            result_num = car(args)->i;
         } 
     } else if (result->type == DOUBLE_TYPE) {
-        if (length(values) == 1) {
-            if (car(values)->d == 0) {
+        if (length(args) == 1) {
+            if (car(args)->d == 0) {
                 printf("/: division by 0. ");
                 evaluationError();
             }
-            result->d = 1 / car(values)->d;
+            result->d = 1 / car(args)->d;
             return result;
         } else {
-            result_num = car(values)->d;
+            result_num = car(args)->d;
         }
     } else {
         printf("Expected numerical arguments for division. ");
         evaluationError();
     }
 
-    cur_arg = cdr(values); 
+    Value *cur_arg = cdr(args); 
     while (cur_arg->type != NULL_TYPE) {
         Value *cur_num = car(cur_arg);
         if (cur_num->type != INT_TYPE) {
@@ -641,7 +590,7 @@ Value *primitiveDiv(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive null? function.
  */
-Value *primitiveIsNull(Value *args, Frame *frame) {
+Value *primitiveIsNull(Value *args) {
     if (length(args) != 1) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
         evaluationError();
@@ -664,7 +613,7 @@ Value *primitiveIsNull(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive car function.
  */
-Value *primitiveCar(Value *args, Frame *frame) {
+Value *primitiveCar(Value *args) {
     if (length(args) != 1) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
         evaluationError();
@@ -680,7 +629,7 @@ Value *primitiveCar(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive cdr function.
  */
-Value *primitiveCdr(Value *args, Frame *frame) {
+Value *primitiveCdr(Value *args) {
     if (length(args) != 1) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", length(args));
         evaluationError();
@@ -696,7 +645,7 @@ Value *primitiveCdr(Value *args, Frame *frame) {
 /*
  * Implementing the Scheme primitive cons function.
  */
-Value *primitiveCons(Value *args, Frame *frame) {
+Value *primitiveCons(Value *args) {
     if (length(args) != 2) {
         printf("Arity mismatch. Expected: 2. Given: %i. ", length(args));
         evaluationError();
@@ -708,7 +657,7 @@ Value *primitiveCons(Value *args, Frame *frame) {
 /* 
  * Implementing the Scheme primitive <= function.
  */
-Value *primitiveLeq(Value *args, Frame *frame) {
+Value *primitiveLeq(Value *args) {
     Value *result = talloc(sizeof(Value));
     if (!result) {
         printf("Error! Not enough memory!\n");
@@ -723,28 +672,16 @@ Value *primitiveLeq(Value *args, Frame *frame) {
     result->s = "#t";
     double cur_largest;
     
-    // Eval args before applying /
-    Value *cur_arg = args;
-    Value *values = makeNull();
-    if (!values) {
-        texit(1);
-    }
-    while (cur_arg->type != NULL_TYPE) {
-        values = cons(eval(car(cur_arg), frame), values);
-        cur_arg = cdr(cur_arg);
-    }
-    values = reverse(values);
-    
-    if (car(values)->type == INT_TYPE) {
-        cur_largest = car(values)->i;
+    if (car(args)->type == INT_TYPE) {
+        cur_largest = car(args)->i;
     } else if (result->type == DOUBLE_TYPE) {
-        cur_largest = car(values)->d;
+        cur_largest = car(args)->d;
     } else {
         printf("Expected numerical arguments for <=. ");
         evaluationError();
     }
 
-    cur_arg = cdr(values); 
+    Value *cur_arg = cdr(args); 
     while (cur_arg->type != NULL_TYPE) {
         Value *cur_num = car(cur_arg);
         if (cur_num->type != INT_TYPE) {
@@ -774,6 +711,30 @@ Value *primitiveLeq(Value *args, Frame *frame) {
     
 }
 
+
+/*
+ * Implementing the Scheme primitive pair? function.
+ */
+Value *primitiveIsPair(Value *args) {
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    result->type = BOOL_TYPE; 
+    if (car(args)->type == CONS_TYPE) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+
 /*
  * Helper function that applies a function to a given set of 
  * arguments.
@@ -783,7 +744,7 @@ Value *primitiveLeq(Value *args, Frame *frame) {
 Value *apply(Value *function, Value *args, Frame *frame) {
     // Apply primitive f
     if (function->type == PRIMITIVE_TYPE) {
-        return (function->pf)(args, frame);
+        return (function->pf)(args);
     }
     if (function->type != CLOSURE_TYPE) {
         printf("Expected the first argument to be a procedure! ");
@@ -910,8 +871,8 @@ void interpret(Value *tree){
     bind("/", primitiveDiv, topFrame);
     bind("<=", primitiveLeq, topFrame);
 //    bind("eq?", primitiveIsEq, topFrame);
-//    bind("pair?", primitiveIsPair, topFrame);
-//    bind("pair?", primitiveIsPair, topFrame);
+    bind("pair?", primitiveIsPair, topFrame);
+    bind("null?", primitiveIsNull, topFrame);
 //    bind("apply", primitiveApply, topFrame);
     bind("car", primitiveCar, topFrame);
     bind("cdr", primitiveCdr, topFrame);
