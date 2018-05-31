@@ -87,6 +87,42 @@ void evaluationError(){
 }
 
 
+/* 
+ * Helper function to verify that all formal parameters are 
+ * identifiers.
+ */
+bool verifyFormal(Value *formals) {
+    Value *cur = formals;
+    while (cur->type != NULL_TYPE) {
+        if (car(cur)->type != SYMBOL_TYPE) {
+            return false;
+        }
+        cur = cdr(cur);
+    }
+    return true;
+}
+
+
+/* 
+ * Check whether there are duplicated identifiers in the 
+ * formal parameters.
+ */
+char *containsDuplicate(Value *formals) {
+    Value *cur = formals;
+    while (cur->type != NULL_TYPE) {
+        Value *next = cdr(cur);
+        while (next->type != NULL_TYPE) {
+            if (!strcmp(car(cur)->s, car(next)->s)) {
+                return car(cur)->s;
+            }
+            next = cdr(next);
+        }
+        cur = cdr(cur);
+    }
+    return NULL;
+}
+
+
 /*
  * Helper function to lookup symbols in the given environment.
  */
@@ -118,6 +154,10 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
  * Helper function to evaluate the IF special form.
  */
 Value *evalIf(Value *args, Frame *frame){
+    if (length(args) != 3 && length(args) != 2){
+        printf("Number of arguments for 'if' has to be 2 or 3. ");
+        evaluationError();
+    }
     if (eval(car(args), frame)->type == BOOL_TYPE &&
 	!strcmp(eval(car(args), frame)->s, "#f")){
 	    if (cdr(cdr(args))->type != NULL_TYPE){
@@ -273,6 +313,11 @@ Value *evalLet(Value *args, Frame *frame){
  * creating bindings and then evaluate the body.
  */
 Value *evalDefine(Value *args, Frame *frame){
+    if (frame->parent != NULL) {
+        printf("'define' expressions only allowed"
+               " in the global environment. ");
+        evaluationError();
+    }
     Value *result = talloc(sizeof(Value));
     if (!result) {
         printf("Error! Not enough memory!\n");
@@ -294,6 +339,37 @@ Value *evalDefine(Value *args, Frame *frame){
     return result;
 }
 
+
+/* 
+ * Helper function to evaluate the LAMBDA special form by
+ * creating a Value object of closure type.
+ */
+Value *evalLambda(Value *args, Frame *frame) {
+    if (length(args) < 2) {
+        printf("There has to be at least 2 arguments for 'lambda'. ");
+        evaluationError();
+    }
+    Value *closure = talloc(sizeof(Value));
+    if (!closure) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    closure->type = CLOSURE_TYPE;
+    // All formals should be identifiers
+    if (!verifyFormal(car(args))) {
+        printf("All formal parameters should be identifiers. ");
+        evaluationError();
+    }
+    // Check whether formal parameters are duplicated
+    if (containsDuplicate(car(args))) {
+        printf("Duplicated identifiers %s in lambda. ", containsDuplicate(car(args)));
+        evaluationError();
+    }
+    closure->closure.formal = car(args);
+    closure->closure.body = cdr(args);
+    closure->closure.frame = frame;
+    return closure;
+}
 
 /*
  * Implementing the Scheme primitive +.
@@ -445,41 +521,6 @@ Value *apply(Value *function, Value *args) {
     return eval(car(body), newFrame);
 }
 
-
-/* 
- * Helper function to verify that all formal parameters are 
- * identifiers.
- */
-bool verifyFormal(Value *formals) {
-    Value *cur = formals;
-    while (cur->type != NULL_TYPE) {
-        if (car(cur)->type != SYMBOL_TYPE) {
-            return false;
-        }
-        cur = cdr(cur);
-    }
-    return true;
-}
-
-
-/* 
- * Check whether there are duplicated identifiers in the 
- * formal parameters.
- */
-bool containsDuplicate(Value *formals) {
-    Value *cur = formals;
-    while (cur->type != NULL_TYPE) {
-        Value *next = cdr(cur);
-        while (next->type != NULL_TYPE) {
-            if (!strcmp(cur->s, next->s)) {
-                return true;
-            }
-            next = cdr(next);
-        }
-        cur = cdr(cur);
-    }
-    return false;
-}
 /*
  * The function takes a parse tree of a single S-expression and 
  * an environment frame in which to evaluate the expression and 
@@ -506,10 +547,6 @@ Value *eval(Value *expr, Frame *frame){
 	    Value *first = car(expr);
 	    Value *args = cdr(expr);
 	    if (!strcmp(first->s, "if")){
-    		if (length(args) != 3 && length(args) != 2){
-	            printf("Number of arguments for 'if' has to be 2 or 3. ");
-                evaluationError();
-    		}
     		return evalIf(args, frame);
 	    } 
 	    else if (!strcmp(first->s, "quote")){
@@ -523,38 +560,10 @@ Value *eval(Value *expr, Frame *frame){
 	    	return evalLet(args, frame);
 	    }
         else if (!strcmp(first->s, "define")) {
-            if (frame->parent != NULL) {
-                printf("'define' expressions only allowed"
-                       " in the global environment. ");
-                evaluationError();
-            }
             return evalDefine(args, frame);
         }
         else if (!strcmp(first->s, "lambda")) {
-            if (length(args) < 2) {
-                printf("There has to be at least 2 arguments for 'lambda'. ");
-                evaluationError();
-            }
-            Value *closure = talloc(sizeof(Value));
-            if (!closure) {
-                printf("Error! Not enough memory!\n");
-                texit(1);
-            }
-            closure->type = CLOSURE_TYPE;
-            // All formals should be identifiers
-            if (!verifyFormal(car(args))) {
-                printf("All formal parameters should be identifiers. ");
-                evaluationError();
-            }
-            // Check whether formal parameters are duplicated
-            if (containsDuplicate(car(args))) {
-                printf("Duplicated identifiers in lambda. ");
-                evaluationError();
-            }
-            closure->closure.formal = car(args);
-            closure->closure.body = cdr(args);
-            closure->closure.frame = frame;
-            return closure;
+            return evalLambda(args, frame);
         }
 	    else{
             // Stores the result of recursively evaluating e1...en
