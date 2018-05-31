@@ -36,7 +36,7 @@ struct Value {
        /* A pointer to a C implementation of a Scheme primitive function.
        * Note: `pf' is the variable name I chose for the function pointer.
        */
-      struct Value *(*pf)(struct Value *);
+      struct Value *(*pf)(struct Value *, struct Frame *);
    };
 };
 
