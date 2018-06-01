@@ -294,6 +294,52 @@ Value *evalAnd(Value *args, Frame *frame){
 
 }
 
+/*
+ * Helper function to evaluate the OR special form.
+ */
+Value *evalOr(Value *args, Frame *frame){
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    result->type = BOOL_TYPE;
+    if (length(args) == 0) {
+        result->s = "#f";
+        return result;
+    }
+    Value *body = args;
+    assert(body->type == CONS_TYPE);
+    while (cdr(body)->type != NULL_TYPE) {
+        Value *curValue = eval(car(body), frame);
+        if (!(curValue->type == BOOL_TYPE && (!strcmp(curValue->s, "#f")))) {
+            return curValue;
+        }
+        body = cdr(body);
+    }
+    return eval(car(body),frame);
+}
+
+/*
+ * Helper function to evaluate the BEGIN special form.
+ */
+Value *evalBegin(Value *args, Frame *frame) {
+    assert(args->type == NULL_TYPE || args->type == CONS_TYPE);
+    Value *body = args;
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    result->type = VOID_TYPE;
+    if (body->type == NULL_TYPE)
+	return result;
+    while (cdr(body)->type != NULL_TYPE) {
+	Value *curValue = eval(car(body),frame);
+	body = cdr(body); 
+   }
+   return eval(car(body),frame); 
+}
 
 /*
  * Helper function to evaluate the LET special form by 
@@ -978,7 +1024,7 @@ Value *apply(Value *function, Value *args, Frame *frame) {
     }
     newFrame->parent = parentFrame;
     newFrame->bindings = makeNull();
-    Value *curFormal = formal;
+     Value *curFormal = formal;
     Value *curActual = args;
     if (curFormal->type == CONS_TYPE) { 
 	    while (curFormal->type != NULL_TYPE) {
@@ -1035,12 +1081,12 @@ Value *eval(Value *expr, Frame *frame){
         else if (!strcmp(first->s, "and")) {
             return evalAnd(args, frame);
         }
-      /*  else if (!strcmp(first->s, "or")) {
+        else if (!strcmp(first->s, "or")) {
             return evalOr(args, frame);
         }
         else if (!strcmp(first->s, "begin")) {
             return evalBegin(args, frame);
-        }*/
+        }
         else if (!strcmp(first->s, "cond")) {
             return evalCond(args, frame);
         }
