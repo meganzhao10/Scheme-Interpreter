@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 (and 2 3 9 8)
 (and 8 #f)
 (and (<= 4 1) #t)
@@ -31,3 +32,9 @@ x
 (set! x 3)
 x
 
+=======
+(apply + 1 2 (quote (3 4)))
+(let ((add (lambda (x y) (+ x y))))
+    (apply add (quote (1  2))))
+(apply + 1 2 3)
+>>>>>>> 0265c5cce9a9c489b30e1ca95e7d1350001a390b

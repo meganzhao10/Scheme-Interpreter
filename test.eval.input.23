@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 (begin)
 
 (begin 3)
@@ -20,3 +21,18 @@
 (or #f)
 
 (or 5 #f #t)
+=======
+(eq? (quote a) (quote a))                           
+(eq? (quote (a)) (quote (a)))                       
+(eq? "a" "a")                           
+(eq? "" "")                             
+(eq? (quote ()) (quote ()))                           
+(eq? 2 2)                              
+(eq? car car)                    
+(let ((n (+ 2 3)))
+  (eq? n n))             
+(let ((x (quote (a))))
+  (eq? x x))              
+(let ((p (lambda (x) x)))
+  (eq? p p))            
+>>>>>>> 0265c5cce9a9c489b30e1ca95e7d1350001a390b

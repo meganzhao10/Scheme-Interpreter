@@ -19,3 +19,6 @@ None
 
 Proj7: Primitives
 None
+
+Proj8: Extensions and additional features
+None
