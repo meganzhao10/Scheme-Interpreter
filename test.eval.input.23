@@ -5,6 +5,12 @@
 (define x 4)
 (begin (set! x 100) x)
 
+(let ((x 4)
+        (y 5))
+    (begin (set! x 100)
+           (+ x y)))
+
+
 (or)
 
 (or 1)
