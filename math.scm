@@ -93,15 +93,11 @@
 (define modulo
   (lambda (x y)
     (if (and (integer? x) (integer? y))
-        (if (integer? (/ x y))
-            0
-            (- x (* y (floor (/ x y)))))
+        (- x (* y (floor (/ x y)))))
         (evaluationError "Inputs for 'modulo' has to be integers"))))            
 
 
 
-        
-        (integer? (/ x y))
 ;take in integer
 (define even?
   (lambda (x)
