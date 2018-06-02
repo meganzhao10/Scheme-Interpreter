@@ -1173,10 +1173,48 @@ Value *primitiveEvalError (Value *errorMessage){
     
 } 
 
+Value *primitiveNumberCheck (Value *args){
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    
+    result->type = BOOL_TYPE; 
+    if (car(args)->type == INT_TYPE || car(args)->type ==DOUBLE_TYPE) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
 
-//bind("evaluationError", primitiveEvalError, topFrame);
- //   bind("number?", primitiveNumberCheck, topFrame);
- //   bind("integer", primitiveIntegerCheck, topFrame);
+Value *primitiveIntegerCheck (Value *args){
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    
+    result->type = BOOL_TYPE; 
+    if (car(args)->type == INT_TYPE) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+
 
 
 /*
@@ -1299,9 +1337,11 @@ void interpret(Value *tree){
     bind("cons", primitiveCons, topFrame);
     
     //to use in math.scm
-    bind("evaluationError", primitiveEvalError, topFrame);
     bind("number?", primitiveNumberCheck, topFrame);
-    bind("integer", primitiveIntegerCheck, topFrame);
+
+    bind("evaluationError", primitiveEvalError, topFrame);
+    
+    bind("integer?", primitiveIntegerCheck, topFrame);
     
     // Evaluate the program
     Value *cur = tree;
