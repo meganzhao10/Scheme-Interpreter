@@ -383,7 +383,9 @@ Value *tokenize(){
             entry->type = OPEN_TYPE;
         } else if (charRead == ')') {
             entry->type = CLOSE_TYPE;
-        } else if (charRead == '#') {
+        } else if (charRead == '\''){
+            entry->type = QUOTE_TYPE;
+        }else if (charRead == '#') {
             bool success = parseBool(entry);
             if (!success) {
                 texit(1);
@@ -481,6 +483,9 @@ void displayTokens(Value *list){
                 break;
             case STR_TYPE:
                 printf("%s:string\n", car(cur)->s);
+                break;
+            case QUOTE_TYPE:
+                printf("':quote");
                 break;
             default:
                 printf("ERROR\n");

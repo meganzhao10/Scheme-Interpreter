@@ -14,7 +14,8 @@ typedef enum {
    NULL_TYPE,
    VOID_TYPE,
    CLOSURE_TYPE,
-   PRIMITIVE_TYPE
+   PRIMITIVE_TYPE,
+   QUOTE_TYPE
 } valueType;
 
 struct Value {
