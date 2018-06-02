@@ -10,12 +10,12 @@
 ;;         odd?              lcm         round
 
 ;;need to do
-;;         modulo, , equal?, list, and append.
+;;         , , list, and append.
 ;;                      max         modulo
-;;       positive?         min         floor
-;;        negative?         abs         ceiling
-;;        even?             gcd         truncate
-;;         odd?              lcm         round
+;;                   min         floor
+;;                   abs         ceiling
+;;                     gcd         truncate
+;;                     lcm         round
 
 
 (define not
@@ -54,11 +54,63 @@
   (lambda (x)
     (if (number? x)
         (= x 0)
-        (evaluationError "Input for 'zero?' have to be a number"))))
+        (evaluationError "Input for 'zero?' has to be a number"))))
+
+;Equal? recursively compares the contents of pairs, vectors, and strings
+;applying eqv? on other objects such as numbers and symbols.
+;since we have eq? already, we will use eq? instead as -
+;"Eq? and eqv? are guaranteed to have the same behavior
+;on symbols, booleans, the empty list, pairs,
+;procedures, and non-empty strings and vectors."
+;refer to R5RS 
+(define equal?
+  (lambda (x y)
+    (if (and (pair? x) (pair? y))
+        (letrec ((helper
+                  (lambda (x y)
+                           (if (not (equal? (car x) (car y)))
+                               #f
+                               (equal? (cdr x) (cdr y))))))
+          (helper x y))
+        (eq? x y))))
+
+
+(define positive?
+  (lambda (x)
+    (if (number? x)
+        (> x 0)
+        (evaluationError "Input for 'positive?' has to be a number"))))
+
+
+(define negative?
+  (lambda (x)
+    (if (number? x)
+        (< x 0)
+        (evaluationError "Input for 'negative?' has to be a number"))))
+
+(define floor)
+
+(define modulo
+  (lambda (x y)
+    (if (and (integer? x) (integer? y))
+        (if (integer? (/ x y))
+            0
+            (- x (* y (floor (/ x y)))))
+        (evaluationError "Inputs for 'modulo' has to be integers"))))            
 
 
 
+        
+        (integer? (/ x y))
+;take in integer
+(define even?
+  (lambda (x)
+    (if (integer? x)
+        (zero? (modulo x 2))
+        (evaluationError "Input for 'even?' has to be a integer"))))
 
-
-
+(define odd?
+  (lambda (x)
+    (not (even? x))))
+        
 
