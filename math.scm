@@ -94,7 +94,7 @@
   (lambda (x y)
     (if (and (integer? x) (integer? y))
         (- x (* y (floor (/ x y)))))
-        (evaluationError "Inputs for 'modulo' has to be integers"))))            
+        (evaluationError "Inputs for 'modulo' has to be integers")))            
 
 
 
