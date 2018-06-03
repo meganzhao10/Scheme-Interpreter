@@ -190,7 +190,8 @@
 
 
 ;These procedures return the maximum or minimum of their arguments.
-;; these will only take in two inputs, will try to make them variadic.
+;currently take in two arguments as default
+;will try to make them variadic.
 (define max
   (lambda (x y)
     (if (and (number? x) (number? y))
@@ -216,13 +217,35 @@
             (evaluationError "abs a expects real numbers as input"))))
 
 ;using idea of Euclid Algorithm
-;; will try to make this variadic.
-; greatest common divisor of their arguments.
+;because modulo is adopted and modulo assumed integer
+;will only deal with integers in this function
+;will try to make this variadic,
+;but currently take in two arguments as default
+;greatest common divisor of their arguments.
 ;The result is always non-negative.
 ;if no inputs or inputs are 0, return 0 as of DrRacket's behavior
-(define gcd)
-        
-        
-  
-        
+(define gcd
+  (lambda (x y)
+    ;(cond ;((and (null? x) (null? y)) 0)
+          ;((and (or (zero? x) (null? x)) (number? y)) (abs y))
+          ;((and (or (zero? y) (null? y)) (number? x)) (abs x))
+    (if (and (integer? x) (integer? y))
+           (if (< x y)
+               (if (zero? (modulo y x))
+                   (abs x)
+                   (gcd (modulo y x) x))
+               (if (zero? (modulo x y))
+                   (abs y)
+                   (gcd (modulo x y) y)))
+           (evaluationError "gcd expects rational numbers as input"))))
+           
+          
+
+
+
+
+   
+(define max-mag
+  (lambda (num . nums)
+    (apply max (map magnitude (cons num nums)))))
 ;;test cases
