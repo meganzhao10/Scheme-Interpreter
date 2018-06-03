@@ -3,32 +3,43 @@
 ## Phases of this project
 ### Phase 1: Linked List
 To implement a linked list that will be used throughout the interpreter project.
+###### Main files at this phase: linkedlist.c xx
 
 ### Phase 2: Talloc("tracked malloc")
 To create a garbage collector to manage memory usage throughout the interpreter project.
+###### Main files at this phase:
 
 ### Phase 3: Tokenizer
 To implement a tokenizer for Scheme in C.
+###### Main files at this phase:
 
 ### Phase 4: Parser
 To parse the tokens into a syntax tree.
+###### Main files at this phase:
 
 ### Phase 5: Eval
 To evaluate the Scheme code. Specifically allow the evaluation of
 bounded variables, if, let and quote special forms.
+###### Main files at this phase:
 
 ### Phase 6: Apply
 Extend the evaluator's ability to handle define and lambda special forms.
+###### Main files at this phase:
 
 ### Phase 7: Primitives
 To support applying Scheme primitive functions implemented in C; to implement a few primitive functions.
+###### Main files at this phase:
 
 ### Phase 8: Interpreter
 To add a myriad of features to the interpreter including:
+###### Main files at this phase:
+
 ##### Primitive procedures:
 *, -, /, <=, eq?, pair?, and apply.
 ##### Library procedures:
 =, modulo, zero?, equal?, list, and append.
+(please find =, modulo, zero?, equal?, in math.scm)
+
 ##### Special forms: 
 lambda, let*, letrec, and, or, cond, set!, and begin.
 ##### Extensions 
