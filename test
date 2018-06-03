@@ -1,0 +1,20 @@
+(letrec
+	((x 3)
+	 (y x))
+	(+ 1 y))
+
+(let ((x 2))
+ (let* ((x 3) (y x))
+  y))
+
+(let ((x 2))
+ (let ((x 3) (y x))
+  y))
+
+((lambda x x) 4)
+
+((lambda y y) 1 2 3)
+
+((lambda x x))
+
+((lambda x (car x)) 1 2 3)

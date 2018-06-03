@@ -93,11 +93,13 @@ void evaluationError(){
  */
 bool verifyFormal(Value *formals) {
     Value *cur = formals;
-    while (cur->type != NULL_TYPE) {
-        if (car(cur)->type != SYMBOL_TYPE) {
-            return false;
-        }
-        cur = cdr(cur);
+    if (formals->type == CONS_TYPE) {
+	while (cur->type != NULL_TYPE) {
+        	if (car(cur)->type != SYMBOL_TYPE) {
+            		return false;
+        	}
+        	cur = cdr(cur);
+    	}
     }
     return true;
 }
@@ -109,15 +111,17 @@ bool verifyFormal(Value *formals) {
  */
 char *containsDuplicate(Value *formals) {
     Value *cur = formals;
-    while (cur->type != NULL_TYPE) {
-        Value *next = cdr(cur);
-        while (next->type != NULL_TYPE) {
-            if (!strcmp(car(cur)->s, car(next)->s)) {
-                return car(cur)->s;
+    if (cur->type == CONS_TYPE) {
+        while (cur->type != NULL_TYPE) {
+            Value *next = cdr(cur);
+            while (next->type != NULL_TYPE) {
+            	if (!strcmp(car(cur)->s, car(next)->s)) {
+                    return car(cur)->s;
+            	}
+            	next = cdr(next);
             }
-            next = cdr(next);
-        }
-        cur = cdr(cur);
+            cur = cdr(cur);
+    	}
     }
     return NULL;
 }
@@ -135,14 +139,14 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
        assert(binding != NULL);      
        while (binding->type != NULL_TYPE){
            Value *curBinding = car(binding);
-    	   Value *name = car(curBinding);
+           Value *name = car(curBinding);
 	       Value *value = car(cdr(curBinding));
 	       assert(name->type == SYMBOL_TYPE);
-	   if (!strcmp(name->s, expr->s)){
-	       return value;	      
-	   }
-       binding = cdr(binding);
-	}
+	       if (!strcmp(name->s, expr->s)){
+                return value;	      
+	       }
+           binding = cdr(binding);
+       }
     curF = curF->parent;
     }
     printf("The symbol %s is unbounded! ", expr->s);
@@ -263,6 +267,81 @@ void bind(char *name, Value *(*function)(Value *), Frame *frame) {
 
 
 /*
+ * Helper function to evaluate the AND special form.
+ */
+Value *evalAnd(Value *args, Frame *frame){
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    result->type = BOOL_TYPE;
+    if (length(args) == 0) {
+        result->s = "#t";
+        return result;
+    }
+    Value *body = args;
+    assert(body->type == CONS_TYPE);
+    while (cdr(body)->type != NULL_TYPE) {
+        Value *curValue = eval(car(body), frame);
+        if (curValue->type == BOOL_TYPE && (!strcmp(curValue->s, "#f"))) {
+            result->s = "#f";
+            return result;
+        }
+        body = cdr(body);
+    }
+    return eval(car(body),frame);
+
+}
+
+/*
+ * Helper function to evaluate the OR special form.
+ */
+Value *evalOr(Value *args, Frame *frame){
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    result->type = BOOL_TYPE;
+    if (length(args) == 0) {
+        result->s = "#f";
+        return result;
+    }
+    Value *body = args;
+    assert(body->type == CONS_TYPE);
+    while (cdr(body)->type != NULL_TYPE) {
+        Value *curValue = eval(car(body), frame);
+        if (!(curValue->type == BOOL_TYPE && (!strcmp(curValue->s, "#f")))) {
+            return curValue;
+        }
+        body = cdr(body);
+    }
+    return eval(car(body),frame);
+}
+
+/*
+ * Helper function to evaluate the BEGIN special form.
+ */
+Value *evalBegin(Value *args, Frame *frame) {
+    assert(args->type == NULL_TYPE || args->type == CONS_TYPE);
+    Value *body = args;
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    result->type = VOID_TYPE;
+    if (body->type == NULL_TYPE)
+	return result;
+    while (cdr(body)->type != NULL_TYPE) {
+	Value *curValue = eval(car(body),frame);
+	body = cdr(body); 
+   }
+   return eval(car(body),frame); 
+}
+
+/*
  * Helper function to evaluate the LET special form by 
  * creating bindings and then evaluate the body.
  */
@@ -307,6 +386,140 @@ Value *evalLet(Value *args, Frame *frame){
     return eval(body, frameG);    
 }
 
+/*
+ * Helper function to evaluate the LETREC special form by 
+ * creating bindings and then evaluate the body.
+ */
+Value *evalLetrec(Value *args, Frame *frame){
+    Value *cur = car(args);
+    if (!isNull(cur) && cur->type != CONS_TYPE) {
+        printf("Invalid syntax in 'letrec'. ");
+        evaluationError();
+    }
+    if (isNull(cdr(args))) {
+        printf("Empty body in 'letrec'. ");
+        evaluationError();
+    }
+    Value *body = cdr(args);
+    Frame *frameG = talloc(sizeof(Frame));
+    if (!frameG) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    frameG->parent = frame;
+    frameG->bindings = makeNull();
+    while (cur != NULL && cur->type != NULL_TYPE){
+        if (car(cur)->type != CONS_TYPE || length(car(cur)) != 2) {
+            printf("Invalid syntax in 'letrec' bindings. ");
+            evaluationError();
+        }
+    	Value *v = eval(car(cdr(car(cur))), frameG);
+        if (car(car(cur))->type != SYMBOL_TYPE) {
+            printf("Invalid syntax in 'letrec'. Not a valid identifier! ");
+            evaluationError();
+        }    
+	    addBindingLocal(car(car(cur)), v, frameG);
+	    cur = cdr(cur);
+    }
+    // Evaluate all expressions but 
+    // only return the last expression in body
+    while (cdr(body)->type != NULL_TYPE){
+        eval(car(body), frameG);
+        body = cdr(body);
+    }
+    body = car(body);
+    return eval(body, frameG);    
+}
+
+/*
+ * Helper function to evaluate the LET* special form by 
+ * creating bindings and then evaluate the body.
+ */
+Value *evalLetstar(Value *args, Frame *frame){
+    Value *cur = car(args);
+    if (!isNull(cur) && cur->type != CONS_TYPE) {
+        printf("Invalid syntax in 'let*'. ");
+        evaluationError();
+    }
+    if (isNull(cdr(args))) {
+        printf("Empty body in 'let*'. ");
+        evaluationError();
+    }
+    Value *body = cdr(args);
+    Frame *lastFrame = frame;
+    while (cur != NULL && cur->type != NULL_TYPE){   
+    	Frame *frameG = talloc(sizeof(Frame));
+    	if (!frameG) {
+        	printf("Error! Not enough memory!\n");
+        	texit(1);
+    	}
+    	frameG->parent = lastFrame;
+    	frameG->bindings = makeNull();
+    	if (car(cur)->type != CONS_TYPE || length(car(cur)) != 2) {
+            printf("Invalid syntax in 'let*' bindings. ");
+            evaluationError();
+        }
+	    Value *v = eval(car(cdr(car(cur))), frameG);
+        if (car(car(cur))->type != SYMBOL_TYPE) {
+            printf("Invalid syntax in 'let*'. Not a valid identifier! ");
+            evaluationError();
+        }    
+    	addBindingLocal(car(car(cur)), v, frameG);
+    	lastFrame = frameG;
+    	cur = cdr(cur);
+    }
+    // Evaluate all expressions but 
+    // only return the last expression in body
+    while (cdr(body)->type != NULL_TYPE){
+        eval(car(body), lastFrame);
+        body = cdr(body);
+    }
+    body = car(body);
+    return eval(body, lastFrame);    
+}
+
+/*
+ * Helper function to evaluate the COND special form. 
+ */
+Value *evalCond(Value *args, Frame *frame){
+    assert(args->type == CONS_TYPE || args->type == NULL_TYPE);
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    result->type = VOID_TYPE;
+    Value *clauses = args;
+    while (clauses->type != NULL_TYPE){
+        Value *curClause = car(clauses);
+        Value *test = car(curClause);
+        if (test->type == SYMBOL_TYPE && (!strcmp(test->s, "else"))) {
+            if (cdr(clauses)->type == NULL_TYPE) {
+                Value *body = cdr(curClause);
+                while (cdr(body)->type != NULL_TYPE) {
+                    eval(car(body), frame);
+                    body = cdr(body);
+                }
+                return eval(car(body), frame);
+            } else {
+                printf("Error! 'Else' clause must be last\n");
+                evaluationError();
+            }
+        }
+        if (!(eval(test, frame)->type == BOOL_TYPE && 
+                (!strcmp(eval(test,frame)->s, "#f")))) {
+            Value *body = cdr(curClause);
+            while (cdr(body)->type != NULL_TYPE) {
+                eval(car(body), frame);
+                body = cdr(body);
+            }
+            return eval(car(body), frame);
+        }
+        clauses = cdr(clauses);
+    }
+    return result; 
+}
+
 
 /*
  * Helper function to evaluate the DEFINE special form by 
@@ -336,6 +549,52 @@ Value *evalDefine(Value *args, Frame *frame){
     } 
     Value *expr = eval(car(cdr(args)), frame);
     addBindingGlobal(car(args), expr, frame);
+    return result;
+}
+
+/*
+ * Helper function to evaluate the SET! special form by 
+ * changing bindings and then evaluate the body.
+ */
+Value *evalSet(Value *args, Frame *frame){
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        texit(1);
+    }
+    if (car(args)->type != SYMBOL_TYPE) {
+        printf("Invalid syntax in 'set!'. "
+               "First argument must be a symbol. ");
+        evaluationError();
+    }
+    result->type = VOID_TYPE;
+    if (length(args) != 2) {
+        printf("Invalid syntax in 'set!'. Multiple expressions"
+               " after identifier! ");
+        evaluationError();
+    } 
+    Frame *curFrame = frame;
+    while (curFrame != NULL) {
+	    if (lookUpSymbol(car(args), curFrame)) {
+	        Value *newBindings = makeNull(); 
+	        Value *newValue = eval(car(cdr(args)),frame);
+   	        Value *oldBindings = curFrame->bindings;
+	        assert(oldBindings != NULL);
+    	    while (oldBindings->type != NULL_TYPE) {
+	    	    Value *curBinding = car(oldBindings);
+		        Value *name = car(curBinding);
+		        assert(name->type == SYMBOL_TYPE);
+	   	        if (!strcmp(name->s, car(args)->s)){
+		            curBinding = cons(name, cons(newValue, makeNull()));
+	    	    }
+		        newBindings = cons(curBinding, newBindings);
+       		    oldBindings = cdr(oldBindings);
+	        }
+	        curFrame->bindings = newBindings;
+	        return result;
+	    }
+	    curFrame = curFrame->parent;
+    }
     return result;
 }
 
@@ -824,7 +1083,7 @@ Value *apply(Value *function, Value *args, Frame *frame) {
     Value *formal = function->closure.formal;
     Value *body = function->closure.body;
     Frame *parentFrame = function->closure.frame;
-    if (length(formal) != length(args)) {
+    if (formal->type == CONS_TYPE && length(formal) != length(args)) {
         printf("Expected %i arguments, supplied %i. ", 
                length(formal), length(args));
         evaluationError();
@@ -836,12 +1095,16 @@ Value *apply(Value *function, Value *args, Frame *frame) {
     }
     newFrame->parent = parentFrame;
     newFrame->bindings = makeNull();
-    Value *curFormal = formal;
+     Value *curFormal = formal;
     Value *curActual = args;
-    while (curFormal->type != NULL_TYPE) {
-        addBindingLocal(car(curFormal), car(curActual), newFrame);
-        curFormal = cdr(curFormal);
-        curActual = cdr(curActual);
+    if (curFormal->type == CONS_TYPE) { 
+	    while (curFormal->type != NULL_TYPE) {
+            addBindingLocal(car(curFormal), car(curActual), newFrame);
+            curFormal = cdr(curFormal);
+            curActual = cdr(curActual);
+    	}
+    } else {
+	    addBindingLocal(curFormal, curActual, newFrame);
     }
     // Evaluate multiple expressions
     while (cdr(body)->type != NULL_TYPE){
@@ -929,36 +1192,57 @@ Value *eval(Value *expr, Frame *frame){
 	    } 
 	    else if (!strcmp(first->s, "quote")){
     		if (length(args) != 1){
-                printf("Number of arguments for 'quote' has to be 1. "); 
-                evaluationError();
+                    printf("Number of arguments for 'quote' has to be 1. "); 
+                    evaluationError();
             }
             return car(args);
-	    } 
-	    else if (!strcmp(first->s, "let")){ 
+	    }
+        else if (!strcmp(first->s, "and")) {
+            return evalAnd(args, frame);
+        }
+        else if (!strcmp(first->s, "or")) {
+            return evalOr(args, frame);
+        }
+        else if (!strcmp(first->s, "begin")) {
+            return evalBegin(args, frame);
+        }
+        else if (!strcmp(first->s, "cond")) {
+            return evalCond(args, frame);
+        }
+	    else if (!strcmp(first->s, "let")) { 
 	    	return evalLet(args, frame);
 	    }
-        else if (!strcmp(first->s, "define")) {
-            return evalDefine(args, frame);
-        }
-        else if (!strcmp(first->s, "lambda")) {
+	    else if (!strcmp(first->s, "letrec")) {
+		return evalLetrec(args, frame);
+	    }
+	    else if (!strcmp(first->s, "let*")) {
+		return evalLetstar(args, frame);
+	    }
+	    else if (!strcmp(first->s, "define")) {
+            	return evalDefine(args, frame);
+            }
+	    else if (!strcmp(first->s, "set!")) {
+	    	return evalSet(args, frame);
+	    }
+       	else if (!strcmp(first->s, "lambda")) {
             return evalLambda(args, frame);
         }
 	    else{
             // Stores the result of recursively evaluating e1...en
-            Value *values = makeNull();
-            if (!values) {
-                texit(1);
-            }
-            Value *cur = expr;
-            while (cur->type != NULL_TYPE) {
-                Value *cur_value = eval(car(cur), frame);
-                values = cons(cur_value, values);
-                cur = cdr(cur);
-            }
-            values = reverse(values);
-            Value *function = car(values);
-            Value *actual = cdr(values);
-            return apply(function, actual, frame);
+                Value *values = makeNull();
+                if (!values) {
+                    texit(1);
+                }
+            	Value *cur = expr;
+            	while (cur->type != NULL_TYPE) {
+ 	            Value *cur_value = eval(car(cur), frame);
+        	    values = cons(cur_value, values);
+                    cur = cdr(cur);
+                }
+            	values = reverse(values);
+            	Value *function = car(values);
+            	Value *actual = cdr(values);
+            	return apply(function, actual, frame);
 	    }		
 	    break;
 	}
