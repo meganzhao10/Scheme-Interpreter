@@ -175,9 +175,6 @@
               (else (floor x)))
         (evaluationError "round expects a real number as input"))))
         
-
-
-
 ;take in integer
 (define even?
   (lambda (x)
@@ -190,6 +187,26 @@
     (if (integer? x)
         (not (even? x))
         (evaluationError "odd? expects a integer as input"))))
+
+
+;These procedures return the maximum or minimum of their arguments.
+;; these will only take in two inputs, will try to make them variadic.
+(define max
+  (lambda (x y)
+    (if (and (number? x) (number? y))
+        (if (>= x y)
+            x
+            y)
+        (evaluationError "max expects real numbers as input"))))
+(define min
+  (lambda (x y)
+    (if (and (number? x) (number? y))
+        (if (<= x y)
+            x
+            y)
+        (evaluationError "min expects real numbers as input"))))
+
+(define abs
+  (lambda (x)
         
 ;;test cases
-(= 5 7)
