@@ -236,12 +236,14 @@
                    (gcd (modulo x y) y)))
            (evaluationError "gcd expects rational numbers as input"))))
 
+;;need to test
 (define lcm
   (lambda (x y)
     (if (and (integer? x) (integer? y))
-        (if (or (zero? x) (zero? y))
-            0
-            (/ (abs (* x y)) (gcd x y)))
+        (cond ((or (zero? x) (zero? y)) 0)
+              ((zero? (modulo x y)) x)
+              ((zero? (modulo y x)) y)
+              (else (/ (abs (* x y)) (gcd x y))))
         (evaluationError "lcm expects rational numbers as input"))))
             
            
