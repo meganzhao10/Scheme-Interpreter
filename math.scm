@@ -11,9 +11,9 @@
 
 ;;need to do
 ;;         , , list, and append.
-;;                      max         
-;;                   min         
-;;                   abs         
+;;                              
+;;                            
+;;                            
 ;;                     gcd         
 ;;                     lcm         
 
@@ -206,7 +206,23 @@
             y)
         (evaluationError "min expects real numbers as input"))))
 
+
 (define abs
   (lambda (x)
+    (if (number? x)
+        (if (positive? x)
+            x
+            (* -1 x))
+            (evaluationError "abs a expects real numbers as input"))))
+
+;using idea of Euclid Algorithm
+;; will try to make this variadic.
+; greatest common divisor of their arguments.
+;The result is always non-negative.
+;if no inputs or inputs are 0, return 0 as of DrRacket's behavior
+(define gcd)
+        
+        
+  
         
 ;;test cases
