@@ -15,7 +15,7 @@
 ;;                   min         
 ;;                   abs         
 ;;                     gcd         
-;;                     lcm         round
+;;                     lcm         
 
 ;We consulted R5RS(link in readme) for specifications of procedures
 
@@ -108,7 +108,7 @@
                                   (- 1 (floor (+ x 1))))))))
                 (helper x)))
         (evaluationError "floor expects a real number as input"))))
-  
+ 
 ;Ceiling returns the smallest integer not smaller than x
 ;print in format of float number as the behavior of Dr.Racket
 (define ceiling
@@ -131,6 +131,14 @@
                                   (- 1 (ceiling (+ x 1))))))))
                 (helper x)))
         (evaluationError "ceiling expects a real number as input"))))
+
+;remainder
+(define modulo
+  (lambda (x y)
+    (if (and (integer? x) (integer? y))
+        (- x (* y (floor (/ x y)))))
+        (evaluationError "modulo expects integers as input")))
+
 
 ;Truncate returns the integer closest to x whose absolute value
 ;is not larger than the absolute value of x
@@ -158,24 +166,15 @@
 
 ;Round returns the closest integer to x,
 ;rounding to even when x is halfway between two integers.
+;print in format of float number as the behavior of Dr.Racket
 (define round
   (lambda (x)
     (if (number? x)
         (cond ((integer? x) x)
               ((> x (+ (floor x) 0.5)) (ceiling x))
               (else (floor x)))
-        (evaluationError "round expects a real number as input")
-
-
-
-
-
-
-(define modulo
-  (lambda (x y)
-    (if (and (integer? x) (integer? y))
-        (- x (* y (floor (/ x y)))))
-        (evaluationError "modulo expects integers as input")))            
+        (evaluationError "round expects a real number as input"))))
+        
 
 
 
