@@ -226,9 +226,6 @@
 ;if no inputs or inputs are 0, return 0 as of DrRacket's behavior
 (define gcd
   (lambda (x y)
-    ;(cond ;((and (null? x) (null? y)) 0)
-          ;((and (or (zero? x) (null? x)) (number? y)) (abs y))
-          ;((and (or (zero? y) (null? y)) (number? x)) (abs x))
     (if (and (integer? x) (integer? y))
            (if (< x y)
                (if (zero? (modulo y x))
@@ -238,6 +235,15 @@
                    (abs y)
                    (gcd (modulo x y) y)))
            (evaluationError "gcd expects rational numbers as input"))))
+
+(define lcm
+  (lambda (x y)
+    (if (and (integer? x) (integer? y))
+        (if (or (zero? x) (zero? y))
+            0
+            (/ (abs (* x y)) (gcd x y)))
+        (evaluationError "lcm expects rational numbers as input"))))
+            
            
           
 
