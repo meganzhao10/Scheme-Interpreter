@@ -11,10 +11,10 @@
 
 ;;need to do
 ;;         , , list, and append.
-;;                      max         modulo
-;;                   min         floor
-;;                   abs         ceiling
-;;                     gcd         truncate
+;;                      max         
+;;                   min         
+;;                   abs         
+;;                     gcd         
 ;;                     lcm         round
 
 ;We consulted R5RS(link in readme) for specifications of procedures
@@ -48,7 +48,7 @@
   (lambda (x y)
     (if (and (number? x) (number? y))
         (and (not (= x y)) (>= x y))
-        (evaluationError "Inputs for '>' have to be numbers"))))
+        (evaluationError "> expects numbers as input"))))
 
 
 (define zero?
