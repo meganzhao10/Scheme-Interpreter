@@ -1347,6 +1347,7 @@ void interpret(Value *tree){
     bind("evaluationError", primitiveEvalError, topFrame);
     bind("integer?", primitiveIntegerCheck, topFrame);
     
+    
     // Evaluate the program
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
