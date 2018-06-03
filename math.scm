@@ -155,9 +155,16 @@
                                   (- 1 (truncate (+ x 1))))))))
                 (helper x)))
         (evaluationError "truncate expects a real number as input"))))
+
 ;Round returns the closest integer to x,
 ;rounding to even when x is halfway between two integers.
-(define round)
+(define round
+  (lambda (x)
+    (if (number? x)
+        (cond ((integer? x) x)
+              ((> x (+ (floor x) 0.5)) (ceiling x))
+              (else (floor x)))
+        (evaluationError "round expects a real number as input")
 
 
 
@@ -168,7 +175,7 @@
   (lambda (x y)
     (if (and (integer? x) (integer? y))
         (- x (* y (floor (/ x y)))))
-        (evaluationError "Inputs for 'modulo' has to be integers")))            
+        (evaluationError "modulo expects integers as input")))            
 
 
 
@@ -177,11 +184,13 @@
   (lambda (x)
     (if (integer? x)
         (zero? (modulo x 2))
-        (evaluationError "Input for 'even?' has to be a integer"))))
+        (evaluationError "even? expects a integer as input"))))
 
 (define odd?
   (lambda (x)
-    (not (even? x))))
+    (if (integer? x)
+        (not (even? x))
+        (evaluationError "odd? expects a integer as input"))))
         
 ;;test cases
 (= 5 7)
