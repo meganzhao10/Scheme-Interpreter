@@ -1161,6 +1161,68 @@ Value *primitiveApply(Value *args) {
     return apply(procedure, arguments, frame);
 }
 
+/* 
+ * Helper function to be display error message in primitive
+ * procedures
+ */
+Value *primitiveEvalError (Value *errorMessage){
+    printf("%s\n", car(errorMessage)->s);
+    evaluationError();
+    Value *values = makeNull();
+        if (!values) {
+            texit(1);
+        }
+    values->type = VOID_TYPE;
+    return values;
+} 
+/* 
+ * Implementing the Scheme primitive number? function.
+ */
+Value *primitiveNumberCheck (Value *args){
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    
+    result->type = BOOL_TYPE; 
+    if (car(args)->type == INT_TYPE || car(args)->type ==DOUBLE_TYPE) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+/* 
+ * Implementing the Scheme primitive integer? function.
+ */
+Value *primitiveIntegerCheck (Value *args){
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    
+    result->type = BOOL_TYPE; 
+    if (car(args)->type == INT_TYPE) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+
+
 
 /*
  * The function takes a parse tree of a single S-expression and 
@@ -1280,6 +1342,11 @@ void interpret(Value *tree){
     bind("car", primitiveCar, topFrame);
     bind("cdr", primitiveCdr, topFrame);
     bind("cons", primitiveCons, topFrame);
+    //to be used in math.scm
+    bind("number?", primitiveNumberCheck, topFrame);
+    bind("evaluationError", primitiveEvalError, topFrame);
+    bind("integer?", primitiveIntegerCheck, topFrame);
+    
     // Evaluate the program
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){
