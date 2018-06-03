@@ -35,13 +35,13 @@
   (lambda (x y)
     (if (and (number? x) (number? y))
         (or (= x y) (not (<= x y)))
-        (evaluationError "Inputs for '>=' have to be numbers"))))
+        (evaluationError">= expects numbers as input"))))
          
 (define <
   (lambda (x y)
     (if (and (number? x) (number? y))
         (and (not (= x y)) (<= x y))
-        (evaluationError "Inputs for '<' have to be numbers"))))
+        (evaluationError "< expects numbers as input"))))
         
     
 (define >
