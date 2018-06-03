@@ -55,7 +55,7 @@
   (lambda (x)
     (if (number? x)
         (= x 0)
-        (evaluationError "Input for 'zero?' has to be a number"))))
+        (evaluationError "zero? expects a number as input"))))
 
 ;Equal? recursively compares the contents of pairs, vectors, and strings
 ;applying eqv? on other objects such as numbers and symbols.
@@ -80,24 +80,80 @@
   (lambda (x)
     (if (number? x)
         (> x 0)
-        (evaluationError "Input for 'positive?' has to be a number"))))
+        (evaluationError "positive? expects a real number as input"))))
 
 
 (define negative?
   (lambda (x)
     (if (number? x)
         (< x 0)
-        (evaluationError "Input for 'negative?' has to be a number"))))
+        (evaluationError "negative? expects a real number as input"))))
 
 ;Floor returns the largest integer not larger than x.
+;print in format of float number as the behavior of Dr.Racket
 (define floor
-  (lambda 
-  )
+  (lambda (x)
+    (if (number? x)
+        (if (integer? x)
+            x
+            (letrec ((helper
+                        (lambda (x)
+                          (if (positive? x)
+                              (if (< x 1)
+                                  0.0
+                                  (+ 1 (floor (- x 1))))
+                              ;;case of negative
+                              (if (> x -1)
+                                  -1.0
+                                  (- 1 (floor (+ x 1))))))))
+                (helper x)))
+        (evaluationError "floor expects a real number as input"))))
+  
 ;Ceiling returns the smallest integer not smaller than x
-(define ceiling)
+;print in format of float number as the behavior of Dr.Racket
+(define ceiling
+  (lambda (x)
+    (if (number? x)
+        (if (integer? x)
+            x
+            (letrec ((helper
+                        (lambda (x)
+                          (if (positive? x)
+                              (if (< x 1)
+                                  1.0
+                                  (+ 1 (ceiling (- x 1))))
+                              ;;case of negative
+                              (if (> x -1)
+                                  ;Dr.Racket prints -0.0
+                                  ;but for the sake of clarity
+                                  ;we decide to print 0.0
+                                  0.0
+                                  (- 1 (ceiling (+ x 1))))))))
+                (helper x)))
+        (evaluationError "ceiling expects a real number as input"))))
+
 ;Truncate returns the integer closest to x whose absolute value
 ;is not larger than the absolute value of x
-(define truncate)
+(define truncate
+  (lambda (x)
+    (if (number? x)
+        (if (integer? x)
+            x
+            (letrec ((helper
+                        (lambda (x)
+                          (if (positive? x)
+                              (if (< x 1)
+                                  0.0
+                                  (+ 1 (truncate (- x 1))))
+                              ;;case of negative
+                              (if (> x -1)
+                                  ;Dr.Racket prints -0.0
+                                  ;but for the sake of clarity
+                                  ;we decide to print 0.0
+                                  0.0
+                                  (- 1 (truncate (+ x 1))))))))
+                (helper x)))
+        (evaluationError "truncate expects a real number as input"))))
 ;Round returns the closest integer to x,
 ;rounding to even when x is halfway between two integers.
 (define round)
