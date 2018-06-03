@@ -1161,6 +1161,10 @@ Value *primitiveApply(Value *args) {
     return apply(procedure, arguments, frame);
 }
 
+/* 
+ * Helper function to be display error message in primitive
+ * procedures
+ */
 Value *primitiveEvalError (Value *errorMessage){
     printf("%s\n", car(errorMessage)->s);
     evaluationError();
@@ -1170,9 +1174,10 @@ Value *primitiveEvalError (Value *errorMessage){
         }
     values->type = VOID_TYPE;
     return values;
-    
 } 
-
+/* 
+ * Implementing the Scheme primitive number? function.
+ */
 Value *primitiveNumberCheck (Value *args){
     if (length(args) != 1) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", 
@@ -1193,7 +1198,9 @@ Value *primitiveNumberCheck (Value *args){
     }
     return result;
 }
-
+/* 
+ * Implementing the Scheme primitive integer? function.
+ */
 Value *primitiveIntegerCheck (Value *args){
     if (length(args) != 1) {
         printf("Arity mismatch. Expected: 1. Given: %i. ", 
@@ -1335,12 +1342,9 @@ void interpret(Value *tree){
     bind("car", primitiveCar, topFrame);
     bind("cdr", primitiveCdr, topFrame);
     bind("cons", primitiveCons, topFrame);
-    
-    //to use in math.scm
+    //to be used in math.scm
     bind("number?", primitiveNumberCheck, topFrame);
-
     bind("evaluationError", primitiveEvalError, topFrame);
-    
     bind("integer?", primitiveIntegerCheck, topFrame);
     
     // Evaluate the program

@@ -17,18 +17,19 @@
 ;;                     gcd         truncate
 ;;                     lcm         round
 
-
-(define not
-    (lambda (x)
-        (if x
-            #f
-            #t)))
+;We consulted R5RS(link in readme) for specifications of procedures
 
 (define =
   (lambda (x y)
     (if (and (number? x) (number? y))
         (and (<= x y ) (<= y x))
         (evaluationError "Inputs for '=' have to be numbers"))))
+
+(define not
+    (lambda (x)
+        (if x
+            #f
+            #t)))
 
 (define >=
   (lambda (x y)
@@ -88,7 +89,23 @@
         (< x 0)
         (evaluationError "Input for 'negative?' has to be a number"))))
 
-(define floor)
+;Floor returns the largest integer not larger than x.
+(define floor
+  (lambda 
+  )
+;Ceiling returns the smallest integer not smaller than x
+(define ceiling)
+;Truncate returns the integer closest to x whose absolute value
+;is not larger than the absolute value of x
+(define truncate)
+;Round returns the closest integer to x,
+;rounding to even when x is halfway between two integers.
+(define round)
+
+
+
+
+
 
 (define modulo
   (lambda (x y)
@@ -109,4 +126,5 @@
   (lambda (x)
     (not (even? x))))
         
-
+;;test cases
+(= 5 7)

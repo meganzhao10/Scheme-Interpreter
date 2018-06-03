@@ -1,0 +1,34 @@
+;More built-in functions with regards to arithmetic.
+;using only special forms and primitives
+;that we've implemented (e.g., +, -, *, /, and <=).(load "library.scm")
+
+;;2 Library procedures: =, modulo, zero?, equal?, list, and append.
+
+;;=        zero?             max         modulo
+;;>=       positive?         min         floor
+;;<        negative?         abs         ceiling
+;;>        even?             gcd         truncate
+;;         odd?              lcm         round
+(define not
+    (lambda (x)
+        (if x #f #t)))
+
+(define equal?
+    (lambda (x y)
+        (if (and (pair? x) (pair? y))
+            (letrec ((helper (lambda (x y)
+                                (cond ((not (equal? (car x) (car y))) #f)
+                                    (else (equal? (cdr x) (cdr y)))))))
+                (helper x y))
+            (eq? x y))))
+
+(define =
+  (lambda (x y)
+    (if (and (number? x) (number? y))
+        (and (<= x y ) (<= y x))
+        (evaluationError "Input has to be number"))))
+
+
+
+
+
