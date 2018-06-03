@@ -23,8 +23,9 @@
   (lambda (x y)
     (if (and (number? x) (number? y))
         (and (<= x y ) (<= y x))
-        (evaluationError "Inputs for '=' have to be numbers"))))
+        (evaluationError "= expects numbers as input"))))
 
+;to be used later
 (define not
     (lambda (x)
         (if x
@@ -63,7 +64,6 @@
 ;"Eq? and eqv? are guaranteed to have the same behavior
 ;on symbols, booleans, the empty list, pairs,
 ;procedures, and non-empty strings and vectors."
-;refer to R5RS 
 (define equal?
   (lambda (x y)
     (if (and (pair? x) (pair? y))
@@ -134,6 +134,7 @@
 
 ;Truncate returns the integer closest to x whose absolute value
 ;is not larger than the absolute value of x
+;print in format of float number as the behavior of Dr.Racket
 (define truncate
   (lambda (x)
     (if (number? x)
