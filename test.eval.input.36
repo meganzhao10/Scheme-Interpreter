@@ -1,2 +1,0 @@
-;test lists.scm
-(load "lists.scm")
