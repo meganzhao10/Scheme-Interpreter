@@ -1,0 +1,2 @@
+;;; used as input file for load
+(set! x 12) 

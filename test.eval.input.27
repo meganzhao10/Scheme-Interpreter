@@ -1,0 +1,33 @@
+(define x 1)
+(define y 2)
+
+(define lst (cons x y))
+
+x 
+y
+lst
+
+(load "test.eval.input.28")
+
+x
+y
+lst
+
+(load "test.eval.input.29")
+
+x
+y
+lst
+
+(load "test.eval.input.30")
+
+(define mult-test
+  (lambda (a)
+    (lambda (b)
+      (* a b))))
+(((curry2 -) 2) 3)
+((uncurry2 (curry2 *)) 2 3) 
+((mult 2) 3)
+((compose integer? -) 1)
+
+(load "not-a-test-file")

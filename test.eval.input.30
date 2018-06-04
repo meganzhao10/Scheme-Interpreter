@@ -1,0 +1,34 @@
+;;; Used as input file to load 
+
+;; This procedure takes a 2-parameter function f as input
+;; and returns a curried version of f.
+(define curry2
+  (lambda (f)
+    (lambda (a)
+      (lambda (b)
+        (f a b)))))
+
+;; This procedure takes a curried 2-parameter function f
+;; as input and returns an uncurried version of f.
+(define uncurry2
+  (lambda (f)
+    (lambda (a b)
+      ((f a) b))))
+
+;; This curried function mult multiplies two integers
+;; and is defined using curry2.
+(define mult (curry2 *))
+
+;; This procedures takes two 1-parameter function f and g
+;; as input and returns a function that is f composed with g.
+(define compose
+  (lambda (f g)
+    (lambda (x)
+      (f (g x)))))
+
+;; This procedure takes a 1-parameter predicate and returns a
+;; predicate that is the negation of predicate.
+(define negate
+  (lambda (predicate)
+    (lambda (x)
+      (not (predicate x)))))

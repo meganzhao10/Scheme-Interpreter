@@ -1173,7 +1173,8 @@ Value *primitiveLoad(Value *arg) {
     FILE *stream;
     stream = fopen(filename, "r");
     if (stream == NULL) {
-        texit(1);
+        printf("Cannot open file \"%s\". ", filename);
+        evaluationError();
     } 
     Value *list = tokenize(stream);
     if (list == NULL) {
@@ -1182,12 +1183,7 @@ Value *primitiveLoad(Value *arg) {
     Value *tree = parse(list);
     if (tree == NULL) {
         texit(1);
-    }
-
-//    Value *voidResult = talloc(sizeof(Value));
-//    voidResult->type = VOID_TYPE;
-//    return voidResult;
-    
+    }    
     return tree;
 }
 
