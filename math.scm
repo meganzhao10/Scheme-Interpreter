@@ -247,3 +247,11 @@
               (else (/ (abs (* x y)) (gcd x y))))
         (evaluationError "lcm expects integers as input"))))
 
+(= 3 5)
+(zero? -3)
+(max 7 0)
+(min 3 4)
+;(eq? (quote s) 4)
+(eq? 3 4)
+(= 3 3.0)
+

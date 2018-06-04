@@ -143,8 +143,12 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
        while (binding->type != NULL_TYPE){
            Value *curBinding = car(binding);
            Value *name = car(curBinding);
+
+           if (name->type == NULL_TYPE) {
+               break;
+           }
 	       Value *value = car(cdr(curBinding));
-	       assert(name->type == SYMBOL_TYPE);
+//	       assert(name->type == SYMBOL_TYPE);
 	       if (!strcmp(name->s, expr->s)){
                 return value;	      
 	       }
