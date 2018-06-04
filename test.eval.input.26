@@ -45,19 +45,19 @@
 (reverse '(1))
 
 
-;;;(map (lambda (x) (* x x)) '(1 2 3))    
-;;;(map (lambda (number)
-;;;         (+ 1 number))
-;;;                '(1 2 3 4))
+(map (lambda (x) (* x x)) '(1 2 3))    
+(map (lambda (number)
+                (+ 1 number))
+                '(1 2 3 4))
 
-;;;(map (lambda (number1 number2)
-;;;         (+ number1 number2))
-;;;                '(1 2 3 4)
-;;;                       '(10 100 1000 10000))
+(map (lambda (number1 number2)
+         (+ number1 number2))
+                '(1 2 3 4)
+                       '(10 100 1000 10000))
 
 
-;;;(filter odd? '(1 2 3))                
+(filter odd? '(1 2 3))                
 
-;;;(foldl cons '() '(1 2 3))              
+(foldl cons '() '(1 2 3))              
 
-;;;(foldr cons '() '(1 2 3))              
+(foldr cons '() '(1 2 3))              

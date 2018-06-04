@@ -1,1 +1,2 @@
-'(12 2)
+;test lists.scm
+(load "lists.scm")
