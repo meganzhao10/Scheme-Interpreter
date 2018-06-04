@@ -85,27 +85,28 @@
         (evaluationError "negative? expects a real number as input"))))
 
 ;Floor returns the largest integer not larger than x.
-;print in format of float number as the behavior of Dr.Racket
+;display a bit different from DrRacket in terms of float format/int format
 (define floor
   (lambda (x)
     (if (number? x)
         (if (integer? x)
             x
-            (letrec ((helper
-                        (lambda (x)
-                          (if (positive? x)
-                              (if (< x 1)
-                                  0.0
-                                  (+ 1 (floor (- x 1))))
-                              ;;case of negative
-                              (if (> x -1)
-                                  -1.0
-                                  (- 1 (floor (+ x 1))))))))
+            (letrec ((helper(lambda (x)
+                              (cond ((positive? x)
+                                 (if (< x 1)
+                                     0
+                                     (+ 1 (floor (- x 1)))))
+                                ((negative? x)
+                                 (if (> x -1)
+                                     -1
+                                     (- (floor (+ x 1)) 1)))
+                                (else 0)))))
+                              
                 (helper x)))
         (evaluationError "floor expects a real number as input"))))
  
 ;Ceiling returns the smallest integer not smaller than x
-;print in format of float number as the behavior of Dr.Racket
+;display a bit different from DrRacket in terms of float format/int format
 (define ceiling
   (lambda (x)
     (if (number? x)
@@ -115,15 +116,15 @@
                         (lambda (x)
                           (if (positive? x)
                               (if (< x 1)
-                                  1.0
+                                  1
                                   (+ 1 (ceiling (- x 1))))
                               ;;case of negative
                               (if (> x -1)
                                   ;Dr.Racket prints -0.0
                                   ;but for the sake of clarity
                                   ;we decide to print 0.0
-                                  0.0
-                                  (- 1 (ceiling (+ x 1))))))))
+                                  0
+                                  (- (ceiling (+ x 1)) 1))))))
                 (helper x)))
         (evaluationError "ceiling expects a real number as input"))))
 
@@ -133,6 +134,7 @@
     (if (and (integer? x) (integer? y))
         (- x (* y (floor (/ x y))))
         (evaluationError "modulo expects integers as input"))))
+
 
         
 ;Truncate returns the integer closest to x whose absolute value
@@ -147,15 +149,15 @@
                         (lambda (x)
                           (if (positive? x)
                               (if (< x 1)
-                                  0.0
+                                  0
                                   (+ 1 (truncate (- x 1))))
                               ;;case of negative
                               (if (> x -1)
                                   ;Dr.Racket prints -0.0
                                   ;but for the sake of clarity
                                   ;we decide to print 0.0
-                                  0.0
-                                  (- 1 (truncate (+ x 1))))))))
+                                  0
+                                  (- (truncate (+ x 1)) 1))))))
                 (helper x)))
         (evaluationError "truncate expects a real number as input"))))
 
@@ -166,7 +168,7 @@
   (lambda (x)
     (if (number? x)
         (cond ((integer? x) x)
-              ((> x (+ (floor x) 0.5)) (ceiling x))
+              ((>= x (+ (floor x) 0.5)) (ceiling x))
               (else (floor x)))
         (evaluationError "round expects a real number as input"))))
         
