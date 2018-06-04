@@ -6,11 +6,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <assert.h>
 #include "parser.h"
 #include "linkedlist.h"
 #include "interpreter.h"
-#include <assert.h>
 #include "talloc.h"
+#include "tokenizer.h"
 
 /*
  * Print a representation of the contents of a linked list.
@@ -27,7 +28,9 @@ void displayEval(Value *list, bool newline){
                 printf("%f ",cur->d);
                 break;
             case STR_TYPE:
-                printf("%s ",cur->s);
+                printf("\"");
+                printf("%s",cur->s);
+                printf("\" ");
                 break;
             case SYMBOL_TYPE:
                 printf("%s ",cur->s);
@@ -1162,6 +1165,92 @@ Value *primitiveApply(Value *args) {
 }
 
 
+/* 
+ * Implements the primitive load function.
+ */
+Value *primitiveLoad(Value *arg) {
+    char *filename = car(arg)->s;
+    FILE *stream;
+    stream = fopen(filename, "r");
+    if (stream == NULL) {
+        printf("Cannot open file \"%s\". ", filename);
+        evaluationError();
+    } 
+    Value *list = tokenize(stream);
+    if (list == NULL) {
+        texit(1);
+    }
+    Value *tree = parse(list);
+    if (tree == NULL) {
+        texit(1);
+    }    
+    return tree;
+}
+
+
+/* 
+ * Helper function to be display error message in primitive
+ * procedures
+ */
+Value *primitiveEvalError (Value *errorMessage){
+    printf("%s\n", car(errorMessage)->s);
+    evaluationError();
+    Value *values = makeNull();
+        if (!values) {
+            texit(1);
+        }
+    values->type = VOID_TYPE;
+    return values;
+} 
+/* 
+ * Implementing the Scheme primitive number? function.
+ */
+Value *primitiveNumberCheck (Value *args){
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    
+    result->type = BOOL_TYPE; 
+    if (car(args)->type == INT_TYPE || car(args)->type ==DOUBLE_TYPE) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+/* 
+ * Implementing the Scheme primitive integer? function.
+ */
+Value *primitiveIntegerCheck (Value *args){
+    if (length(args) != 1) {
+        printf("Arity mismatch. Expected: 1. Given: %i. ", 
+               length(args));
+        evaluationError();
+    }
+    Value *result = talloc(sizeof(Value));
+    if (!result) {
+        printf("Error! Not enough memory!\n");
+        evaluationError();
+    }
+    
+    result->type = BOOL_TYPE; 
+    if (car(args)->type == INT_TYPE) {
+        result->s = "#t";
+    } else {
+        result->s = "#f";
+    }
+    return result;
+}
+
+
+
 /*
  * The function takes a parse tree of a single S-expression and 
  * an environment frame in which to evaluate the expression and 
@@ -1228,21 +1317,37 @@ Value *eval(Value *expr, Frame *frame){
             return evalLambda(args, frame);
         }
 	    else{
-            // Stores the result of recursively evaluating e1...en
+                // Stores the result of recursively evaluating e1...en
                 Value *values = makeNull();
                 if (!values) {
                     texit(1);
                 }
-            	Value *cur = expr;
-            	while (cur->type != NULL_TYPE) {
- 	            Value *cur_value = eval(car(cur), frame);
-        	    values = cons(cur_value, values);
-                    cur = cdr(cur);
-                }
-            	values = reverse(values);
-            	Value *function = car(values);
-            	Value *actual = cdr(values);
-            	return apply(function, actual, frame);
+
+                // Special treatment for load
+                if (first->type == SYMBOL_TYPE && !strcmp(first->s, "load")) {
+                    Value *loadFunction = eval(first, frame);
+                    Value *loadTree = (loadFunction->pf)(args);
+                    Value *curLoad = loadTree;
+                    while (curLoad != NULL && curLoad->type == CONS_TYPE){
+                        eval(car(curLoad), frame);
+                        curLoad = cdr(curLoad);
+                    }
+                    Value *voidResult = talloc(sizeof(Value));
+                    voidResult->type = VOID_TYPE;
+                    return voidResult;
+                    
+                } else {
+                    Value *cur = expr;
+                    while (cur->type != NULL_TYPE) {
+                        Value *cur_value = eval(car(cur), frame);
+                        values = cons(cur_value, values);
+                        cur = cdr(cur);
+                    }
+                    values = reverse(values);
+                    Value *function = car(values);
+                    Value *actual = cdr(values);
+                    return apply(function, actual, frame);
+                }          
 	    }		
 	    break;
 	}
@@ -1259,14 +1364,15 @@ Value *eval(Value *expr, Frame *frame){
  * each S-expression in the top-level environment and prints each
  * result 
  */
-void interpret(Value *tree){
-    Frame *topFrame = talloc(sizeof(Frame));
+void interpret(Value *tree, Frame *topFrame){
+  /*  Frame *topFrame = talloc(sizeof(Frame));
     if (!topFrame) {
         printf("Error! Not enough memory!\n");
         texit(1);
     }
     topFrame->bindings = makeNull();
     topFrame->parent = NULL;
+*/
     // Bind the primitive functions
     bind("+", primitiveAdd, topFrame);
     bind("*", primitiveMult, topFrame);
@@ -1280,6 +1386,12 @@ void interpret(Value *tree){
     bind("car", primitiveCar, topFrame);
     bind("cdr", primitiveCdr, topFrame);
     bind("cons", primitiveCons, topFrame);
+    bind("load", primitiveLoad, topFrame);
+    //to be used in math.scm&list.scm
+    bind("number?", primitiveNumberCheck, topFrame);
+    bind("evaluationError", primitiveEvalError, topFrame);
+    bind("integer?", primitiveIntegerCheck, topFrame);
+    
     // Evaluate the program
     Value *cur = tree;
     while (cur != NULL && cur->type == CONS_TYPE){

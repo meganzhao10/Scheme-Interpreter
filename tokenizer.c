@@ -13,6 +13,7 @@
 #include "tokenizer.h"
 #include "talloc.h"
 #include "value.h"
+#include <unistd.h>
 
 /* 
  * Check whether the input character is a delimiter.
@@ -136,19 +137,19 @@ char *convertVector(Vector *list, bool isStr) {
         printf("Error! Not enough memory!\n");
         texit(1);
     }
-    if (isStr) {
-        result[0] = '"';
-        for (int i = 1; i <= list->size; i ++) {
-            result[i] = list->data[list->size - i];
-        }
-        result[list->size + 1] = '"';
-        result[list->size + 2] = '\0';
-    } else {
+//    if (isStr) {
+//        result[0] = '"';
+//        for (int i = 1; i <= list->size; i ++) {
+//            result[i] = list->data[list->size - i];
+//        }
+//        result[list->size + 1] = '"';
+//        result[list->size + 2] = '\0';
+//    } else {
         for (int i = 0; i < list->size; i ++) {
             result[i] = list->data[list->size - i - 1];
         }
         result[list->size] = '\0';
-    }
+//    }
     return result;
 }
 
@@ -157,15 +158,15 @@ char *convertVector(Vector *list, bool isStr) {
  *
  * Return true if the parsing is successful, false if the parsing fails.
  */
-bool parseNumber(Value *entry) {
-    char sign = fgetc(stdin);
+bool parseNumber(Value *entry, FILE* src) {
+    char sign = fgetc(src);
     bool neg = false;
     if (sign == '+') {
         neg = false;
     } else if (sign == '-') {
         neg = true;
     } else {
-        ungetc(sign, stdin);
+        ungetc(sign, src);
     }
     
     // Construct vector to store the number
@@ -179,23 +180,23 @@ bool parseNumber(Value *entry) {
     bool isFloat = false;
     
     // Check if the number starts with a decimal point
-    char nextChar = fgetc(stdin);
+    char nextChar = fgetc(src);
     if (!isdigit(nextChar)) {
         if (nextChar == '.') {
             isFloat = true;
-            char follow = fgetc(stdin);
+            char follow = fgetc(src);
             if (!isdigit(follow)) {
                 printf("Error! Unrecognized sequence with %c!\n", follow);
                 return false;
             }
-            ungetc(follow, stdin);
+            ungetc(follow, src);
         } else {
             printf("Error! Unrecognized sequence with %c!\n", nextChar);
             return false;
         }
     } 
     addVector(vector, 0, nextChar);
-    nextChar = fgetc(stdin);
+    nextChar = fgetc(src);
     while (!isDelimiter(nextChar)) {
         if (nextChar == '.') { 
             // Multiple decimal points are not allowed
@@ -211,7 +212,7 @@ bool parseNumber(Value *entry) {
             return false;
         }
         addVector(vector, 0, nextChar);
-        nextChar = fgetc(stdin);
+        nextChar = fgetc(src);
     }
     // Convert vector into string
     char *valueStr = convertVector(vector, false);
@@ -234,7 +235,7 @@ bool parseNumber(Value *entry) {
     }
     
     // Restore the delimiter
-    ungetc(nextChar, stdin);
+    ungetc(nextChar, src);
     return true;
 }
 
@@ -244,7 +245,7 @@ bool parseNumber(Value *entry) {
  *
  * Return true if the parsing is successful, false if the parsing fails.
  */
-bool parseString(Value *entry) {
+bool parseString(Value *entry, FILE *src) {
     bool balanced = false;
     
     // Create a vector to store the string
@@ -254,14 +255,14 @@ bool parseString(Value *entry) {
         printf("Error! Out of memory!\n");
         return false;            
     }
-    char nextChar = fgetc(stdin);
+    char nextChar = fgetc(src);
     while (nextChar != EOF) {
         if (nextChar == '"') {
             balanced = true;
             break;
         }
         if (nextChar == '\\') {
-            char escaped = fgetc(stdin);
+            char escaped = fgetc(src);
             switch (escaped) {
                 case 'n':
                     addVector(vector, 0, '\n');
@@ -285,7 +286,7 @@ bool parseString(Value *entry) {
         } else {
             addVector(vector, 0, nextChar);
         }
-        nextChar = fgetc(stdin);
+        nextChar = fgetc(src);
     }
     // Raise error if the string is not closed
     if (!balanced) {
@@ -302,12 +303,12 @@ bool parseString(Value *entry) {
  *
  * Return true if the parsing is successful, false if the parsing fails.
  */
-bool parseBool(Value *entry) {
-    char lookAhead = fgetc(stdin);
+bool parseBool(Value *entry, FILE *src) {
+    char lookAhead = fgetc(src);
     if (lookAhead == 't' || lookAhead == 'f') {
-        char follow = fgetc(stdin);
+        char follow = fgetc(src);
         if (isDelimiter(follow)) {
-            ungetc(follow, stdin);
+            ungetc(follow, src);
             entry->type = BOOL_TYPE;
             if (lookAhead == 't') {
                 entry->s = "#t";
@@ -330,7 +331,7 @@ bool parseBool(Value *entry) {
  *
  * Return true if the parsing is successful, false if the parsing fails.
  */
-bool parseIdentifier(Value *entry) {
+bool parseIdentifier(Value *entry, FILE *src) {
     // Construct vector to store the identifier
     Vector *vector = talloc(sizeof(Vector));
     initVector(vector, 10);
@@ -339,7 +340,7 @@ bool parseIdentifier(Value *entry) {
         return false;            
     }
     
-    char nextChar = fgetc(stdin);
+    char nextChar = fgetc(src);
     
     while (!isDelimiter(nextChar)) {
         if (isSubsequent(nextChar)) {
@@ -348,12 +349,12 @@ bool parseIdentifier(Value *entry) {
             printf("Error! Unrecognized identifier sequence!\n");
             return false;
         }
-        nextChar = fgetc(stdin);
+        nextChar = fgetc(src);
     }
     entry->type = SYMBOL_TYPE;
     entry->s = convertVector(vector, false);
     // Restore the delimiter
-    ungetc(nextChar, stdin);
+    ungetc(nextChar, src);
     return true;
 }
 
@@ -363,7 +364,7 @@ bool parseIdentifier(Value *entry) {
  * Return a null pointer if memory allocation fails or scanning error.
  * Returns a list of tokens otherwise.
  */
-Value *tokenize(){
+Value *tokenize(FILE *src){
     char charRead;
     // Initialize the list to store the tokens
     Value *list = makeNull();
@@ -372,7 +373,12 @@ Value *tokenize(){
         printf("Error! Not enough memory!\n");
         return list;
     }
-    charRead = fgetc(stdin);
+    bool interactive = isatty(fileno(stdin));
+    if (interactive) {
+        printf("> ");
+    }
+    int count = 0; 
+    charRead = fgetc(src);
     while (charRead != EOF) {
         Value *entry = talloc(sizeof(Value));
         if (!entry) {
@@ -381,20 +387,26 @@ Value *tokenize(){
         }
         if (charRead == '(') {
             entry->type = OPEN_TYPE;
+            if (interactive) {
+                count += 1;
+            }
         } else if (charRead == ')') {
             entry->type = CLOSE_TYPE;
+            if (interactive) {
+                count -= 1;
+            }
         } else if (charRead == '#') {
-            bool success = parseBool(entry);
+            bool success = parseBool(entry, src);
             if (!success) {
                 texit(1);
             }
         } else if (charRead == '"') {
-            bool success = parseString(entry);
+            bool success = parseString(entry, src);
             if (!success) {
                 texit(1);
             }
         } else if (charRead == '+' || charRead == '-') {
-            char nextChar = fgetc(stdin);
+            char nextChar = fgetc(src);
             if (isDelimiter(nextChar)) {
                 entry->type = SYMBOL_TYPE;
                 switch (charRead) {
@@ -405,11 +417,11 @@ Value *tokenize(){
                         entry->s = "-";
                         break;
                 }
-                ungetc(nextChar, stdin);
+                ungetc(nextChar, src);
             } else if (isdigit(nextChar) || nextChar == '.') {
-                ungetc(nextChar, stdin);
-                ungetc(charRead, stdin);
-                bool success = parseNumber(entry);
+                ungetc(nextChar, src);
+                ungetc(charRead, src);
+                bool success = parseNumber(entry, src);
                 if (!success) {
                     texit(1);
                 }
@@ -418,24 +430,30 @@ Value *tokenize(){
                 texit(1);
             }
         } else if (isInitial(charRead)) {
-            ungetc(charRead, stdin);
-            bool success = parseIdentifier(entry);
+            ungetc(charRead, src);
+            bool success = parseIdentifier(entry, src);
             if (!success) {
                 texit(1);
             }
         } else if (charRead == ';') {
-            char nextChar = fgetc(stdin);
+            char nextChar = fgetc(src);
             while (nextChar != EOF && nextChar != '\n') {
-                nextChar = fgetc(stdin);
+                nextChar = fgetc(src);
             }
-            charRead = fgetc(stdin);
+            charRead = fgetc(src);
             continue;
+        } else if (interactive && charRead == '\n') {
+            if (count == 0) {
+                return reverse(list);
+            } else {
+                printf(". ");
+            }
         } else if (charRead == '\n' || charRead == '\t' || charRead == ' ') {
-            charRead = fgetc(stdin);
+            charRead = fgetc(src);
             continue;
         } else if (isdigit(charRead) || charRead == '.') {
-            ungetc(charRead, stdin);
-            bool success = parseNumber(entry);
+            ungetc(charRead, src);
+            bool success = parseNumber(entry, src);
             if (!success) {
                 texit(1);
             }
@@ -443,10 +461,13 @@ Value *tokenize(){
             printf("Error! Unrecognized symbol %c in input!\n", charRead);
             texit(1);
         }
-        list = cons(entry, list);
-
-        charRead = fgetc(stdin);
+        if (!(interactive && charRead == '\n')) {
+            list = cons(entry, list);
+        }
+        charRead = fgetc(src);
     }
+    if (interactive && charRead == EOF)
+        texit(1);
     return reverse(list);
 }
 
@@ -480,7 +501,9 @@ void displayTokens(Value *list){
                 printf("%f:double\n", car(cur)->d);
                 break;
             case STR_TYPE:
-                printf("%s:string\n", car(cur)->s);
+                printf("\"");
+                printf("%s:string", car(cur)->s);
+                printf("\"\n");
                 break;
             default:
                 printf("ERROR\n");

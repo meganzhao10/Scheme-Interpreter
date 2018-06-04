@@ -1,0 +1,3 @@
+;;; used as input file for load
+(set! y (+ y 1))
+(define lst (cons x y)) 

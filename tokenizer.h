@@ -19,7 +19,7 @@ typedef struct Vector Vector;
  * stream in C) in its entirety and return a linked list consisting 
  * of all tokens found.
  */
-Value *tokenize();
+Value *tokenize(FILE *src);
 
 /* 
  * The displayTokens function takes a linked list of tokens as 
