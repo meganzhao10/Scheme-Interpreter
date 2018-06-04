@@ -1321,14 +1321,15 @@ Value *eval(Value *expr, Frame *frame){
  * each S-expression in the top-level environment and prints each
  * result 
  */
-void interpret(Value *tree){
-    Frame *topFrame = talloc(sizeof(Frame));
+void interpret(Value *tree, Frame *topFrame){
+  /*  Frame *topFrame = talloc(sizeof(Frame));
     if (!topFrame) {
         printf("Error! Not enough memory!\n");
         texit(1);
     }
     topFrame->bindings = makeNull();
     topFrame->parent = NULL;
+*/
     // Bind the primitive functions
     bind("+", primitiveAdd, topFrame);
     bind("*", primitiveMult, topFrame);
