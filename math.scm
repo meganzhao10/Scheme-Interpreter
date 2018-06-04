@@ -245,15 +245,4 @@
               ((zero? (modulo y x)) y)
               (else (/ (abs (* x y)) (gcd x y))))
         (evaluationError "lcm expects rational numbers as input"))))
-            
-           
           
-
-
-
-
-   
-(define max-mag
-  (lambda (num . nums)
-    (apply max (map magnitude (cons num nums)))))
-;;test cases
