@@ -55,12 +55,13 @@ lambda, let*, letrec, and, or, cond, set!, and begin.
 ###### Main file:
 interpreter.c
 
-##### Garbage collection
-A Scheme program is a list of S-expressions. A simple version of mark-and-sweep that cleans up between evaluating these top-level S-expressions is can drastically improve the memory usage. 
-###### Main file:
-talloc.c
 
-##### A simple interface
+##### Extensions 
+##### Garbage collection
+A genuine attempt was made to implement the garbage collector, but we could not figure out how to implement mark and sweep without generating much overhead. We also tried to implement stop and copy instead of mark and sweep, but got stuck on copying the PRIMITIVE_TYPE functions. Given the time constraint, we decided to pursue other extensions instead. 
+###### Main file:
+N/A
+###### A simple interface
 The classic core of an interpreter is the read–eval–print loop, a.k.a. REPL. Adding this functionality to our code allows for interactive usage.
 ###### Main file:
 tokenizer.c main.c
@@ -86,7 +87,6 @@ To implement the following functions using only special forms and primitives tha
 math.scm
 
 ##### More to come????
-
 
 
 

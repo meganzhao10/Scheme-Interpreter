@@ -137,19 +137,9 @@ char *convertVector(Vector *list, bool isStr) {
         printf("Error! Not enough memory!\n");
         texit(1);
     }
-//    if (isStr) {
-//        result[0] = '"';
-//        for (int i = 1; i <= list->size; i ++) {
-//            result[i] = list->data[list->size - i];
-//        }
-//        result[list->size + 1] = '"';
-//        result[list->size + 2] = '\0';
-//    } else {
-        for (int i = 0; i < list->size; i ++) {
-            result[i] = list->data[list->size - i - 1];
-        }
+    for (int i = 0; i < list->size; i ++) {
+        result[i] = list->data[list->size - i - 1];}
         result[list->size] = '\0';
-//    }
     return result;
 }
 
