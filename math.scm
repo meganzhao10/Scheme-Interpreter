@@ -222,17 +222,20 @@
 ;greatest common divisor of their arguments.
 ;The result is always non-negative.
 ;if no inputs or inputs are 0, return 0 as of DrRacket's behavior
+
 (define gcd
-  (lambda (x y)
-    (if (and (integer? x) (integer? y))
-           (if (< x y)
-               (if (zero? (modulo y x))
-                   (abs x)
-                   (gcd (modulo y x) x))
-               (if (zero? (modulo x y))
-                   (abs y)
-                   (gcd (modulo x y) y)))
-           (evaluationError "gcd expects rational numbers as input"))))
+    (lambda (x y)
+        (if (and (integer? x) (integer? y))
+            (letrec ((helper (lambda (x y)
+                        (cond ((zero? x) (abs y))
+                              ((zero? y) (abs x))
+                              ((zero? (modulo x y)) (abs y))
+                              
+                              (else (gcd y (modulo x y)))))))
+              
+                (helper (if (>= (abs x) (abs y)) x y)
+                        (if (>= (abs x) (abs y)) y x)))
+            (evalError "gcd expects integers as input"))))
 
 ;;need to test
 (define lcm
@@ -242,5 +245,5 @@
               ((zero? (modulo x y)) x)
               ((zero? (modulo y x)) y)
               (else (/ (abs (* x y)) (gcd x y))))
-        (evaluationError "lcm expects rational numbers as input"))))
+        (evaluationError "lcm expects integers as input"))))
 
