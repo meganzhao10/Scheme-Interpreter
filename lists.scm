@@ -137,66 +137,72 @@
     (lambda (lst)
       (if (list? lst)
           (letrec ((helper
-            (lambda (lst result)
-                (if (null? lst)
-                    result
-                    (helper (cdr lst)
-                        (cons (car lst) result))))))
+                    (lambda (lst result)
+                      (if (null? lst)
+                          result
+                          (helper (cdr lst)
+                                  (cons (car lst) result))))))
             (helper lst (quote ())))
           (evaluationError "reverse expects a list as input"))))
 
-;(define map)
 
-;(define 
-
-;
-;
-;(define cadr
-;    (lambda (lst)
-;          (car (cdr lst))))
-;
-;(define cdar
-;    (lambda (lst)
-;          (cdr (car lst))))
-;
-;(define cddr
-;    (lambda (lst)
-;          (cdr (cdr lst))))
-;
-;(define caaar
-;    (lambda (lst)
-;          (car (car (car lst)))))
-;
-;(define caadr
-;    (lambda (lst)
-;          (car (car (cdr lst)))))
-;
-;(define cadar
-;    (lambda (lst)
-;          (car (cdr (car lst)))))
-;
-;(define caddr
-;    (lambda (lst)
-;          (car (cdr (cdr lst)))))
-;
-;(define cdaar
-;    (lambda (lst)
-;          (cdr (car (car lst)))))
-;
-;(define cdadr
-;    (lambda (lst)
-;          (cdr (car (cdr lst)))))
-;
-;(define cddar
-;    (lambda (lst)
-;          (cdr (cdr (car lst)))))
-;
-;(define cdddr
-;    (lambda (lst)
-;          (cdr (cdr (cdr lst)))))
+(define map
+  (lambda (f lst)
+    (if (list? lst)
+        (if (null? lst)
+            (quote ())
+            (cons (f (car lst)) (map f (cdr lst))))
+        (evaluationError "map expects list as one of its input"))))
 
 
 
+(define cadr
+    (lambda (lst)
+          (car (cdr lst))))
+
+(define cdar
+    (lambda (lst)
+          (cdr (car lst))))
+
+(define cddr
+    (lambda (lst)
+          (cdr (cdr lst))))
+
+(define caaar
+    (lambda (lst)
+          (car (car (car lst)))))
+
+(define caadr
+    (lambda (lst)
+          (car (car (cdr lst)))))
+
+(define cadar
+    (lambda (lst)
+          (car (cdr (car lst)))))
+
+(define caddr
+    (lambda (lst)
+          (car (cdr (cdr lst)))))
+
+(define cdaar
+    (lambda (lst)
+          (cdr (car (car lst)))))
+
+(define cdadr
+    (lambda (lst)
+          (cdr (car (cdr lst)))))
+
+(define cddar
+    (lambda (lst)
+          (cdr (cdr (car lst)))))
+
+(define cdddr
+    (lambda (lst)
+          (cdr (cdr (cdr lst)))))
+
+
+
+;taken from class lecture
 (define filter
   (lambda (f lst)
     (cond ((null? lst)
@@ -208,6 +214,7 @@
 
 
 
+;taken from class lecture
 (define foldl
   (lambda (f init lst)
     (if (null? lst)
@@ -216,7 +223,7 @@
                (f (car lst) init)
                (cdr lst)))))
 
-
+;;taken from class lecture
 (define foldr
   (lambda (f init lst)
     (if (null? lst)
@@ -226,7 +233,7 @@
 
 
 ;test cases:
-;member 有问题
+;filter 不了odd? & even? 会有Expected numerical arguments for <=. Evaluation error!
 ;会print extra 空格
 
 (list 1 2 3)
@@ -255,8 +262,12 @@
 (reverse (quote (1 2 3)))
 ;(reverse 3)
 
-;(map (lambda (x) (* x x)) '(1 2 3))
+(map (lambda (x) (* x x)) (quote (1 2 3)))
 
-(filter odd? (quote (1 2 3)))             
-; (foldl cons (quote ()) (quote (1 2 3)))           
- ;(foldr cons (quote ()) (quote (1 2 3))) 
+(map (lambda (x) (* x x)) 2)
+
+;(filter even? (quote (1 2 3)))
+(filter zero? (quote (1 2 3)))
+(filter positive? (quote (1 2 3)))
+(foldl cons (quote ()) (quote (1 2 3)))           
+ (foldr cons (quote ()) (quote (1 2 3))) 
