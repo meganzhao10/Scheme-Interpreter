@@ -1,10 +1,25 @@
 ;test lists
 (load "lists.scm")
 
-(pair? (cons 2 1))
+(list 1 2 3)   
+(cons 1 2)     
+
+(length '(1 2 3))       
+(list-ref '(0 1 2 3 4) 3)    
+
+(list-tail '(0 1 2 3 4) 3)
+(member 'a '(1 2 3 a b c))  
+;(assq 2 '((0 a) (1 b) (2 c) (3 d)))  
+(append '(a b) '(c d))
+(reverse '(1 2 3))
+
+(map (lambda (x) (* x x)) '(1 2 3))
+
+(filter odd? '(1 2 3))
+(foldl cons '() '(1 2 3))
+(foldr cons '() '(1 2 3)) 
 
 
 
-(pair? (car '((1 2) (3 4) (5 6) (7 8))))
 
 
