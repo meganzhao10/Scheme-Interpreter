@@ -131,10 +131,10 @@
 (define modulo
   (lambda (x y)
     (if (and (integer? x) (integer? y))
-        (- x (* y (floor (/ x y)))))
-        (evaluationError "modulo expects integers as input")))
+        (- x (* y (floor (/ x y))))
+        (evaluationError "modulo expects integers as input"))))
 
-
+        
 ;Truncate returns the integer closest to x whose absolute value
 ;is not larger than the absolute value of x
 ;print in format of float number as the behavior of Dr.Racket
@@ -194,6 +194,7 @@
             x
             y)
         (evaluationError "max expects real numbers as input"))))
+
 (define min
   (lambda (x y)
     (if (and (number? x) (number? y))
@@ -241,19 +242,3 @@
               (else (/ (abs (* x y)) (gcd x y))))
         (evaluationError "lcm expects rational numbers as input"))))
 
-
-;;6.more arithmetic procedures
-;;=        zero?             max         modulo
-;;>=       positive?         min         floor
-;;<        negative?         abs         ceiling
-;;>        even?             gcd         truncate
-;;         odd?              lcm         round
-
-
-(= 3 5)
-(zero? -3)
-(max 7 0)
-(min 3 4)
-;(eq? (quote s) 4)
-(eq? 3 4)
-       
