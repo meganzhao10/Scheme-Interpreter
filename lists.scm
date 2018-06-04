@@ -30,14 +30,6 @@
 
 
 
-;cddddr      ;; (cddddr '((1 2) (3 4) (5 6) (7 8)))    ==> ()
-;
-;map         ;; (map (lambda (x) (* x x)) '(1 2 3))    ==> (1 4 9)
-;filter      ;; (filter odd? '(1 2 3))                 ==> (1 3)
-;foldl       ;; (foldl cons '() '(1 2 3))              ==> (3 2 1)
-;foldr       ;; (foldr cons '() '(1 2 3))              ==> (1 2 3)
-
-
 (define caar
     (lambda (lst)
       (if (pair? lst)
@@ -232,7 +224,4 @@
            (foldr f init (cdr lst))))))
 
 
-;test cases:
-;filter 不了odd? & even? 会有Expected numerical arguments for <=. Evaluation error!
-;会print extra 空格
 
