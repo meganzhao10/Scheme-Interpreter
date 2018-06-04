@@ -26,7 +26,6 @@
 ;foldl       ;; (foldl cons '() '(1 2 3))              ==> (3 2 1)
 ;foldr       ;; (foldr cons '() '(1 2 3))              ==> (1 2 3)
 
-;...
 
 (define caar
     (lambda (lst)
