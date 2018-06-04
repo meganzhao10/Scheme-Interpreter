@@ -27,22 +27,13 @@
 ;foldr       ;; (foldr cons '() '(1 2 3))              ==> (1 2 3)
 
 
-(define caar1
+(define caar
     (lambda (lst)
       (if (pair? lst)
           (if (pair? (car lst))
               (car (car lst))
               (evaluationError "caar expects pair as input for (car arg)"))
           (evaluationError "caar expects pair as input"))))
-
-(define caar
-  (lambda (x)
-    (cond ((not (pair? x))
-           (evalError "Expecting pair for arg."))
-          ((pair? (car x))
-           (car (car x)))
-          (else
-           (evalError "Expecting pair for (car arg).")))))
 
 (define cadr
   (lambda (lst)
