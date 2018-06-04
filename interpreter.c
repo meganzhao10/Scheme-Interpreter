@@ -6,11 +6,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <assert.h>
 #include "parser.h"
 #include "linkedlist.h"
 #include "interpreter.h"
-#include <assert.h>
 #include "talloc.h"
+#include "tokenizer.h"
 
 /*
  * Print a representation of the contents of a linked list.
@@ -27,7 +28,9 @@ void displayEval(Value *list, bool newline){
                 printf("%f ",cur->d);
                 break;
             case STR_TYPE:
-                printf("%s ",cur->s);
+                printf("\"");
+                printf("%s",cur->s);
+                printf("\" ");
                 break;
             case SYMBOL_TYPE:
                 printf("%s ",cur->s);
@@ -1161,6 +1164,34 @@ Value *primitiveApply(Value *args) {
     return apply(procedure, arguments, frame);
 }
 
+
+/* 
+ * Implements the primitive load function.
+ */
+Value *primitiveLoad(Value *arg) {
+    char *filename = car(arg)->s;
+    FILE *stream;
+    stream = fopen(filename, "r");
+    if (stream == NULL) {
+        texit(1);
+    } 
+    Value *list = tokenize(stream);
+    if (list == NULL) {
+        texit(1);
+    }
+    Value *tree = parse(list);
+    if (tree == NULL) {
+        texit(1);
+    }
+
+//    Value *voidResult = talloc(sizeof(Value));
+//    voidResult->type = VOID_TYPE;
+//    return voidResult;
+    
+    return tree;
+}
+
+
 /* 
  * Helper function to be display error message in primitive
  * procedures
@@ -1290,21 +1321,37 @@ Value *eval(Value *expr, Frame *frame){
             return evalLambda(args, frame);
         }
 	    else{
-            // Stores the result of recursively evaluating e1...en
+                // Stores the result of recursively evaluating e1...en
                 Value *values = makeNull();
                 if (!values) {
                     texit(1);
                 }
-            	Value *cur = expr;
-            	while (cur->type != NULL_TYPE) {
- 	            Value *cur_value = eval(car(cur), frame);
-        	    values = cons(cur_value, values);
-                    cur = cdr(cur);
-                }
-            	values = reverse(values);
-            	Value *function = car(values);
-            	Value *actual = cdr(values);
-            	return apply(function, actual, frame);
+
+                // Special treatment for load
+                if (first->type == SYMBOL_TYPE && !strcmp(first->s, "load")) {
+                    Value *loadFunction = eval(first, frame);
+                    Value *loadTree = (loadFunction->pf)(args);
+                    Value *curLoad = loadTree;
+                    while (curLoad != NULL && curLoad->type == CONS_TYPE){
+                        eval(car(curLoad), frame);
+                        curLoad = cdr(curLoad);
+                    }
+                    Value *voidResult = talloc(sizeof(Value));
+                    voidResult->type = VOID_TYPE;
+                    return voidResult;
+                    
+                } else {
+                    Value *cur = expr;
+                    while (cur->type != NULL_TYPE) {
+                        Value *cur_value = eval(car(cur), frame);
+                        values = cons(cur_value, values);
+                        cur = cdr(cur);
+                    }
+                    values = reverse(values);
+                    Value *function = car(values);
+                    Value *actual = cdr(values);
+                    return apply(function, actual, frame);
+                }          
 	    }		
 	    break;
 	}
@@ -1342,6 +1389,7 @@ void interpret(Value *tree){
     bind("car", primitiveCar, topFrame);
     bind("cdr", primitiveCdr, topFrame);
     bind("cons", primitiveCons, topFrame);
+    bind("load", primitiveLoad, topFrame);
     //to be used in math.scm
     bind("number?", primitiveNumberCheck, topFrame);
     bind("evaluationError", primitiveEvalError, topFrame);
