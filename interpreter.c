@@ -1020,43 +1020,43 @@ Value *primitiveIsEq(Value *args) {
     
     switch (first->type) {
         case BOOL_TYPE:
-            resultBool = (!strcmp(first->s, second->s) 
-                          && second->type == BOOL_TYPE);
+            resultBool = (second->type == BOOL_TYPE &&
+                          !strcmp(first->s, second->s) );
             break;
         case SYMBOL_TYPE:
-            resultBool = (!strcmp(first->s, second->s) 
-                          && second->type == SYMBOL_TYPE);
+            resultBool = (second->type == SYMBOL_TYPE &&
+                         !strcmp(first->s, second->s));
             break;
         case INT_TYPE:
-            resultBool = (first->i == second->i 
-                          && second->type == INT_TYPE);
+            resultBool = (second->type == INT_TYPE &&
+                          first->i == second->i);
             break;
         case DOUBLE_TYPE:
-            resultBool = (first->d == second->d
-                          && second->type == DOUBLE_TYPE);
+            resultBool = (second->type == DOUBLE_TYPE &&
+                          first->d == second->d);
             break;
         case STR_TYPE:
-            resultBool = (!strcmp(first->s, second->s) 
-                          && second->type == STR_TYPE);
+            resultBool = (second->type == STR_TYPE &&
+                         !strcmp(first->s, second->s));
             break;
         case NULL_TYPE:
             resultBool = second->type == NULL_TYPE;
             break;
         case CONS_TYPE:
-            resultBool = (&first->c == &second->c
-                          && second->type == CONS_TYPE);
+            resultBool = (second->type == CONS_TYPE &&
+                          &first->c == &second->c);
             break;
         case CLOSURE_TYPE:
-            resultBool = (&first->closure == &second->closure
-                          && second->type == CLOSURE_TYPE);
+            resultBool = (second->type == CLOSURE_TYPE &&
+                          &first->closure == &second->closure);
             break;
         case PRIMITIVE_TYPE:
-            resultBool = (&first->pf == &second->pf
-                          && second->type == PRIMITIVE_TYPE);
+            resultBool = (second->type == PRIMITIVE_TYPE &&
+                          &first->pf == &second->pf);
             break;
         default:
-            resultBool = (&first == &second
-                          && second->type == CLOSURE_TYPE);
+            resultBool = (second->type == CLOSURE_TYPE &&
+                          &first == &second);
             break;
     }
     if (resultBool) {
