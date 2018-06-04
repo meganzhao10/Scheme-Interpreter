@@ -99,40 +99,67 @@ Value *parse(Value *tokens) {
     if (!stack) {
         texit(1);
     }
+                Value *quoteEn= talloc(sizeof(Value));
+                quoteEn->type = SYMBOL_TYPE;
+                quoteEn->s = "quote";
     
     int depth = 0;
     Value *current = tokens;
-
+    bool quote = false;
+    int quoteDepth = 0;
     while (current->type != NULL_TYPE) {
         Value *token = car(current);
         if (token->type == OPEN_TYPE) {
             depth ++;
+            if (quote) {
+                quoteDepth ++;
+            }
             stack = cons(token, stack);
-        } else if (token->type == CLOSE_TYPE) {
+            
+        }else if (token->type == CLOSE_TYPE) {
             // Pop from the stack until reaching (
             if (depth == 0) {
                 printf("Error! Unbalanced use of parentheses!\n");
                 texit(1);
             }
             depth --;
+            if (quote) 
+                quoteDepth --;
             // Access top item in the list
             Value *head = car(stack);
-            // Create a list of items being popped
             Value *inner = makeNull();
-            while (head->type != OPEN_TYPE) {
-                inner = cons(head, inner);
-                // Pop off the top item
+                while (head->type != OPEN_TYPE) {
+                   inner = cons(head, inner);
+                    // Pop off the top item
+                    stack = cdr(stack);
+                    head = car(stack);
+                }
+                // Pop off the (
                 stack = cdr(stack);
-                head = car(stack);
+            if (!quote) {
+                // Push the list back on to the stack
+                stack = cons(inner, stack);
+            } else {
+                inner = cons(inner, makeNull());
+                stack = cons(cons(quoteEn, inner), stack); 
+                quote = false;
+                quoteDepth = 0;
             }
-            // Pop off the (
-            stack = cdr(stack);
-            // Push the list back on to the stack
-            stack = cons(inner, stack);
         } else {
             if (token->type == SYMBOL_TYPE) {
                 if (!specialChar(token)) {
-                   stack = cons(token, stack); 
+                    if (quote && quoteDepth == 0) {
+                        stack = cons(cons (quoteEn, 
+                                    (cons (token, makeNull()))), stack); 
+                        quote = false;
+                        quoteDepth = 0;
+                    } else {
+                        if (!strcmp(token->s, "\'")){
+                            quote = true;
+                        } else {
+                            stack = cons(token, stack);
+                        }
+                    }
                 }
             } else {
                 stack = cons(token, stack);

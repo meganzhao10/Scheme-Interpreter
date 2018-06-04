@@ -85,27 +85,28 @@
         (evaluationError "negative? expects a real number as input"))))
 
 ;Floor returns the largest integer not larger than x.
-;print in format of float number as the behavior of Dr.Racket
+;display a bit different from DrRacket in terms of float format/int format
 (define floor
   (lambda (x)
     (if (number? x)
         (if (integer? x)
             x
-            (letrec ((helper
-                        (lambda (x)
-                          (if (positive? x)
-                              (if (< x 1)
-                                  0.0
-                                  (+ 1 (floor (- x 1))))
-                              ;;case of negative
-                              (if (> x -1)
-                                  -1.0
-                                  (- 1 (floor (+ x 1))))))))
+            (letrec ((helper(lambda (x)
+                              (cond ((positive? x)
+                                 (if (< x 1)
+                                     0
+                                     (+ 1 (floor (- x 1)))))
+                                ((negative? x)
+                                 (if (> x -1)
+                                     -1
+                                     (- (floor (+ x 1)) 1)))
+                                (else 0)))))
+                              
                 (helper x)))
         (evaluationError "floor expects a real number as input"))))
  
 ;Ceiling returns the smallest integer not smaller than x
-;print in format of float number as the behavior of Dr.Racket
+;display a bit different from DrRacket in terms of float format/int format
 (define ceiling
   (lambda (x)
     (if (number? x)
@@ -115,15 +116,15 @@
                         (lambda (x)
                           (if (positive? x)
                               (if (< x 1)
-                                  1.0
+                                  1
                                   (+ 1 (ceiling (- x 1))))
                               ;;case of negative
                               (if (> x -1)
                                   ;Dr.Racket prints -0.0
                                   ;but for the sake of clarity
                                   ;we decide to print 0.0
-                                  0.0
-                                  (- 1 (ceiling (+ x 1))))))))
+                                  0
+                                  (- (ceiling (+ x 1)) 1))))))
                 (helper x)))
         (evaluationError "ceiling expects a real number as input"))))
 
@@ -131,10 +132,11 @@
 (define modulo
   (lambda (x y)
     (if (and (integer? x) (integer? y))
-        (- x (* y (floor (/ x y)))))
-        (evaluationError "modulo expects integers as input")))
+        (- x (* y (floor (/ x y))))
+        (evaluationError "modulo expects integers as input"))))
 
 
+        
 ;Truncate returns the integer closest to x whose absolute value
 ;is not larger than the absolute value of x
 ;print in format of float number as the behavior of Dr.Racket
@@ -147,15 +149,15 @@
                         (lambda (x)
                           (if (positive? x)
                               (if (< x 1)
-                                  0.0
+                                  0
                                   (+ 1 (truncate (- x 1))))
                               ;;case of negative
                               (if (> x -1)
                                   ;Dr.Racket prints -0.0
                                   ;but for the sake of clarity
                                   ;we decide to print 0.0
-                                  0.0
-                                  (- 1 (truncate (+ x 1))))))))
+                                  0
+                                  (- (truncate (+ x 1)) 1))))))
                 (helper x)))
         (evaluationError "truncate expects a real number as input"))))
 
@@ -166,7 +168,7 @@
   (lambda (x)
     (if (number? x)
         (cond ((integer? x) x)
-              ((> x (+ (floor x) 0.5)) (ceiling x))
+              ((>= x (+ (floor x) 0.5)) (ceiling x))
               (else (floor x)))
         (evaluationError "round expects a real number as input"))))
         
@@ -194,6 +196,7 @@
             x
             y)
         (evaluationError "max expects real numbers as input"))))
+
 (define min
   (lambda (x y)
     (if (and (number? x) (number? y))
@@ -219,19 +222,22 @@
 ;greatest common divisor of their arguments.
 ;The result is always non-negative.
 ;if no inputs or inputs are 0, return 0 as of DrRacket's behavior
-(define gcd
-  (lambda (x y)
-    (if (and (integer? x) (integer? y))
-           (if (< x y)
-               (if (zero? (modulo y x))
-                   (abs x)
-                   (gcd (modulo y x) x))
-               (if (zero? (modulo x y))
-                   (abs y)
-                   (gcd (modulo x y) y)))
-           (evaluationError "gcd expects rational numbers as input"))))
 
-;;need to test
+(define gcd
+    (lambda (x y)
+        (if (and (integer? x) (integer? y))
+            (letrec ((helper (lambda (x y)
+                        (cond ((zero? x) (abs y))
+                              ((zero? y) (abs x))
+                              ((zero? (modulo x y)) (abs y))
+                              
+                              (else (gcd y (modulo x y)))))))
+              
+                (helper (if (>= (abs x) (abs y)) x y)
+                        (if (>= (abs x) (abs y)) y x)))
+            (evalError "gcd expects integers as input"))))
+
+
 (define lcm
   (lambda (x y)
     (if (and (integer? x) (integer? y))
@@ -239,16 +245,7 @@
               ((zero? (modulo x y)) x)
               ((zero? (modulo y x)) y)
               (else (/ (abs (* x y)) (gcd x y))))
-        (evaluationError "lcm expects rational numbers as input"))))
-
-
-;;6.more arithmetic procedures
-;;=        zero?             max         modulo
-;;>=       positive?         min         floor
-;;<        negative?         abs         ceiling
-;;>        even?             gcd         truncate
-;;         odd?              lcm         round
-
+        (evaluationError "lcm expects integers as input"))))
 
 (= 3 5)
 (zero? -3)
@@ -257,4 +254,4 @@
 ;(eq? (quote s) 4)
 (eq? 3 4)
 (= 3 3.0)
-       
+

@@ -395,6 +395,9 @@ Value *tokenize(FILE *src){
             if (!success) {
                 texit(1);
             }
+        } else if (charRead == '\'') {
+            entry->type = SYMBOL_TYPE;
+            entry->s = "\'";
         } else if (charRead == '+' || charRead == '-') {
             char nextChar = fgetc(src);
             if (isDelimiter(nextChar)) {

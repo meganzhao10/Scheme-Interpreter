@@ -1,0 +1,38 @@
+;test math.scm
+(load "math.scm")
+
+(<= 3 8)
+
+(zero? 0)
+(zero? 5)
+
+(zero? (* 0 3))
+(zero? (* 3 3))
+(zero? (- 0 3))
+(zero? (+ 228 3))
+
+(equal? (quote a) (quote a) )  
+(equal? (quote a) (quote c) ) 
+
+(equal? (quote (a)) (quote (a)))     
+(equal? (quote (a)) (quote (c)))
+
+(equal? (quote (a)) 228) 
+
+(equal? (quote (a (b) c))
+        (quote (a (b) c)))                    
+(equal? "abc" "abc")                    
+(equal? 2 2)           
+
+(equal? (lambda (x) x)
+        (lambda (y) y))
+
+
+(positive? 400)
+(positive? -400.9)
+        
+
+(negative? -400.28)
+(negative? 400)
+
+(positive? (quote (3)))

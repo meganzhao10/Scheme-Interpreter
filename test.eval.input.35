@@ -1,0 +1,26 @@
+;test math.scm
+(load "math.scm")
+
+(max 3 4)
+(max 3 3)
+(max 228 -4)
+(max -228.0 -4.3)
+
+(min 3 4)
+(min 3 3)
+(min 228 -4)
+(min -228.0 -4.3)
+
+(abs -7)   
+(abs -9.3)
+(abs 0)
+(abs 4)
+(abs 4.5)
+
+(gcd 32 -36)
+(gcd 3 0)
+(gcd 3 9)
+
+
+(lcm 32 -36)                    
+(lcm 32.3 -36) 

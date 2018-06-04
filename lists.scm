@@ -28,16 +28,6 @@
 
 ;...
 
-
-
-;cddddr      ;; (cddddr '((1 2) (3 4) (5 6) (7 8)))    ==> ()
-;
-;map         ;; (map (lambda (x) (* x x)) '(1 2 3))    ==> (1 4 9)
-;filter      ;; (filter odd? '(1 2 3))                 ==> (1 3)
-;foldl       ;; (foldl cons '() '(1 2 3))              ==> (3 2 1)
-;foldr       ;; (foldr cons '() '(1 2 3))              ==> (1 2 3)
-
-
 (define caar
     (lambda (lst)
       (if (pair? lst)
@@ -230,44 +220,3 @@
         init
         (f (car lst)
            (foldr f init (cdr lst))))))
-
-
-;test cases:
-;filter 不了odd? & even? 会有Expected numerical arguments for <=. Evaluation error!
-;会print extra 空格
-
-(list 1 2 3)
-
-(caar (quote ((1 2) (3 4) (5 6) (7 8)))) 
-
-(cadr (quote ((1 2) (3 4) (5 6) (7 8))))
-
-(list? (quote (cons 1 2)))
-
-(length (quote (1 2 3)))
-
-(list-ref (quote (0 1 2 3 4)) 3)
-
-(list-tail (quote (0 1 2 3 4)) 3)
-
-(member (quote a) (quote (a b c)))
-;(member (quote a) (quote (1 2 3 a b c)))
-(member (list (quote a))
-        (quote (b (a) c)))
-
-(assq 2 (quote ((0 a) (1 b) (2 c) (3 d))))
-
-(append (quote (a b)) (quote (c d)))
-
-(reverse (quote (1 2 3)))
-;(reverse 3)
-
-(map (lambda (x) (* x x)) (quote (1 2 3)))
-
-(map (lambda (x) (* x x)) 2)
-
-;(filter even? (quote (1 2 3)))
-(filter zero? (quote (1 2 3)))
-(filter positive? (quote (1 2 3)))
-(foldl cons (quote ()) (quote (1 2 3)))           
- (foldr cons (quote ()) (quote (1 2 3))) 
