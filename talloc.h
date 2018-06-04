@@ -28,18 +28,18 @@ void tfree();
  */
 void texit(int status);
 
-/* 
- * Start with objects bound in the top/global environment, mark them 
- * as useful. Recursively mark everything pointed by them as useful
- * as well.
- */
-void mark(Frame *global);
+// /* 
+//  * Start with objects bound in the top/global environment, mark them 
+//  * as useful. Recursively mark everything pointed by them as useful
+//  * as well.
+//  */
+// void mark(Frame *global);
 
-/* 
- * Sweep useless objects by: i) free the memory ii) remove the pointer
- * from the active list of all allocated pointers so that we don't 
- * double free.
- */
-void sweep();
+// /* 
+//  * Sweep useless objects by: i) free the memory ii) remove the pointer
+//  * from the active list of all allocated pointers so that we don't 
+//  * double free.
+//  */
+// void sweep();
 
 #endif
