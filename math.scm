@@ -1,4 +1,7 @@
-;;2 Library procedures: =, modulo, zero?, equal?, list, and append.;More built-in functions with regards to arithmetic.
+;;Requred - 2 Library procedures: =, modulo, zero?, equal?;
+; Please refer to list.scm for list, and append.;
+
+;More built-in functions with regards to arithmetic.
 ;using only special forms and primitives
 ;that we've implemented (e.g., +, -, *, /, and <=)
 
@@ -8,14 +11,6 @@
 ;;<        negative?         abs         ceiling
 ;;>        even?             gcd         truncate
 ;;         odd?              lcm         round
-
-;;need to do
-;;         , , list, and append.
-;;                              
-;;                            
-;;                            
-;;                     gcd         
-;;                     lcm         
 
 ;We consulted R5RS(link in readme) for specifications of procedures
 
