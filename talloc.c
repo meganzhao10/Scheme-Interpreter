@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "talloc.h"
+#include "linkedlist.h"
 
 // The golbal static variable
 static Value *head;
@@ -70,7 +71,9 @@ void *talloc(size_t size){
 		return newHead;
 	}
 	newHead->type = PTR_TYPE;
+    newHead->useful = false;
 	newHead->p = malloc(size);
+//    newHead->useful = false;
 	if (!newHead->p){
 		printf("Out of memory!\n");
         return newHead->p;
@@ -106,4 +109,67 @@ void tfree(){
 void texit(int status){
 	tfree();
 	exit(status);
+}
+
+
+/*
+ * Helper function to check whether a pointer is useful in the given
+ * frame.
+ */
+bool useful(Value *pointer, Frame *frame) {
+    return true;
+}
+
+/* 
+ * Start with objects bound in the top/global environment, mark them 
+ * as useful. Recursively mark everything pointed by them as useful
+ * as well.
+ */
+void mark(Frame *global){
+    Value *usefulListHead = makeNull();
+    usefulListHead->useful = true;
+    // Add the usefulListHead to usefulList
+    
+    
+    Value *cur = head;
+    while (cur->type != NULL_TYPE) {
+        if (car(cur)->p == usefulListHead) {
+            car(cur)->useful = true;
+//            car(cur)->useful = true;
+//            if (car(cur)->p->useful) {
+//                printf("made it\n");
+//            }
+            printf("trye\n");
+        }
+        cur = cdr(cur);
+    }
+//    Value *bindings = global->bindings;
+//    
+//    Value *cur = head;
+//    while (cur->type != NULL_TYPE) {
+//        if (useful(car(cur)->p, global)) {
+//            car(cur)->useful = true;
+//        } else {
+//            car(cur)->useful = false;
+//        }
+//        cur = cdr(cur);
+//    }
+}
+
+/* 
+ * Sweep useless objects by: i) free the memory ii) remove the pointer
+ * from the active list of all allocated pointers so that we don't 
+ * double free.
+ */
+void sweep() {
+//    Value *cur = head;
+//    
+//    while (cur->type != NULL_TYPE) {
+////        Value *my = car(cur)->p;
+////        printf("type of %i\n", my->type);
+//        if (!car(cur->useful)) {
+//            // Free memmory, remove from list
+//        }
+//        cur = cdr(cur);
+//    }
 }

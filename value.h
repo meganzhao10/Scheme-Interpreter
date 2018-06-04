@@ -1,3 +1,5 @@
+#include <stdbool.h>
+
 #ifndef VALUE_H
 #define VALUE_H
 
@@ -20,6 +22,7 @@ typedef enum {
 struct Value {
    valueType type;
    union {
+      bool useful;
       void *p;
       int i;
       double d;
