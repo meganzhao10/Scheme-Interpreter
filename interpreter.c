@@ -1391,7 +1391,7 @@ void interpret(Value *tree, Frame *topFrame){
     bind("cdr", primitiveCdr, topFrame);
     bind("cons", primitiveCons, topFrame);
     bind("load", primitiveLoad, topFrame);
-    //to be used in math.scm
+    //to be used in math.scm&list.scm
     bind("number?", primitiveNumberCheck, topFrame);
     bind("evaluationError", primitiveEvalError, topFrame);
     bind("integer?", primitiveIntegerCheck, topFrame);
