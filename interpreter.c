@@ -144,7 +144,7 @@ Value *lookUpSymbol(Value *expr, Frame *frame){
            Value *curBinding = car(binding);
            Value *name = car(curBinding);
 
-           if (name->type == NULL_TYPE) {
+           if (name != NULL && name->type == NULL_TYPE) {
                break;
            }
 	       Value *value = car(cdr(curBinding));
@@ -217,7 +217,6 @@ void addBindingLocal(Value *var, Value *expr, Frame *frame){
         printf("Duplicate identifier in local binding. ");
         evaluationError();
     }
-    printf("%s\n", var->s);
     Value *nullTail = makeNull();
     if (!nullTail) {
         texit(1);
