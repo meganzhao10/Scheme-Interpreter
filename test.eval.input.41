@@ -1,0 +1,63 @@
+(cond 2 3 9 8)
+
+(and 8 #f)
+
+(and (<= 4 1) #t)
+
+(define p 90)
+
+(and 3 (set! p 9))
+
+(and)
+
+
+
+(cond)
+
+
+
+(define t 3)
+
+(cond ((<= 5 2) 9)
+
+    (else (set! t 10) t))
+
+
+
+    (cond (#f 0))
+
+
+
+    (cond (#t 3))
+
+
+
+    (cond (3 4))
+
+
+
+    (let ((x 4)
+
+          (y 5))
+
+              (set! x y)
+
+                  (+ x y))
+
+
+
+                  (define z 12)
+
+                  (set! z (+ z 3))
+
+                  z
+
+
+
+                  (define x 2)
+
+                  x
+
+                  (set! x 3)
+
+                  x
