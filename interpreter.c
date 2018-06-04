@@ -1291,6 +1291,8 @@ void interpret(Value *tree){
         } else {
             displayEval(result, true);
         }
+        mark(topFrame);
+        sweep();
         cur = cdr(cur);
     }
 }
