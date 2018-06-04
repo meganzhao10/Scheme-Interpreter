@@ -14,7 +14,7 @@
  * each S-expression in the top-level environment and prints each
  * result 
  */
-void interpret(Value *tree);
+void interpret(Value *tree, Frame *frame);
 
 /*
  * The function takes a parse tree of a single S-expression and 

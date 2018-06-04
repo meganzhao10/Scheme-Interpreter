@@ -400,7 +400,7 @@ Value *tokenize(FILE *src){
             if (!success) {
                 texit(1);
             }
-        } else if (charRead == " ' "){
+        } else if (charRead == '\''){
             entry->type = QUOTE_TYPE;
         } else if (charRead == '"') {
             bool success = parseString(entry, src);

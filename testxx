@@ -1,2 +1,10 @@
-(load "math.scm")
-(= 3 5)
+;tokenizer test cases for comments and strings
+"This is a string"
+"foo;; still a string"  ;; now it's a comment!
+; this is a comment + - x /
+
+182749
+0
+-39  -0.3
+-.333
+1.002
