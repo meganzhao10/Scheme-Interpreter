@@ -400,11 +400,13 @@ Value *tokenize(FILE *src){
             if (!success) {
                 texit(1);
             }
+        } else if (charRead == " ' "){
+            entry->type = QUOTE_TYPE;
         } else if (charRead == '"') {
             bool success = parseString(entry, src);
             if (!success) {
                 texit(1);
-            }
+            }  
         } else if (charRead == '+' || charRead == '-') {
             char nextChar = fgetc(src);
             if (isDelimiter(nextChar)) {
@@ -487,6 +489,9 @@ void displayTokens(Value *list){
                 break;
             case CLOSE_TYPE:
                 printf("):close\n");
+                break;
+            case QUOTE_TYPE:
+                printf("':quote\n");
                 break;
             case BOOL_TYPE:
                 printf("%s:boolean\n", car(cur)->s);

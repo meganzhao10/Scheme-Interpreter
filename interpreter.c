@@ -1,4 +1,3 @@
-
 /*
  * This program implements the evaluator for Scheme.
  *
@@ -39,16 +38,16 @@ void displayEval(Value *list, bool newline){
             case BOOL_TYPE:
                 printf("%s ", cur->s);
                 break;
-	    case CONS_TYPE:
+	        case CONS_TYPE:
                 {if (car(cur)->type == CONS_TYPE) {
                     printf("(");
                     displayEval(car(cur), false); 
                     printf(")");
-		    if (cdr(cur)->type != NULL_TYPE &&
-			cdr(cur)->type != CONS_TYPE){
-			printf(" . ");
-		    }
-                } else {
+                    if (cdr(cur)->type != NULL_TYPE &&
+                        cdr(cur)->type != CONS_TYPE){
+                        printf(" . ");
+                    }
+                }else {
                     displayEval(car(cur), false);
 		    if (cdr(cur)->type != NULL_TYPE &&
 			cdr(cur)->type != CONS_TYPE){
