@@ -46,6 +46,7 @@ struct Value {
 struct Frame {
     struct Value *bindings;
     struct Frame *parent;
+    bool useful;
 };
 typedef struct Frame Frame;
 

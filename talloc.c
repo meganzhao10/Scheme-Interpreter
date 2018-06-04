@@ -9,9 +9,9 @@
 #include "talloc.h"
 #include "linkedlist.h"
 
-// The golbal static variable
+// The global static variable
 static Value *head;
-
+//static Value *usefulListHead;
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  *
@@ -126,19 +126,29 @@ bool useful(Value *pointer, Frame *frame) {
  * as well.
  */
 void mark(Frame *global){
-    Value *usefulListHead = makeNull();
-    usefulListHead->useful = true;
-    // Add the usefulListHead to usefulList
+//    usefulListHead = talloc_makeNull();
+//    usefulListHead->useful = true;
+    global->useful = true;
+    markValue(global->bindings);
     
-    
+//    usefulListHead->useful = true;
+//    // Add the usefulListHead to usefulList
+//    Value *wrapper = malloc(sizeof(Value));
+//    wrapper->p = global;
+//    usefulListHead = cons(wrapper, usefulListHead);
+//    printf("%p\n", global);
+//    printf("%p\n", &global);
+////    
     Value *cur = head;
     while (cur->type != NULL_TYPE) {
-        if (car(cur)->p == usefulListHead) {
-            car(cur)->useful = true;
+        if (car(cur)->p == global) {
 //            car(cur)->useful = true;
-//            if (car(cur)->p->useful) {
-//                printf("made it\n");
-//            }
+//            car(cur)->useful = true;
+            Value *carVal = car(cur)->p;
+            Frame *carFrame = car(cur)->p;
+            if (carVal->useful || carFrame->useful) {
+                printf("made it\n");
+            }
             printf("trye\n");
         }
         cur = cdr(cur);
@@ -172,4 +182,8 @@ void sweep() {
 //        }
 //        cur = cdr(cur);
 //    }
+//    free(usefulListHead);
+    printf("Huh?");
+//    free(car(usefulListHead));
+//    free(usefulListHead);
 }
