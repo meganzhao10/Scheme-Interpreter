@@ -237,7 +237,7 @@
                         (if (>= (abs x) (abs y)) y x)))
             (evalError "gcd expects integers as input"))))
 
-;;need to test
+
 (define lcm
   (lambda (x y)
     (if (and (integer? x) (integer? y))

@@ -28,8 +28,6 @@
 
 ;...
 
-
-
 (define caar
     (lambda (lst)
       (if (pair? lst)
@@ -222,6 +220,3 @@
         init
         (f (car lst)
            (foldr f init (cdr lst))))))
-
-
-
