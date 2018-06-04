@@ -12,13 +12,10 @@ int main(void) {
     Frame *topFrame = talloc(sizeof(Frame));
     topFrame->bindings = makeNull();
     topFrame->parent = NULL;
-    if (!topFrame) {
+    if (!topFrame) 
         printf("Error! Not enough memory!\n");
-        texit(1);
-    }
-
     do {
-        Value *list = tokenize();
+        Value *list = tokenize(stdin);
         if (list == NULL) {
             texit(1);
         }

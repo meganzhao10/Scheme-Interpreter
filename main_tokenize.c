@@ -10,7 +10,7 @@
 #include "talloc.h"
 
 int main(void) {
-    Value *list = tokenize();
+    Value *list = tokenize(stdin);
     if (list == NULL) {
         texit(1);
     }
