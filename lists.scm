@@ -1,112 +1,262 @@
-(define list
-  (lambda x
-        x))
+;More built-in functions to manipulate lists.
+;refer to R5RS for specification
+;using only special forms and primitives (e.g., car, cdr, cons, null?, pair?, and apply)
+;and also other functions we have written in math.scm
 
-(define list?
-    (lambda (lst)
-          (cond
-            ((null? lst) #t)
-            ((pair? lst) 
-            (flist? (cdr lst)))
-            (else #f))))
 
-(define length
-    (lambda (lst)
-          (length lst)))
+(load "math.scm")
+
+;caar        ;; (caar '((1 2) (3 4) (5 6) (7 8)))      ==> 1
+;cadr        ;; (cadr '((1 2) (3 4) (5 6) (7 8)))      ==> (3 4)
+;...                                           
+;cddddr      ;; (cddddr '((1 2) (3 4) (5 6) (7 8)))    ==> ()
+;
+;list        ;; (list 1 2 3)                           ==> (1 2 3)               
+;list?       ;; (cons 1 2)                             ==> #f
+;length      ;; (length '(1 2 3))                      ==> 3
+;list-ref    ;; (list-ref '(0 1 2 3 4) 3)              ==> 3 
+;list-tail   ;; (list-tail '(0 1 2 3 4) 3)             ==> (3 4)
+;member      ;; (member 'a '(1 2 3 a b c))             ==> (a b c)
+;assq        ;; (assq 2 '((0 a) (1 b) (2 c) (3 d)))    ==> (2 c)
+;append      ;; (append '(a b) '(c d))                 ==> (a b c d)
+;reverse     ;; (reverse '(1 2 3))                     ==> (3 2 1)
+;
+;map         ;; (map (lambda (x) (* x x)) '(1 2 3))    ==> (1 4 9)
+;filter      ;; (filter odd? '(1 2 3))                 ==> (1 3)
+;foldl       ;; (foldl cons '() '(1 2 3))              ==> (3 2 1)
+;foldr       ;; (foldr cons '() '(1 2 3))              ==> (1 2 3)
+
+;...
+
+
+
+;cddddr      ;; (cddddr '((1 2) (3 4) (5 6) (7 8)))    ==> ()
+;
+;map         ;; (map (lambda (x) (* x x)) '(1 2 3))    ==> (1 4 9)
+;filter      ;; (filter odd? '(1 2 3))                 ==> (1 3)
+;foldl       ;; (foldl cons '() '(1 2 3))              ==> (3 2 1)
+;foldr       ;; (foldr cons '() '(1 2 3))              ==> (1 2 3)
+
 
 (define caar
     (lambda (lst)
-          (car (car lst))))
+      (if (pair? lst)
+          (if (pair? (car lst))
+              (car (car lst))
+              (evaluationError "caar expects pair as input for (car arg)"))
+          (evaluationError "caar expects pair as input"))))
 
 (define cadr
-    (lambda (lst)
-          (car (cdr lst))))
+  (lambda (lst)
+    (if (pair? lst)
+        (if (pair? (cdr lst))
+            (car (cdr lst))
+            (evaluationError "cadr expects pair as input for (cdr arg)"))
+        (evaluationError "cadr expects pair as input"))))
 
-(define cdar
-    (lambda (lst)
-          (cdr (car lst))))
 
-(define cddr
-    (lambda (lst)
-          (cdr (cdr lst))))
 
-(define caaar
-    (lambda (lst)
-          (car (car (car lst)))))
+(define list
+  (lambda x x))
 
-(define caadr
+            
+       
+(define list?
     (lambda (lst)
-          (car (car (cdr lst)))))
+      (if (pair? lst)
+          (list? (cdr lst))
+          (null? lst))))
 
-(define cadar
+     
+
+(define length
     (lambda (lst)
-          (car (cdr (car lst)))))
-
-(define caddr
-    (lambda (lst)
-          (car (cdr (cdr lst)))))
-
-(define cdaar
-    (lambda (lst)
-          (cdr (car (car lst)))))
-
-(define cdadr
-    (lambda (lst)
-          (cdr (car (cdr lst)))))
-
-(define cddar
-    (lambda (lst)
-          (cdr (cdr (car lst)))))
-
-(define cdddr
-    (lambda (lst)
-          (cdr (cdr (cdr lst)))))
-
+      (if (list? lst)
+          (if (null? lst)
+              0
+              (+ 1 (length (cdr lst))))
+          (evaluationError "length expects list as input"))))
+        
+      
 (define list-ref
     (lambda (lst num)
+      (if (and (list? lst) (>= num 0))
           (if (= num 0)
                 (car lst)
-                (flist-ref (cdr lst) (- num 1)))))
+                (list-ref (cdr lst) (- num 1)))
+          (evaluationError "list-ref expects list and non-negative integer as input"))))
+
+
 
 (define list-tail
     (lambda (lst num)
+      (if (and (list? lst) (>= num 0))
           (if (= num 0)
                 lst
-                (flist-tail (cdr lst) (- num 1)))))
+                (list-tail (cdr lst) (- num 1)))
+          (evaluationError "list-tail expects list and non-negative integer as input"))))
+
 
 (define member
     (lambda (v lst)
+      (if (list? lst)
           (cond
             ((null? lst) #f)
             ((equal? v (car lst)) lst)
-            (else (fmember v (cdr lst))))))
+            (else
+             (member v (cdr lst))))
+          (evaluationError "member expects list as one of the input"))))
+
 
 (define assq
     (lambda (v lst)
+      (if (list? lst)
           (cond
             ((null? lst) #f)
             ((eq? v (caar lst)) (car lst))
-            (else (fassq v (cdr lst))))))
-
+            (else (assq v (cdr lst))))
+          (evaluationError "assp expects list as one of the input"))))
+            
+(define append
+    (lambda x
+        (letrec ((helper (lambda (x y)
+                    (if (null? y)
+                        x
+                        (letrec ((helper2 (lambda (x)
+                                (if (null? x)
+                                    (helper (car y) (cdr y))
+                                    (if (pair? x)
+                                        (cons (car x) (helper2 (cdr x)))
+                                        (evaluationError "append expects pairs as input")
+                                        )))))
+                            (helper2 x))))))
+            (helper (quote ()) x))))            
+           
+  
 (define reverse
     (lambda (lst)
+      (if (list? lst)
           (letrec ((helper
             (lambda (lst result)
                 (if (null? lst)
                     result
                     (helper (cdr lst)
                         (cons (car lst) result))))))
-            (helper lst '()))))
+            (helper lst (quote ())))
+          (evaluationError "reverse expects a list as input"))))
 
-;;doesn't work yet
-;;(define ffilter
-;;  (lambda (f lst)
-;;      (cond ((null? lst) (quote ()))
-;;                ((eqv? #t (f (car lst)))
-;;                           (cons (car lst) (ffilter (cdr lst))))
-;;                                     (else (ffilter (cdr lst))))))
-;;                                             
-;;
-;;                                                        
-;;
-;;
+;(define map)
+
+;(define 
+
+;
+;
+;(define cadr
+;    (lambda (lst)
+;          (car (cdr lst))))
+;
+;(define cdar
+;    (lambda (lst)
+;          (cdr (car lst))))
+;
+;(define cddr
+;    (lambda (lst)
+;          (cdr (cdr lst))))
+;
+;(define caaar
+;    (lambda (lst)
+;          (car (car (car lst)))))
+;
+;(define caadr
+;    (lambda (lst)
+;          (car (car (cdr lst)))))
+;
+;(define cadar
+;    (lambda (lst)
+;          (car (cdr (car lst)))))
+;
+;(define caddr
+;    (lambda (lst)
+;          (car (cdr (cdr lst)))))
+;
+;(define cdaar
+;    (lambda (lst)
+;          (cdr (car (car lst)))))
+;
+;(define cdadr
+;    (lambda (lst)
+;          (cdr (car (cdr lst)))))
+;
+;(define cddar
+;    (lambda (lst)
+;          (cdr (cdr (car lst)))))
+;
+;(define cdddr
+;    (lambda (lst)
+;          (cdr (cdr (cdr lst)))))
+
+
+
+(define filter
+  (lambda (f lst)
+    (cond ((null? lst)
+           (quote ()))
+          ((f (car lst))
+           (cons (car lst)
+                  (filter f (cdr lst))))
+          (else (filter f (cdr lst))))))
+
+
+
+(define foldl
+  (lambda (f init lst)
+    (if (null? lst)
+        init
+        (foldl f
+               (f (car lst) init)
+               (cdr lst)))))
+
+
+(define foldr
+  (lambda (f init lst)
+    (if (null? lst)
+        init
+        (f (car lst)
+           (foldr f init (cdr lst))))))
+
+
+;test cases:
+;member 有问题
+;会print extra 空格
+
+(list 1 2 3)
+
+(caar (quote ((1 2) (3 4) (5 6) (7 8)))) 
+
+(cadr (quote ((1 2) (3 4) (5 6) (7 8))))
+
+(list? (quote (cons 1 2)))
+
+(length (quote (1 2 3)))
+
+(list-ref (quote (0 1 2 3 4)) 3)
+
+(list-tail (quote (0 1 2 3 4)) 3)
+
+(member (quote a) (quote (a b c)))
+;(member (quote a) (quote (1 2 3 a b c)))
+(member (list (quote a))
+        (quote (b (a) c)))
+
+(assq 2 (quote ((0 a) (1 b) (2 c) (3 d))))
+
+(append (quote (a b)) (quote (c d)))
+
+(reverse (quote (1 2 3)))
+;(reverse 3)
+
+;(map (lambda (x) (* x x)) '(1 2 3))
+
+(filter odd? (quote (1 2 3)))             
+; (foldl cons (quote ()) (quote (1 2 3)))           
+ ;(foldr cons (quote ()) (quote (1 2 3))) 

@@ -31,7 +31,7 @@
   (lambda (x y)
     (if (and (number? x) (number? y))
         (or (= x y) (not (<= x y)))
-        (evaluationError">= expects numbers as input"))))
+        (evaluationError ">= expects numbers as input"))))
          
 (define <
   (lambda (x y)
@@ -240,4 +240,20 @@
               ((zero? (modulo y x)) y)
               (else (/ (abs (* x y)) (gcd x y))))
         (evaluationError "lcm expects rational numbers as input"))))
-          
+
+
+;;6.more arithmetic procedures
+;;=        zero?             max         modulo
+;;>=       positive?         min         floor
+;;<        negative?         abs         ceiling
+;;>        even?             gcd         truncate
+;;         odd?              lcm         round
+
+
+(= 3 5)
+(zero? -3)
+(max 7 0)
+(min 3 4)
+;(eq? (quote s) 4)
+(eq? 3 4)
+       
