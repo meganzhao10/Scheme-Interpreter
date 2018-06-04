@@ -1,2 +1,23 @@
-;test lists.scm
-(load "lists.scm")
+;test begin
+(begin) 
+ 
+ (begin 3) 
+  
+  (define x 4) 
+  (begin (set! x 100) x) 
+   
+   (let ((x 4) 
+           (y 5)) 
+               (begin (set! x 100) 
+                          (+ x y))) 
+                           
+                            
+                            (or) 
+                             
+                             (or 1) 
+                              
+                              (or #f 5) 
+                               
+                               (or #f) 
+                                
+                                (or 5 #f #t) 
