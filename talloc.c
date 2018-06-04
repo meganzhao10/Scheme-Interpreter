@@ -7,11 +7,13 @@
 #include <assert.h>
 #include <stdio.h>
 #include "talloc.h"
+#include <string.h>
 #include "linkedlist.h"
 
 // The global static variable
 static Value *head;
-//static Value *usefulListHead;
+static Value *usefulListHead;
+
 /*
  * Create an empty list (a new Value object of type NULL_TYPE).
  *
@@ -71,7 +73,7 @@ void *talloc(size_t size){
 		return newHead;
 	}
 	newHead->type = PTR_TYPE;
-    newHead->useful = false;
+//    newHead->useful = false;
 	newHead->p = malloc(size);
 //    newHead->useful = false;
 	if (!newHead->p){
@@ -109,81 +111,4 @@ void tfree(){
 void texit(int status){
 	tfree();
 	exit(status);
-}
-
-
-/*
- * Helper function to check whether a pointer is useful in the given
- * frame.
- */
-bool useful(Value *pointer, Frame *frame) {
-    return true;
-}
-
-/* 
- * Start with objects bound in the top/global environment, mark them 
- * as useful. Recursively mark everything pointed by them as useful
- * as well.
- */
-void mark(Frame *global){
-//    usefulListHead = talloc_makeNull();
-//    usefulListHead->useful = true;
-    global->useful = true;
-    markValue(global->bindings);
-    
-//    usefulListHead->useful = true;
-//    // Add the usefulListHead to usefulList
-//    Value *wrapper = malloc(sizeof(Value));
-//    wrapper->p = global;
-//    usefulListHead = cons(wrapper, usefulListHead);
-//    printf("%p\n", global);
-//    printf("%p\n", &global);
-////    
-    Value *cur = head;
-    while (cur->type != NULL_TYPE) {
-        if (car(cur)->p == global) {
-//            car(cur)->useful = true;
-//            car(cur)->useful = true;
-            Value *carVal = car(cur)->p;
-            Frame *carFrame = car(cur)->p;
-            if (carVal->useful || carFrame->useful) {
-                printf("made it\n");
-            }
-            printf("trye\n");
-        }
-        cur = cdr(cur);
-    }
-//    Value *bindings = global->bindings;
-//    
-//    Value *cur = head;
-//    while (cur->type != NULL_TYPE) {
-//        if (useful(car(cur)->p, global)) {
-//            car(cur)->useful = true;
-//        } else {
-//            car(cur)->useful = false;
-//        }
-//        cur = cdr(cur);
-//    }
-}
-
-/* 
- * Sweep useless objects by: i) free the memory ii) remove the pointer
- * from the active list of all allocated pointers so that we don't 
- * double free.
- */
-void sweep() {
-//    Value *cur = head;
-//    
-//    while (cur->type != NULL_TYPE) {
-////        Value *my = car(cur)->p;
-////        printf("type of %i\n", my->type);
-//        if (!car(cur->useful)) {
-//            // Free memmory, remove from list
-//        }
-//        cur = cdr(cur);
-//    }
-//    free(usefulListHead);
-    printf("Huh?");
-//    free(car(usefulListHead));
-//    free(usefulListHead);
 }
