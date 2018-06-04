@@ -13,6 +13,7 @@
 #include "tokenizer.h"
 #include "talloc.h"
 #include "value.h"
+#include <unistd.h>
 
 /* 
  * Check whether the input character is a delimiter.
@@ -372,6 +373,11 @@ Value *tokenize(FILE *src){
         printf("Error! Not enough memory!\n");
         return list;
     }
+    bool interactive = isatty(fileno(stdin));
+    if (interactive) {
+        printf("> ");
+    }
+    int count = 0; 
     charRead = fgetc(src);
     while (charRead != EOF) {
         Value *entry = talloc(sizeof(Value));
@@ -381,8 +387,14 @@ Value *tokenize(FILE *src){
         }
         if (charRead == '(') {
             entry->type = OPEN_TYPE;
+            if (interactive) {
+                count += 1;
+            }
         } else if (charRead == ')') {
             entry->type = CLOSE_TYPE;
+            if (interactive) {
+                count -= 1;
+            }
         } else if (charRead == '#') {
             bool success = parseBool(entry, src);
             if (!success) {
@@ -430,6 +442,12 @@ Value *tokenize(FILE *src){
             }
             charRead = fgetc(src);
             continue;
+        } else if (interactive && charRead == '\n') {
+            if (count == 0) {
+                return reverse(list);
+            } else {
+                printf(". ");
+            }
         } else if (charRead == '\n' || charRead == '\t' || charRead == ' ') {
             charRead = fgetc(src);
             continue;
@@ -443,10 +461,13 @@ Value *tokenize(FILE *src){
             printf("Error! Unrecognized symbol %c in input!\n", charRead);
             texit(1);
         }
-        list = cons(entry, list);
-
+        if (!(interactive && charRead == '\n')) {
+            list = cons(entry, list);
+        }
         charRead = fgetc(src);
     }
+    if (interactive && charRead == EOF)
+        texit(1);
     return reverse(list);
 }
 
