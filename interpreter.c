@@ -936,9 +936,10 @@ Value *primitiveLeq(Value *args) {
     
     if (car(args)->type == INT_TYPE) {
         cur_largest = car(args)->i;
-    } else if (result->type == DOUBLE_TYPE) {
+    } else if (car(args)->type == DOUBLE_TYPE) {
         cur_largest = car(args)->d;
     } else {
+        printf("type: %i\n", car(args)->type);
         printf("Expected numerical arguments for <=. ");
         evaluationError();
     }
