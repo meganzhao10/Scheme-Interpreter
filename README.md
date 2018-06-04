@@ -57,8 +57,6 @@ interpreter.c
 
 
 ##### Extensions 
-##### Garbage collection
-A genuine attempt was made to implement the garbage collector, but we could not figure out how to implement mark and sweep without generating much overhead. We also tried to implement stop and copy instead of mark and sweep, but got stuck on copying the PRIMITIVE_TYPE functions. Given the time constraint, we decided to pursue other extensions instead. 
 ###### Main file:
 N/A
 ###### A simple interface
@@ -68,6 +66,7 @@ tokenizer.c main.c
 
 ##### ' as the shorthand for quote special form NOT YET!!!!!
 For example, '(2 2 8) as the shorthand for (quote (2 2 8))
+Currently doesn't work for nested lists
 ###### Main file:
 tokenizer.c 
 
@@ -86,7 +85,6 @@ To implement the following functions using only special forms and primitives tha
 ###### Main file:
 math.scm
 
-##### More to come????
 
 
 
