@@ -1,13 +1,23 @@
 # Interpreter for Scheme (R5RS) written in C.
 
 ## How To Run
+```
+# Clone this repository
+$ git clone https://github.com/meganzhao/Scheme-Interpreter.git
+
+# Go into the repository
+$ cd Scheme-Interpreter
+
+# Make file
+$ make interpreter
+```
+You can either run the interface or Scheme files:
 ### Interactive interface
 ```
 $ ./interpreter
 # Type in Scheme command, for example:
 > (+ 1 2)
 3
->
 ```
 ### Run Scheme test files
 ```
