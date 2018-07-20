@@ -1,12 +1,18 @@
 # Interpreter for Scheme (R5RS) written in C.
 
 ## How To Run
+### Interactive interface
 ```
-# Run the interactive interface
 $ ./interpreter
 # Type in Scheme command, for example:
 > (+ 1 2)
 3
+>
+```
+### Run Scheme test files
+```
+# To run test file test.eval.input.01
+$ ./interpreter < test.eval.input.01
 ```
 
 ## Phases of this project
