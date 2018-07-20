@@ -1,5 +1,14 @@
 # Interpreter for Scheme (R5RS) written in C.
 
+## How To Run
+```
+# Run the interactive interface
+$ ./interpreter
+# Type in Scheme command, for example:
+> (+ 1 2)
+3
+```
+
 ## Phases of this project
 ### Phase 1: Linked List
 To implement a linked list that will be used throughout the interpreter project.
