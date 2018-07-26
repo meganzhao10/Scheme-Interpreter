@@ -1,4 +1,4 @@
-# Interpreter for Scheme (R5RS) written in C.
+# A interpreter for Scheme (R5RS) written in C that uses a linked list as the only data structure
 
 ## How To Run
 ```
